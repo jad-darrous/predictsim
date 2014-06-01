@@ -1,4 +1,0 @@
-internship
-==========
-
-lig_internship
