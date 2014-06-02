@@ -1,0 +1,243 @@
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  2 JUN 2014 12:16
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**\nonstopmode \input{report.tex}
+(./report.tex (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (./ijcai11.sty
+Conference Style, version of 6 September 1995 (revised Nov 2010)
+\titlebox=\skip43
+Named Citation Style, version of 30 November 1994
+) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/share/texlive/texmf-dist/tex/latex/datetime/datetime.sty
+Package: datetime 2013/09/10 v2.59 Date Time Package
+
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2011/01/03 v2.1 e-TeX tools for LaTeX
+
+(/usr/share/texlive/texmf-dist/tex/latex/etex-pkg/etex.sty
+Package: etex 1998/03/26 v2.0 eTeX basic definition package (PEB)
+\et@xins=\count87
+)
+\etb@tempcnta=\count88
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fmtcount/fmtcount.sty
+Package: fmtcount 2013/08/17 v2.03
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fmtcount/fcprefix.sty
+Package: fcprefix 2012/09/28
+
+(/usr/share/texlive/texmf-dist/tex/latex/fmtcount/fcnumparser.sty
+Package: fcnumparser 2012/09/28
+\fc@digit@counter=\count89
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks15
+\ex@=\dimen103
+)
+\c@padzeroesN=\count90
+\fc@tmpcatcode=\count91
+\@DT@modctr=\count92
+\@ordinalctr=\count93
+\@orgargctr=\count94
+\@strctr=\count95
+\@tmpstrctr=\count96
+\@DT@loopN=\count97
+\@DT@X=\count98
+
+(/usr/share/texlive/texmf-dist/tex/latex/fmtcount/fc-english.def
+File: fc-english.def 2013/08/17
+))
+(/usr/share/texlive/texmf-dist/tex/latex/datetime/datetime-defaults.sty
+Package: datetime-defaults 2013/09/10
+)
+\@day=\count99
+\@month=\count100
+\@year=\count101
+\c@HOUR=\count102
+\c@HOURXII=\count103
+\c@MINUTE=\count104
+\c@TOHOUR=\count105
+\c@TOMINUTE=\count106
+\c@SECOND=\count107
+\currenthour=\count108
+\currentminute=\count109
+\currentsecond=\count110
+Package datetime Info: No datetime.cfg file found, using default settings on in
+put line 308.
+\@dtctr=\count111
+\dayofyear=\count112
+\dayofweek=\count113
+LaTeX Info: Redefining \today on input line 736.
+\dt@a=\toks16
+\dt@b=\toks17
+)
+(./report.aux)
+\openout1 = `report.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 39.
+ (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 41.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 41.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 41.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 41.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 41.
+
+Overfull \hbox (245.81128pt too wide) detected at line 53
+[] 
+ []
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 76.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 80.
+
+LaTeX Warning: Citation `gottlob:nonmon' on page 1 undefined on input line 99.
+
+
+LaTeX Warning: Citation `gottlob:nonmon' on page 1 undefined on input line 100.
+
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 108.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 108.
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+
+
+
+]
+
+LaTeX Warning: Citation `gottlob:nonmon' on page 2 undefined on input line 174.
+
+
+
+LaTeX Warning: Citation `abelson-et-al:scheme' on page 2 undefined on input lin
+e 176.
+
+
+LaTeX Warning: Citation `bgf:Lixto' on page 2 undefined on input line 177.
+
+
+LaTeX Warning: Citation `brachman-schmolze:kl-one' on page 2 undefined on input
+ line 178.
+
+
+LaTeX Warning: Citation `nebel:jair-2000' on page 2 undefined on input line 180
+.
+
+
+LaTeX Warning: Citation `gls:hypertrees' on page 2 undefined on input line 181.
+
+
+
+LaTeX Warning: Citation `levesque:functional-foundations' on page 2 undefined o
+n input line 181.
+
+
+LaTeX Warning: Citation `abelson-et-al:scheme' undefined on input line 182.
+
+
+LaTeX Warning: Citation `bgf:Lixto' undefined on input line 183.
+
+
+LaTeX Warning: Citation `brachman-schmolze:kl-one' undefined on input line 184.
+
+
+
+LaTeX Warning: Citation `gottlob:nonmon' undefined on input line 185.
+
+
+LaTeX Warning: Citation `gls:hypertrees' undefined on input line 186.
+
+
+LaTeX Warning: Citation `levesque:functional-foundations' undefined on input li
+ne 187.
+
+
+LaTeX Warning: Citation `levesque:belief' undefined on input line 188.
+
+
+LaTeX Warning: Citation `nebel:jair-2000' undefined on input line 189.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 195.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 234.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 237.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+) (./report.bbl
+
+LaTeX Warning: Empty `thebibliography' environment on input line 3.
+
+) [2] (./report.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1458 strings out of 493304
+ 18652 string characters out of 6139871
+ 88918 words of memory out of 5000000
+ 4905 multiletter control sequences out of 15000+600000
+ 26556 words of font info for 52 fonts, out of 8000000 for 9000
+ 957 hyphenation exceptions out of 8191
+ 36i,10n,21p,1009b,244s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
+utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (2 pages, 66499 bytes).
+PDF statistics:
+ 32 PDF objects out of 1000 (max. 8388607)
+ 22 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
