@@ -31,7 +31,7 @@
 
 
 \title{Master 1 MoSIG Research Project Report\\
-Learning Job Runtimes in Homogenous Clusters}
+Learning Job Runtimes in Homogenous HPC Systems}
 \author{Valentin Reis\\
 Supervised by: Denis Trystram \& Eric Gaussier.\\
 }
@@ -62,205 +62,122 @@ to\hsize{\vrule\kern3pt\vbox{\kern3pt
 \end{abstract}
 
 \section{Introduction}
-High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and system administration.
+High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and systems engineering.
 
-The ephemeral nature and broad range of existing architecture of such systems make the development and application of theoretical results difficult.
-For instance, the topological models of these systems regularly change on a yearly (even weekly, in the case of computing grids) basis, and the task of finding scheduling strategies which are robust to those changes is a current research problem.
+The ephemeral nature, and broad range of existing architectures of such systems make the development and application of theoretical results difficult.
+New schemes for distributing resources (e.g.\ memory caches, hard drives, processing units, RAM memory) are ubiquitous. Moreover, the topology of a HPC system can change on a monthly or weekly basis, with the addition of new hardware.
+Finding scheduling, and resource management strategies which can adapt to those changes is a current research problem.
 
-In addition, the input data of the decisional part of these systems presents many peculiarities. For instance, and this is the focus of this research project, the run time of a given job on a specific system is seldom known in advance.
+In addition, the input data these systems have to work with presents many peculiarities. The nature of the information which users provide is very often loose, ( e.g.\ with only upper and/or lower bounds provided ). For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, however an upper bound may be given by the user.
 
 As a consequence of these difficulties most free, open-source and commercial resource management software use simple heuristics, which at best provide bounds on their performance, and at worst guarantee a few functional properties.
-An example of such a strategy is the First Come First Serve (FCFS) strategy to schedule parallel jobs on a homogenous cluster of machines. Among other properties (such as robustness to weak information about job run times), this strategy guarantees the avoidance of starvation.
+An example of such a strategy is the First Come First Serve (FCFS) strategy to schedule parallel jobs on a homogenous cluster of machines. Among other properties (such as robustness to weak information about the amount of time a job will run on the system), this strategy guarantees the avoidance of starvation.
 
-As hinted previously, one of the frontiers to apply more sophisticated techniques in order to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
-Most resource management software (including the SLURM, OpenPBS, OpenLava and OAR systems) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time (the user-provided estimate will be called \textbf{walltime} in the rest of the paper) of the job.
-The the true run time ( now reffered as \textbf{runtime} ) of a job with respect to a given affected topology  is of great interest, as the scheduling policies are highly dependent on this data to provide good solutions.
+As mentionned previously, one of the aspects that must be dealt with in order to apply more sophisticated techniques to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
+
+\subsection{Research Direction}
+The general direction we are headed in, in the course of this research project, is to deal with the input data of the resource management systems.
+In particular, we seek to apply Machine Learning techniques in order to reduce uncertainty in the data and extract information and/or structure relevant for subsequent use by a scheduling algorithm. We will be working only with the problem of presenting input data in the most valuable way possible to a scheduling algorithm, and will not deal with how to use this data beyond simple cases. As for showing the added value of the specific the information we choose to extract, references from the HPC scheduling litterature will provide ground to stand on.
+
+\subsection{Job runtimes}
+Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job. This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, this information is over-estimated by the users, if they choose to provide it. The following section will look in depth at this relationship.
+
+The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \ref{truc}. We will refer to this quantity as the \textbf{runtime} of a job.
+It must be clear that the \textbf{runtime} of a job is only defined with respect to a specific processing environment to which it might be affected.
+This can include and is not limited to, the network topology of the processing units, the availability of shared memory, message passing costs, and the operating system supporting the computations.
 
 
 \subsection{Problem Statement}
 The general problem statement we are dealing with is the following:
 
+TODO: predict runtime on a homogenous grid, blabla.
 
-\subsection{Word Processing Software}
+TODO: insofar as runtime is important, lets do this..
 
 \section{Motivation}
 
-\subsection{Layout}
+\subsection{Importance of \textbf{runtime}}
+\label{sub:importance_of_runtime}
+TODO: to emphasise again... provide more references.
+
+TODO: moreover, show existing solutions such as SLURM which use the walltime instead (leading to the next subsection)
+
+% subsection importance_of_runtime (end)
+
+\subsection{\textbf{reqtime} vs \textbf{runtime} on a real system}
+\label{sub:reqtime_vs_runtime_on_a_real_system}
+
+TODO: show the curie log.
+
+% subsection reqtime_vs_runtime_on_a_real_system (end)
 
 
-\subsection{Format of Electronic Manuscript}
+\section{State of the art in predicting \textbf{runtime}}
 
 
-\subsubsection{Blind Review}
+\subsection{Nature of the prediction}
+\label{sub:nature_of_the_prediction}
 
-In order to make blind reviewing possible, authors must omit their
-names and affiliations when submitting the paper for review. In place
-of names and affiliations, provide a list of content areas. When
-referring to one's own work, use the third person rather than the
-first person. For example, say, ``Previously,
-Gottlob~\shortcite{gottlob:nonmon} has shown that\ldots'', rather
-than, ``In our previous work~\cite{gottlob:nonmon}, we have shown
-that\ldots'' Try to avoid including any information in the body of the
-paper or references that would identify the authors or their
-institutions. Such information can be added to the final camera-ready
-version for publication.
+TODO: -what to predict: value?, confidence interval?, distribution? whith which algorithms can we use those?
 
-\subsection{Abstract}
+% subsection nature_of_the_prediction (end)
 
-Place the abstract at the beginning of the first column 3$''$ from the
-top of the page, unless that does not leave enough room for the title
-and author information. Use a slightly smaller width than in the body
-of the paper. Head the abstract with ``Abstract'' centered above the
-body of the abstract in a 12-point bold font. The body of the abstract
-should be in the same font as the body of the paper.
+\subsection{Predicting a value}
+\label{sub:predicting_a_value}
 
-The abstract should be a concise, one-paragraph summary describing the
-general thesis and conclusion of your paper. A reader should be able
-to learn the purpose of the paper and the reason for its importance
-from the abstract. The abstract should be no more than 200 words long.
+TODO: -give the references and explain the historical methods, gibbons historical scheduler, the tsafir et al paper with mean of two last runtimes values userwise..
 
-\subsection{Text}
+% subsection predicting_a_value (end)
 
-The main body of the text immediately follows the abstract. Use
-10-point type in a clear, readable font with 1-point leading (10 on
-11).
+\subsection{Predicting a distribution}
+\label{sub:predicting_a_distribution}
 
-Indent when starting a new paragraph, except after major headings.
+TODO: -give the references and explain the probabilistic backfilling thing..
 
-\subsection{Headings and Sections}
+% subsection predicting_a_distribution (end)
 
-When necessary, headings should be used to separate major sections of
-your paper. (These instructions use many headings to demonstrate their
-appearance; your paper should have fewer headings.)
 
-\subsubsection{Section Headings}
+\section{Our approach}
+\label{sec:our_approach}
 
-Print section headings in 12-point bold type in the style shown in
-these instructions. Leave a blank space of approximately 10 points
-above and 4 points below section headings.  Number sections with
-arabic numerals.
+\subsection{Random Forests}
+\label{sub:random_forests}
+TODO: -explain our approach, why it could lead to better results (external info+signal locality(ref hmm thesis for locality..))
+% subsection random_forests (end)
 
-\subsubsection{Subsection Headings}
+\subsection{Explainability}
+\label{sub:explainability}
+TODO: -explain one advantage of random forests: discussion about the trees after learning.. 
+% subsection explainability (end)
 
-Print subsection headings in 11-point bold type. Leave a blank space
-of approximately 8 points above and 3 points below subsection
-headings. Number subsections with the section number and the
-subsection number (in arabic numerals) separated by a
-period.
+% section our_approach (end)
 
-\subsubsection{Subsubsection Headings}
+\section{Preliminary Results}
+\label{sec:preliminary_results}
 
-Print subsubsection headings in 10-point bold type. Leave a blank
-space of approximately 6 points above subsubsection headings. Do not
-number subsubsections.
+TODO:results..
 
-\subsubsection{Special Sections}
+% section preliminary_results (end)
 
-You may include an unnumbered acknowledgments section, including
-acknowledgments of help from colleagues, financial support, and
-permission to publish.
+\section{Conclusions}
+\label{sec:conclusions}
 
-Any appendices directly follow the text and look like sections, except
-that they are numbered with capital letters instead of arabic
-numerals.
+TODO:conclure..
 
-The references section is headed ``References,'' printed in the same
-style as a section heading but without a number. A sample list of
-references is given at the end of these instructions. Use a consistent
-format for references, such as that provided by Bib\TeX{}. The reference
-list should not include unpublished work.
+% section conclusions (end)
 
-\subsection{Citations}
 
-Citations within the text should include the author's last name and
-the year of publication, for example~\cite{gottlob:nonmon}.  Append
-lowercase letters to the year in cases of ambiguity.  Treat multiple
-authors as in the following examples:~\cite{abelson-et-al:scheme}
-or~\cite{bgf:Lixto} (for more than two authors) and
-\cite{brachman-schmolze:kl-one} (for two authors).  If the author
-portion of a citation is obvious, omit it, e.g.,
-Nebel~\shortcite{nebel:jair-2000}.  Collapse multiple citations as
-follows:~\cite{gls:hypertrees,levesque:functional-foundations}.
-\nocite{abelson-et-al:scheme}
-\nocite{bgf:Lixto}
-\nocite{brachman-schmolze:kl-one}
-\nocite{gottlob:nonmon}
-\nocite{gls:hypertrees}
-\nocite{levesque:functional-foundations}
-\nocite{levesque:belief}
-\nocite{nebel:jair-2000}
+\section{Acknowledgements}
+\label{sec:conclusions}
 
-\subsection{Footnotes}
+TODO:remercier..
 
-Place footnotes at the bottom of the page in a 9-point font.  Refer to
-them with superscript numbers.\footnote{This is how your footnotes
-should appear.} Separate them from the text by a short
-line.\footnote{Note the line separating these footnotes from the
-text.} Avoid footnotes as much as possible; they interrupt the flow of
-the text.
+% section conclusions (end)
 
-\section{Illustrations}
-
-Place all illustrations (figures, drawings, tables, and photographs)
-throughout the paper at the places where they are first discussed,
-rather than at the end of the paper. If placed at the bottom or top of
-a page, illustrations may run across both columns.
-
-Illustrations must be rendered electronically or scanned and placed
-directly in your document. All illustrations should be in black and
-white, as color illustrations may cause problems. Line weights should
-be 1/2-point or thicker. Avoid screens and superimposing type on
-patterns as these effects may not reproduce well.
-
-Number illustrations sequentially. Use references of the following
-form: Figure 1, Table 2, etc. Place illustration numbers and captions
-under illustrations. Leave a margin of 1/4-inch around the area
-covered by the illustration and caption.  Use 9-point type for
-captions, labels, and other text in illustrations.
-
-\section*{Acknowledgments}
-
-The preparation of these instructions and the \LaTeX{} and Bib\TeX{}
-files that implement them was supported by Schlumberger Palo Alto
-Research, AT\&T Bell Laboratories, and Morgan Kaufmann Publishers.
-Preparation of the Microsoft Word file was supported by IJCAI.  An
-early version of this document was created by Shirley Jowell and Peter
-F. Patel-Schneider.  It was subsequently modified by Jennifer
-Ballentine and Thomas Dean, Bernhard Nebel, and Daniel Pagenstecher.
-These instructions are the same as the ones for IJCAI--05, prepared by
-Kurt Steinkraus, Massachusetts Institute of Technology, Computer
-Science and Artificial Intelligence Lab.
-
-\appendix
-
-\section{\LaTeX{} and Word Style Files}\label{stylefiles}
-
-The \LaTeX{} and Word style files are available on the IJCAI--11
-website, {\tt http://www.ijcai-11.org/}.
-These style files implement the formatting instructions in this
-document.
-
-The \LaTeX{} files are {\tt ijcai11.sty} and {\tt ijcai11.tex}, and
-the Bib\TeX{} files are {\tt named.bst} and {\tt ijcai11.bib}. The
-\LaTeX{} style file is for version 2e of \LaTeX{}, and the Bib\TeX{}
-style file is for version 0.99c of Bib\TeX{} ({\em not} version
-0.98i). The {\tt ijcai11.sty} file is the same as the {\tt
-ijcai07.sty} file used for IJCAI--07.
-
-The Microsoft Word style file consists of a single file, {\tt
-ijcai11.doc}. This template is the same as the one used for
-IJCAI--07.
-
-These Microsoft Word and \LaTeX{} files contain the source of the
-present document and may serve as a formatting sample.
-
-Further information on using these styles for the preparation of
-papers for IJCAI--11 can be obtained by contacting {\tt
-pcchair11@ijcai.org}.
 
 %% The file named.bst is a bibliography style file for BibTeX 0.99c
 \bibliographystyle{named}
-\bibliography{ijcai11}
+\bibliography{report}
 
 \end{document}
 

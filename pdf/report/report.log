@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  2 JUN 2014 12:16
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  2 JUN 2014 23:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -97,7 +97,11 @@ LaTeX Info: Redefining \today on input line 736.
 \dt@a=\toks16
 \dt@b=\toks17
 )
-(./report.aux)
+(./report.aux
+
+LaTeX Warning: Label `sec:conclusions' multiply defined.
+
+)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
@@ -131,113 +135,49 @@ Overfull \hbox (245.81128pt too wide) detected at line 53
 [] 
  []
 
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 76.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 80.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 78.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 83.
 
-LaTeX Warning: Citation `gottlob:nonmon' on page 1 undefined on input line 99.
+LaTeX Warning: Reference `truc' on page 1 undefined on input line 85.
 
 
-LaTeX Warning: Citation `gottlob:nonmon' on page 1 undefined on input line 100.
+Underfull \vbox (badness 2088) has occurred while \output is active []
 
-
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 108.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 108.
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
 
-]
-
-LaTeX Warning: Citation `gottlob:nonmon' on page 2 undefined on input line 174.
-
-
-
-LaTeX Warning: Citation `abelson-et-al:scheme' on page 2 undefined on input lin
-e 176.
-
-
-LaTeX Warning: Citation `bgf:Lixto' on page 2 undefined on input line 177.
-
-
-LaTeX Warning: Citation `brachman-schmolze:kl-one' on page 2 undefined on input
- line 178.
-
-
-LaTeX Warning: Citation `nebel:jair-2000' on page 2 undefined on input line 180
-.
-
-
-LaTeX Warning: Citation `gls:hypertrees' on page 2 undefined on input line 181.
-
-
-
-LaTeX Warning: Citation `levesque:functional-foundations' on page 2 undefined o
-n input line 181.
-
-
-LaTeX Warning: Citation `abelson-et-al:scheme' undefined on input line 182.
-
-
-LaTeX Warning: Citation `bgf:Lixto' undefined on input line 183.
-
-
-LaTeX Warning: Citation `brachman-schmolze:kl-one' undefined on input line 184.
-
-
-
-LaTeX Warning: Citation `gottlob:nonmon' undefined on input line 185.
-
-
-LaTeX Warning: Citation `gls:hypertrees' undefined on input line 186.
-
-
-LaTeX Warning: Citation `levesque:functional-foundations' undefined on input li
-ne 187.
-
-
-LaTeX Warning: Citation `levesque:belief' undefined on input line 188.
-
-
-LaTeX Warning: Citation `nebel:jair-2000' undefined on input line 189.
-
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 195.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 234.
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 237.
-
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) (./report.bbl
+] (./report.bbl
 
 LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
-) [2] (./report.aux)
+) [2
+
+] (./report.aux)
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 1458 strings out of 493304
- 18652 string characters out of 6139871
- 88918 words of memory out of 5000000
- 4905 multiletter control sequences out of 15000+600000
- 26556 words of font info for 52 fonts, out of 8000000 for 9000
+ 1405 strings out of 493304
+ 18029 string characters out of 6139871
+ 87918 words of memory out of 5000000
+ 4865 multiletter control sequences out of 15000+600000
+ 18649 words of font info for 39 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  36i,10n,21p,1009b,244s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf
--dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
-utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (2 pages, 66499 bytes).
+e/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/urw/times/utmr8a.pfb>
+Output written on report.pdf (2 pages, 37635 bytes).
 PDF statistics:
- 32 PDF objects out of 1000 (max. 8388607)
- 22 compressed objects within 1 object stream
+ 20 PDF objects out of 1000 (max. 8388607)
+ 13 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
