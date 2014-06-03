@@ -2,23 +2,11 @@ This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: named.bst
-I couldn't open database file ijcai11.bib
----line 28 of file report.aux
- : \bibdata{ijcai11
- :                 }
-I'm skipping whatever remains of this command
-I found no database files---while reading file report.aux
-Warning--I didn't find a database entry for "gottlob:nonmon"
-Warning--I didn't find a database entry for "abelson-et-al:scheme"
-Warning--I didn't find a database entry for "bgf:Lixto"
-Warning--I didn't find a database entry for "brachman-schmolze:kl-one"
-Warning--I didn't find a database entry for "nebel:jair-2000"
-Warning--I didn't find a database entry for "gls:hypertrees"
-Warning--I didn't find a database entry for "levesque:functional-foundations"
-Warning--I didn't find a database entry for "levesque:belief"
+I found no \citation commands---while reading file report.aux
+Database file #1: report.bib
 You've used 0 entries,
             2439 wiz_defined-function locations,
-            560 strings with 4618 characters,
+            550 strings with 4460 characters,
 and the built_in function-call counts, 22 in all, are:
 = -- 0
 > -- 0
@@ -57,4 +45,4 @@ warning$ -- 0
 while$ -- 0
 width$ -- 0
 write$ -- 2
-(There were 2 error messages)
+(There was 1 error message)
