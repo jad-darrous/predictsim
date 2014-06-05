@@ -124,7 +124,7 @@ if tool=="random_forest":
     err=forest.predict(Xtest)-ytest
     forest_squares=np.mean(err**2)
 elif tool=="svm":
-    pass
+
 
 
 
