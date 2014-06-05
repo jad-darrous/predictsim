@@ -107,7 +107,7 @@ if encoding=="onehot":
     enc_group_id = preprocessing.OneHotEncoder()
     X_onehot_group_id =np.array( enc_group_id.fit_transform(np.reshape(X[:,4],(-1,1))).toarray())
     enc_day_of_week = preprocessing.OneHotEncoder()
-    X_onehot_day_of_week =np.array( enc_onehot_day_of_week.fit_transform(np.reshape(X[:,6],(-1,1))).toarray())
+    X_onehot_day_of_week =np.array( enc_day_of_week.fit_transform(np.reshape(X[:,6],(-1,1))).toarray())
     enc_last_status = preprocessing.OneHotEncoder()
     X_onehot_last_status =np.array( enc_last_status.fit_transform(np.reshape(X[:,10],(-1,1))).toarray())
     enc_last_status2 = preprocessing.OneHotEncoder()
