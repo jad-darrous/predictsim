@@ -102,6 +102,7 @@ np.savetxt("foo.csv", X, delimiter=" ",fmt='%.2e',)
 y=data[:,3]
 
 if encoding=="onehot":
+    mms = preprocessing.MinMaxScaler()
     enc_user_id = preprocessing.OneHotEncoder()
     X_onehot_user_id =np.array( enc_user_id.fit_transform(np.reshape(X[:,3],(-1,1))).toarray())
     enc_group_id = preprocessing.OneHotEncoder()
@@ -109,9 +110,9 @@ if encoding=="onehot":
     enc_day_of_week = preprocessing.OneHotEncoder()
     X_onehot_day_of_week =np.array( enc_day_of_week.fit_transform(np.reshape(X[:,6],(-1,1))).toarray())
     enc_last_status = preprocessing.OneHotEncoder()
-    X_onehot_last_status =np.array( enc_last_status.fit_transform(np.reshape(X[:,10],(-1,1))).toarray())
+    X_onehot_last_status =np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X[:,10],(-1,1)))).toarray())
     enc_last_status2 = preprocessing.OneHotEncoder()
-    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(np.reshape(X[:,11],(-1,1))).toarray())
+    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X[:,11],(-1,1)))).toarray())
     X=np.delete(X,[3,4,6,10,11],1)
     X=np.hstack((X,X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
 
