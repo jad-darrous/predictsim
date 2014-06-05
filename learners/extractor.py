@@ -25,26 +25,47 @@ Options:
     -v --verbose                                   print extra information and log info level data to extractor.log.
 '''
 import re
+import logging
 from collections import deque
 from docopt import docopt
 from simpy import Environment,simulate,Monitor
 from swfpy import io
 from collections import namedtuple
 import numpy as np
+import sys
 #retrieving arguments
 arguments = docopt(__doc__, version='1.0.0rc2')
-print(arguments)
 #verbose?
 if arguments['--verbose']==True:
     print(arguments)
 
-#input
-data=io.swfopen(arguments["<filename>"])
+#logging
+global_logger = logging.getLogger('global')
+hdlr = logging.FileHandler('extractor.log')
+formatter = logging.Formatter('%(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+global_logger.addHandler(hdlr)
+
+
+#logging level
+if arguments['--verbose']==True:
+    global_logger.setLevel(logging.INFO)
+else:
+    global_logger.setLevel(logging.ERROR)
 
 #Getting a simulation environment
 env = Environment()
 
+#logging function
+def global_log(msg):
+    prefix='%.1f'%env.now
+    global_logger.info(prefix+': '+msg)
+
+#input
+data=io.swfopen(arguments['<filename>'])
+
 #identify user IDs
+#print(data)
 users=set(map(lambda j: j.user_id,data))
 
 submitted_jobs={}
@@ -52,80 +73,90 @@ running_jobs={}
 user_info={}
 
 UserInfo= namedtuple('UserInfo', 'last_runtime last_runtime2 last_status last_status2 last_jobend')
-RunningJob = namedtuple('RunningJob', 'job_id start_time cores')
 
 for uid in users:
     submitted_jobs[uid]=[]
     running_jobs[uid]=[]
-    user_info[uid]=UserInfo(-1,-1,-1,-1,-1)
+    #user_info[uid]['UserInfo'](-1,-1,-1,-1,-1)
+    user_info[uid]={'last_runtime':-1, 'last_runtime2':-1, 'last_status':-1, 'last_status2':-1, 'last_jobend':-1}
 
 def job_submit(j):
+    log=lambda x: global_log("JOB SUBMIT: "+x)
+    log("entering job_sumbit with job %s" %(j,))
     submitted_jobs[j.user_id].append(j)
+    log("dbg1")
     #dataoutput for job j, including thinktime computation
     #job_id user_id last_runtime last_runtime2 last_status last_status2 thinktime running_maxlength running_sumlength amount_running running_average_runtime running_allocatedcores
-    printlist=[j.job_id,j.user_id,user_info[j.user_id].last_runtime,user_info[j.user_id].last_runtime2,user_info[j.user_id].last_status,user_info[j.user_id].last_status2]
+    printlist=[j.job_id,j.user_id,user_info[j.user_id]['last_runtime'],user_info[j.user_id]['last_runtime2'],user_info[j.user_id]['last_status'],user_info[j.user_id]['last_status2']]
+    log("dbg2")
 
-    if user_info[uid].last_jobend>=0:
-        printlist+=env.now-user_info[uid].last_jobend
-        user_info[uid].last_jobend=-1
+    if user_info[j.user_id]['last_jobend']>=0:
+        log("dbg2.1")
+        printlist.append(env.now-user_info[j.user_id]['last_jobend'])
+        log("dbg2.3")
+        user_info[j.user_id]['last_jobend']=-1
     else:
-        printlist+=-1
+        log("dbg2.2")
+        printlist.append(-1)
+    log("dbg3")
 
-    amount_running=len(running_jobs[uid])
+    amount_running=len(running_jobs[j.user_id])
     if amount_running>0:
-        running_maxlength=max([env.now-j.submit_time-j.wait_time for j in running_jobs[uid]])
-        running_sumlength=sum([env.now-j.submit_time-j.wait_time for j in running_jobs[uid]])
-        running_average_runtime=np.average([env.now-j.submit_time-j.wait_time for j in running_jobs[uid]])
-        running_allocatedcores=sum([abs(j.proc_alloc) for j in running_jobs[uid]])
+        running_maxlength=max([env.now-j2.submit_time-j2.wait_time for j2 in running_jobs[j.user_id]])
+        running_sumlength=sum([env.now-j2.submit_time-j2.wait_time for j in running_jobs[j.user_id]])
+        running_average_runtime=np.average([env.now-j2.submit_time-j2.wait_time for j in running_jobs[j.user_id]])
+        running_allocatedcores=sum([abs(j2.proc_alloc) for j2 in running_jobs[j.user_id]])
     else:
         running_maxlength=0
         running_sumlength=0
         running_average_runtime=0
         running_allocatedcores=0
 
-    s+=running_maxlength
-    s+=running_sumlength
-    s+=amount_running
-    s+=running_average_runtime
-    s+=running_allocatedcores
+    log("dbg4")
+    printlist.append(running_maxlength)
+    printlist.append(running_sumlength)
+    printlist.append(amount_running)
+    printlist.append(running_average_runtime)
+    printlist.append(running_allocatedcores)
 
     s=""
     for e in printlist:
         s+=str(e)+" "
-    print(e)
+    print(s)
+    log("dbg5")
 
-
+    #print(j.job_id)
 
 def job_start(j):
+    log=lambda x: global_log("JOB START: "+x)
+    log("entering job_start")
     running_jobs[j.user_id].append(j)
 
 def job_end(j):
+    log=lambda x: global_log("JOB END: "+x)
+    log("entering job_end")
     running_jobs[j.user_id].remove(j)
-    submitted_jobs[j.user_id].remove(j)
+    submitted_jobs[j.user_id].append(j)
     #modify data for this user
-    user_info[uid].last_runtime2=user_info[uid].last_runtime
-    user_info[uid].last_runtime=j.run_time
-    user_info[uid].last_status2=user_info[uid].last_status
-    user_info[uid].last_status=j.status
+    user_info[j.user_id]['last_runtime2']=user_info[j.user_id]['last_runtime']
+    user_info[j.user_id]['last_runtime']=j.run_time
+    user_info[j.user_id]['last_status2']=user_info[j.user_id]['last_status']
+    user_info[j.user_id]['last_status']=j.status
     #including : think about the last_jobend
     if len(running_jobs[j.user_id])==0:
-        user_info[uid].last_jobend=env.now
+        user_info[j.user_id]['last_jobend']=env.now
 
-
-def job_start(j):
-    yield env.timeout(j.submit_time)
+def job_process(j):
+    #yield env.timeout(j.submit_time)
     job_submit(j)
     yield env.timeout(j.wait_time)
     job_start(j)
     yield env.timeout(j.run_time)
     job_end(j)
 
+from simpy.util import start_delayed
 for j in data:
-    env.start(job_start(j))
-
-CommonUsers=[]
-for uid in users:
-    users.append(Common.User(env,uid,userdeques[uid],system,log))
+    start_delayed(env,job_process(j),j.submit_time)
 
 #TODO:DEL dataframe
 
@@ -153,6 +184,7 @@ for uid in users:
     #log('TERMINATOR : all users finished.')
 #env.start(terminator())
 
+#sys.setrecursionlimit(20000)
 simulate(env)
 
 print('-------------SUCCESS----------------')

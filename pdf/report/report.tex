@@ -4,13 +4,14 @@
 
 % Use the postscript times font!
 \usepackage{times}
+\usepackage[utf8x]{inputenc}
 \usepackage{datetime}
 
 \usepackage{mathptmx}
 \usepackage[T1]{fontenc}
 
 % the following package is optional:
-%\usepackage{latexsym}
+\usepackage{latexsym}
 
 % Following comment is from ijcai97-submit.tex:
 % The preparation of these files was supported by Schlumberger Palo Alto
@@ -65,25 +66,28 @@ to\hsize{\vrule\kern3pt\vbox{\kern3pt
 \end{abstract}
 
 \section{Introduction}
-High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and systems engineering.
+High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and systems engineering. We outline the two main difficulties that resource management software in this field have to face.
 
-The ephemeral nature, and broad range of existing architectures of such systems make the development and application of theoretical results difficult.
-New schemes for distributing resources (e.g.\ memory caches, hard drives, processing units, RAM memory) are ubiquitous. Moreover, the topology of a HPC system can change on a monthly or weekly basis, with the addition of new hardware.
+First, the ephemeral nature, and broad range of existing architectures of such systems make the development and application of theoretical results difficult.
+New schemes for distributing resources (e.g.\ memory caches, hard drives, processing units, RAM memory) are ubiquitous and their rate of occurence is high. Moreover, the topology of a HPC system can change on a monthly or weekly basis, with the addition of new hardware.
 Finding scheduling, and resource management strategies which can adapt to those changes is a current research problem.
 
-In addition, the input data these systems have to work with presents many peculiarities. The nature of the information which users provide is very often loose, ( e.g.\ with only upper and/or lower bounds provided ). For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, however an upper bound may be given by the user.
+In addition, the input data these systems have to work with presents many peculiarities. The nature of the information which users provide is very often loose ( e.g.\ with only upper and/or lower bounds provided ). For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, however an upper bound may be given by the user.
 
 As a consequence of these difficulties most free, open-source and commercial resource management software use simple heuristics, which at best provide bounds on their performance, and at worst guarantee a few functional properties.
 An example of such a strategy is the First Come First Serve (FCFS) strategy to schedule parallel jobs on a homogenous cluster of machines. Among other properties (such as robustness to weak information about the amount of time a job will run on the system), this strategy guarantees the avoidance of starvation.
 
-As mentionned previously, one of the aspects that must be dealt with in order to apply more sophisticated techniques to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
+%One of the aspects that must be dealt with in order to apply more sophisticated techniques than the currently existing heuristics to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
 
 \subsection{Research Direction}
 The general direction we are headed in, in the course of this research project, is to deal with the input data of the resource management systems.
-In particular, we seek to apply Machine Learning techniques in order to reduce uncertainty in the data and extract information and/or structure relevant for subsequent use by a scheduling algorithm. We will be working only with the problem of presenting input data in the most valuable way possible to a scheduling algorithm, and will not deal with how to use this data beyond simple cases. As for showing the added value of the specific the information we choose to extract, references from the HPC scheduling litterature will provide ground to stand on.
+Accomodating for this data seems separable enough from the actual scheduling problems for work towards this objective to be rewarding.
+No innovative ways to query the data from the users will be studied : we will mainly rely on existing logs from HPC systems. Instead, we seek to apply Machine Learning techniques in order to reduce uncertainty of, and extract information and/or structure from, the input data of the HPC systems.
+We will be working with the problem of presenting input data in the most valuable way possible to a scheduling algorithm. How to use this data to the fullest will not be discussed.
+When assessing the relevance of the specific the information we choose to extract, references from the HPC scheduling litterature will provide ground to stand on.
 
 \subsection{Job runtimes}
-Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job. This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, this information is over-estimated by the users, if they choose to provide it. The following section will look in depth at this relationship.
+Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job. This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, this information is over-estimated by the users, if they choose to provide it. The following section will present a statistical analysis pertaining to this relationship.
 
 The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \ref{truc}. We will refer to this quantity as the \textbf{runtime} of a job.
 It must be clear that the \textbf{runtime} of a job is only defined with respect to a specific processing environment to which it might be affected.
@@ -91,11 +95,12 @@ This can include and is not limited to, the network topology of the processing u
 
 
 \subsection{Problem Statement}
-The general problem statement we are dealing with is the following:
+We restrict the broad question of refining the data to a single relevant variable: the \textbf{runtime}. The problem statement we are dealing with is the following.
 
-TODO: predict runtime on a homogenous grid, blabla.
+Given a specific homogenous HPC cluster with negligible communication costs, how to best predict the value of the \textbf{runtime} of a job?
+The choice of dealing with homogenous machines and without communication costs in a first approach has the interesting property of separing the data treatment step from the scheduling step. In this case, the \textbf{runtime} becomes an objective measure of a job that does not depend on external properties..
 
-TODO: insofar as runtime is important, lets do this..
+TODO:blabla
 
 \section{Motivation}
 
@@ -150,7 +155,7 @@ TODO: -explain our approach, why it could lead to better results (external info+
 
 \subsection{Explainability}
 \label{sub:explainability}
-TODO: -explain one advantage of random forests: discussion about the trees after learning.. 
+TODO: -explain one advantage of random forests: discussion about the trees after learning..
 % subsection explainability (end)
 
 % section our_approach (end)
@@ -183,4 +188,3 @@ TODO:remercier..
 \bibliography{report}
 
 \end{document}
-
