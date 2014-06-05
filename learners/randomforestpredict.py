@@ -2,16 +2,18 @@
 # encoding: utf-8
 '''
 #!/usr/bin/python
-random forest predictor.
+runtime predictor.
 DWTFPL v2.0
 
 Usage:
-    meanpredict.py <filename> <extracted_data> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <tool> <encoding> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
     -v --verbose                                   Be verbose.
     -i --interactive                               Interactive mode after script.
+    tool                                           the machine learning technique to use. available: svm, random_forest
+    encoding                                       how to encode discret attributes (s.t. user ID). available: continuous, onehot.
 
     Please format the csv file correctly before using: remove comments.
 
@@ -31,11 +33,17 @@ arguments = docopt(__doc__, version='1.0.0rc2')
 if '--verbose' in arguments.keys():
     print(arguments)
 
+#svm random_forest
+tool=arguments["<tool>"]
+#normal onehot
+encoding=arguments["<encoding>"]
+
 import numpy as np
 from swfpy import io
 import datetime
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
+from sklearn import preprocessing
 
 data=io.swfopen(arguments["<filename>"],output="np.array")
 
@@ -93,14 +101,25 @@ np.savetxt("foo.csv", X, delimiter=" ",fmt='%.2e',)
 #objective
 y=data[:,3]
 
+if encoding=="onehot":
+    enc_user_id = preprocessing.OneHotEncoder()
+    X_onehot_user_id =np.array( enc_user_id.fit_transform(np.reshape(X[:,3],(-1,1))).toarray())
+    enc_group_id = preprocessing.OneHotEncoder()
+    X_onehot_group_id =np.array( enc_onehot_group_id.fit_transform(np.reshape(X[:,4],(-1,1))).toarray())
+    enc_day_of_week = preprocessing.OneHotEncoder()
+    X_onehot_day_of_week =np.array( enc_onehot_day_of_week.fit_transform(np.reshape(X[:,6],(-1,1))).toarray())
+    enc_last_status = preprocessing.OneHotEncoder()
+    X_onehot_last_status =np.array( enc_last_status.fit_transform(np.reshape(X[:,10],(-1,1))).toarray())
+    enc_last_status2 = preprocessing.OneHotEncoder()
+    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(np.reshape(X[:,11],(-1,1))).toarray())
+    X=np.delete(X,[3,4,6,10,11],1)
+    X=np.hstack((X,X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
+
 i=int(len(X)*.8)
 Xlearn=X[1:i:1,:]
 Xtest=X[i:len(X),:]
 ylearn=y[1:i:1]
 ytest=y[i:len(y)]
-
-#big int least squares
-
 
 #TSAFIR BASELINE
 print(ytest.shape)
@@ -110,13 +129,11 @@ print(err.shape)
 
 tsafir_squares=np.mean(err**2)
 
-#svm random_forest
-tool="svm"
 
 #RANDOM FOREST
 if tool=="random_forest":
     print("creating rand forests regressor")
-    forest=RandomForestRegressor(n_estimators=100, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
+    forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
     print("learning random forests")
     forest.fit(Xlearn,ylearn)
 
@@ -124,6 +141,7 @@ if tool=="random_forest":
     err=forest.predict(Xtest)-ytest
     forest_squares=np.mean(err**2)
 elif tool=="svm":
+    print "tbi"
 
 
 
