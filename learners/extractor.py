@@ -147,7 +147,6 @@ def job_end(j):
         user_info[j.user_id]['last_jobend']=env.now
 
 def job_process(j):
-    #yield env.timeout(j.submit_time)
     job_submit(j)
     yield env.timeout(j.wait_time)
     job_start(j)

@@ -30,7 +30,7 @@ from docopt import docopt
 arguments = docopt(__doc__, version='1.0.0rc2')
 
 #verbose?
-if '--verbose' in arguments.keys():
+if arguments['--verbose']==True:
     print(arguments)
 
 #svm random_forest
@@ -46,82 +46,87 @@ from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
 from sklearn import preprocessing
 
-data=io.swfopen(arguments["<filename>"],output="np.array")
+from numpy.lib.recfunctions import append_fields
+from numpy.lib.recfunctions import drop_fields
+from numpy.lib.recfunctions import merge_arrays
 
+print("opening the swf csv file")
+swf_dtype=np.dtype([('job_id',np.int_), ('submit_time',np.float32) ,('wait_time',np.float32) ,('run_time',np.float32) ,('proc_alloc',np.int_) ,('cpu_time_used',np.float32) ,('mem_used',np.float32) ,('proc_req',np.int_) ,('time_req',np.float32) ,('mem_req',np.float32) ,('status',np.int_) ,('user_id',np.int_) ,('group_id',np.int_) ,('exec_id',np.int_) ,('queue_id',np.int_) ,('partition_id',np.int_) ,('previous_job_id',np.int_) ,('think_time',np.float32)])
+with open (arguments["<filename>"], "r") as f:
+    data=np.loadtxt(f, dtype=swf_dtype)
+
+print("opening the extracted data csv file")
+extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_)])
 with open (arguments["<extracted_data>"], "r") as f:
-    extracted_data=np.loadtxt(f, dtype={'names': ('job_id','user_id','last_runtime','last_runtime2','last_status','last_status2','thinktime','running_maxlength','running_sumlength','amount_running','running_average_runtime','running_allocatedcores'),'formats':(np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32)})
-    #extracted_data=np.loadtxt(f)
-#extracted_data.dtype={'names': ('job_id','user_id','last_runtime','last_runtime2','last_status','last_status2','thinktime','running_maxlength','running_sumlength','amount_running','running_average_runtime','running_allocatedcores'),'formats':(np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32,np.int32)}
+    extracted_data=np.loadtxt(f, dtype=extracted_data_dtype)
 
-print(extracted_data)
 
-#convert recarray to array
-data=data.view(np.int32).reshape(data.shape + (-1,))
-extracted_data=extracted_data.view(np.int32).reshape(extracted_data.shape + (-1,))
-
-#data: 0-'job_id',1'submit_time',2-'wait_time',3-'run_time',4-'proc_alloc',5-'cpu_time_used',6-'mem_used',7'proc_req',8'time_req',9-'mem_req',10-'status',11'user_id',12'group_id',13-'exec_id',14-'queue_id',15-'partition_id',16-'previous_job_id',17-'think_time'.
-#extracted_data: 0job_id 1user_id 2last_runtime 3last_runtime2 4last_status 5last_status2 6thinktime 7running_maxlength 8running_sumlength 9amount_running 10running_average_runtime 11running_allocatedcores
-
-X=np.delete(data,[0,2,3,4,5,6,9,10,13,14,15,16,17],1)
-#X: 0'submit_time',1'proc_req',2'time_req',3'user_id',4'group_id',
-
-#X objective: 0'time_of_day',1'proc_req',2'time_req',3'user_id',4'group_id',5'think_time',6'mean_2last',7'mean_3last',8'value_last',9'value_2last',10'status_n-1',11'status_n-2',12'day_of_week',13'day_of_month'
-X = np.hstack((X, np.zeros((X.shape[0], 5), dtype=X.dtype)))
-#we have empty columns
-
+#______data field modification vectorized functions:
+#day of month
+print("vectorizing functions for added info")
 dom=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).strftime('%d'))
-X[:,9]=dom(X[:,0])
-#we have day_of_month in 13
+#day of week
 dow=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).weekday())
-X[:,8]=dow(X[:,0])
-#we have day_of_week in 12
-s=3600*24
-X[:,0]=X[:,0] %s
-#we have time_of_day in 0
-
-#more on extracted features:
-#-calculating tsafir mean:
-X_extract=extracted_data
 def mean2last(a,b,reqtime):
     if a==-1 or b==-1:
         return reqtime
     else:
         return (a+b)/2
+#tsafir mean2last
+tsafir=np.vectorize(mean2last)
 
-X[:,5]=np.vectorize(mean2last)(X_extract[:,2],X_extract[:,3],X[:,2]) #vector sum
+print("calculating added info: tsafir mean, day of week, day of month")
+X=drop_fields(data,['job_id','wait_time','run_time','proc_alloc','cpu_time_used','mem_used','mem_req','status','exec_id','queue_id','partition_id','previous_job_id','think_time'])
+X=append_fields(X,['day_of_week','day_of_month','tsafir_mean'],[dow(data['submit_time']),dom(X['submit_time']),tsafir(extracted_data['last_runtime'],extracted_data['last_runtime2'],data['time_req'])],dtypes=[np.int_,np.int_,np.float32])
 
-#removing job id and user id
-X_extract=np.delete(X_extract,[0,1],1)
-#joining the extracted data:
-X=np.concatenate((X, X_extract), axis=1)
+#removing job id and user id, merging
+print(X.dtype)
+print("merging all data into one")
+X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),usemask=False,asrecarray=True,flatten=True)
+#X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),asrecarray=True,flatten=True)
 
-np.savetxt("foo.csv", X, delimiter=" ",fmt='%.2e',)
+#__True runtime
+y=data['run_time']
 
-#final values:
-#0'time_of_day',1'proc_req',2'time_req',3'user_id',4'group_id',5'mean_2last',6'day_of_week',7'day_of_month',8'last_runtime',9'last_runtime2',10'last_status',11'last_status2',12'thinktime',13'running_maxlength',14'running_sumlength',15'amount_running',16'running_average_runtime',17'running_allocatedcores,18'tsafir'
-#objective
-y=data[:,3]
+#__tsafir runtime
+tsafir=X['tsafir_mean']
 
 if encoding=="onehot":
+    print("encoding in onehot")
     mms = preprocessing.MinMaxScaler()
     enc_user_id = preprocessing.OneHotEncoder()
-    X_onehot_user_id =np.array( enc_user_id.fit_transform(np.reshape(X[:,3],(-1,1))).toarray())
+    X_onehot_user_id =np.array( enc_user_id.fit_transform(np.reshape(X['user_id'],(-1,1))).toarray())
     enc_group_id = preprocessing.OneHotEncoder()
-    X_onehot_group_id =np.array( enc_group_id.fit_transform(np.reshape(X[:,4],(-1,1))).toarray())
+    X_onehot_group_id =np.array( enc_group_id.fit_transform(np.reshape(X['group_id'],(-1,1))).toarray())
     enc_day_of_week = preprocessing.OneHotEncoder()
-    X_onehot_day_of_week =np.array( enc_day_of_week.fit_transform(np.reshape(X[:,6],(-1,1))).toarray())
+    X_onehot_day_of_week =np.array( enc_day_of_week.fit_transform(np.reshape(X['day_of_week'],(-1,1))).toarray())
+    enc_day_of_month = preprocessing.OneHotEncoder()
+    X_onehot_day_of_month =np.array( enc_day_of_month.fit_transform(np.reshape(X['day_of_month'],(-1,1))).toarray())
     enc_last_status = preprocessing.OneHotEncoder()
-    X_onehot_last_status =np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X[:,10],(-1,1)))).toarray())
+    X_onehot_last_status =np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X['last_status'],(-1,1)))).toarray())
     enc_last_status2 = preprocessing.OneHotEncoder()
-    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X[:,11],(-1,1)))).toarray())
-    X=np.delete(X,[3,4,6,10,11],1)
-    X=np.hstack((X,X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
+    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X['last_status2'],(-1,1)))).toarray())
+    onehot_features=np.hstack((X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
+    X=drop_fields(X,['user_id','group_id','day_of_week','day_of_month','last_status','last_status2'])
+    print("the format of X before going to np.array is:")
+    print(X.dtype)
+    print("the values are:")
+    print(X)
+    X=X.view(np.float32).reshape(X.shape + (-1,))
+    X=np.hstack((X,onehot_features))
+else:
+    X=X.view(np.float32).reshape(X.shape + (-1,))
 
+from IPython import embed
+embed()
+
+start=int(len(X)*.7)
 i=int(len(X)*.8)
-Xlearn=X[1:i:1,:]
+Xlearn=X[start:i:1,:]
 Xtest=X[i:len(X),:]
-ylearn=y[1:i:1]
+ylearn=y[start:i:1]
 ytest=y[i:len(y)]
+tsafirtest=tsafir[i:len(y)]
 
 #TSAFIR BASELINE
 print(ytest.shape)
@@ -145,7 +150,7 @@ if tool=="random_forest":
 elif tool=="svm":
     print("creating SVR")
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
-    print("learning random forests")
+    print("learning SVR")
     svr.fit(Xlearn,ylearn)
     print("Prediction!")
     svr_pred=svr.predict(Xtest)
@@ -154,6 +159,7 @@ elif tool=="svm":
     print(svr_squares)
 
 #interactive?
-if '--interactive' in arguments.keys():
+if arguments['--interactive']==True:
+    print(arguments)
     from IPython import embed
     embed()
