@@ -42,6 +42,7 @@ import numpy as np
 from swfpy import io
 import datetime
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
 from sklearn import preprocessing
 
@@ -130,22 +131,27 @@ print(err.shape)
 
 tsafir_squares=np.mean(err**2)
 
-
 #RANDOM FOREST
 if tool=="random_forest":
     print("creating rand forests regressor")
     forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
     print("learning random forests")
     forest.fit(Xlearn,ylearn)
-
     print("Prediction!")
-    err=forest.predict(Xtest)-ytest
+    pred=forest.predict(Xtest)
+    err=pred-ytest
     forest_squares=np.mean(err**2)
+    print(forest_squares)
 elif tool=="svm":
-    print "tbi"
-
-
-
+    print("creating SVR")
+    svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
+    print("learning random forests")
+    svr.fit(Xlearn,ylearn)
+    print("Prediction!")
+    svr_pred=svr.predict(Xtest)
+    err=svr_pred-ytest
+    svr_squares=np.mean(err**2)
+    print(svr_squares)
 
 #interactive?
 if '--interactive' in arguments.keys():
