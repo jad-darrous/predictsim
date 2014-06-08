@@ -7,7 +7,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage{datetime}
 \usepackage{graphicx}
-
+\usepackage{stfloats}
 \usepackage{mathptmx}
 \usepackage[T1]{fontenc}
 
@@ -130,8 +130,9 @@ As mentioned before, existing solutions use much simpler heuristics. We will now
 The following study is conducted on a log[ref log] containing 20 months worth of data from the Curie[ref curie] supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique). It contains more than 300,000 jobs, submitted from February 2011 to October 2012 by 900 users in the `cleaned' version from the workload archive [ref archive]. The log has several homogenous CPU partitions and CPU+GPU partitions, however in a each partition, all nodes are identical. Jobs are allocated to partitions using user preference. The system is managed using the SLURM (Simple Linux Utility for Resource Management) software.
 Figure [ref figure] shows the marginal distributions of \textbf{reqtimes} and \textbf{runtimes} on this system.
 
-\begin{figure*}[H]
-        \centering
+\begin{figure*}[b]
+  \centering\rule{0.8*\textwidth}{0.3*\textwidth}
+
         \includegraphics[width=\textwidth]{../../wallimage-0.png}
         \caption{Marginal Histograms of \textbf{reqtime} and \textbf{runtime} of jobs on the CEA Curie log.}
 \label{fig:_wall_run_for_report_pdf}
