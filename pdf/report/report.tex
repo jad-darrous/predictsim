@@ -67,44 +67,51 @@ to\hsize{\vrule\kern3pt\vbox{\kern3pt
 \end{abstract}
 
 \section{Introduction}
-High Performance Computing (HPC) systems are complex machinery at the frontier between (research in-a retirer?) scheduling and systems engineering. We outline the two main difficulties that resource management software in this field have to face.
+High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and systems engineering. We outline two of the main difficulties that resource management software in this field have to face.
 
 First, the ephemeral nature, and broad range of existing architectures of such systems make the development and application of theoretical results difficult.
-New schemes for distributing resources (e.g.\ memory caches, hard drives, processing units, RAM memory) are ubiquitous and their rate of occurence is high. Moreover, the topology of a HPC system can change on a monthly or weekly basis, with the addition of new hardware.
-Finding scheduling and resource management strategies which can adapt to those changes is a current research problem.
+New schemes for distributing resources are more present than ever. Many systems have complex network and memory/hard drive sharing topologies. Moreover, the topology of some HPC system can change on a hourly to monthly basis, as the supporting hardware of distributed systems can be reconfigured or extended continually.
+Finding scheduling and resource management strategies which can deal with complex systems and adapt to their evolutions poses a challenge.
 
-In addition, the input data these systems have to work with presents many peculiarities. The nature of the information which users of the system provide is very often loose ( e.g.\ with only upper and/or lower bounds provided ). For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, but an upper bound may be given by the user.
+In addition, the data (i.e.\ the characteristics of the tasks to be executed on the system) these systems have to work with presents many peculiarities.
+The nature of the information which users of the system provide is very often loose ( e.g.\ with only upper and/or lower bounds on numerical quantities provided ).
+For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, but many cluster management software ask the users for an upper bound on this quantity.
 
-As a consequence of these difficulties most free, open-source and commercial resource management software use simple heuristics, which can provide bounds on their performance and/or guarantee a few functional properties.
-An example of such a heuristic is the First Come First Serve (FCFS) policy to schedule parallel jobs on a homogenous cluster of machines. Among other properties (such as robustness to lack of information about the amount of time jobs will run on the system), this strategy guarantees the avoidance of starvation.
-
-%One of the aspects that must be dealt with in order to apply more sophisticated techniques than the currently existing heuristics to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
+As a consequence of these difficulties most free, open-source and commercial resource management software use simple heuristics that can provide bounds on their performance and/or guarantee a few functional properties.
+An example of such a heuristic is the First Come First Serve (FCFS) policy to schedule parallel jobs on a homogenous cluster of machines, which starts jobs as soon as possible, in the exact order they were submitted.
+Among other properties ( such as robustness to lack of information about the amount of time jobs will run on the system ), this strategy guarantees the avoidance of starvation.
 
 \subsection{Research Direction}
 The general direction we are headed in with this research project is to deal with the input data of the resource management systems.
 Accomodating for this data seems separable enough from the actual scheduling problems for work towards this objective to be rewarding.
 No innovative ways to query the data from the users will be studied : we will mainly rely on existing logs from HPC systems. Instead, we seek to apply Machine Learning techniques in order to reduce uncertainty of, and extract information and/or structure from, the input data of the HPC systems.
 We will be working with the problem of presenting input data in the most valuable way possible to a scheduling algorithm. How to use this data to the fullest will not be discussed.
-When assessing the relevance of the specific the information we choose to extract, references from the HPC scheduling litterature will provide ground to stand on.
+When assessing the relevance of the specific information we choose to produce from the job characteristics, references from the scheduling litterature and existing systems will provide ground to stand on.
 
 \subsection{Job runtimes}
-Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job. This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, users overestimate this value, should they choose or be forced to provide it. The following section will present a statistical analysis pertaining to this relationship.
+Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job with respect to its hardware requirements.
+This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, users overestimate this value, should they choose or be forced to provide it. The following section will present a statistical analysis pertaining to this relationship.
 
-The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \ref{truc}. We will refer to this quantity as the \textbf{runtime} of a job.
-It must be clear that in the context of ubiquitous topological heterogeneity, the \textbf{runtime} of a job is only defined with respect to a specific processing environment to which it might be affected.
+The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \~ref{truc}. We will refer to this quantity as the \textbf{runtime} of a job.
+It must be clear that in the context of topological heterogeneity, the \textbf{runtime} of a job is only defined with respect to a specific processing environment to which it might be affected.
 This can include, and is not limited to, the network topology of the processing units, the availability of shared memory, message passing costs, and the operating system supporting the computations.
 
 \subsection{Problem Statement}
-We restrict the broad question of refining the data to a single relevant variable: the \textbf{runtime}. The problem statement we are dealing with is the following.
+In this paper, the broad question of refining the data is reduced to a single variable, the \textbf{runtime}. The problem statement we are dealing with is the following.
 
-Given a specific homogenous HPC Cluster with negligible communication costs, how to best predict the value of the \textbf{runtime} of a job?
+Given a specific homogenous HPC Cluster with negligible communication costs, how to best predict the value of the \textbf{runtime} of a job? 
 
 The choice of dealing with homogenous distributed machines without communication costs in a first approach has the interesting property of separing the data treatment from the scheduling and interaction with the system.
-In this case, the \textbf{runtime} becomes an intrinsic attribute of a job. On the contrary to the input data which is always subject to peculiarities of the various systems and software, the \textbf{runtime} is always present as a simple field in workload logs of HPC systems, such as those available at the workload archive [ref to feitelson].
-Since we will be inferring runtime from the input data, this will be a supervised learning problem, specifically regression.
-We will be careful to only learn our models on logs of homogenous systems, or subset of heterogenous systems which are sizeable enough to learn models from and are homogenous in nature.
+In this case, the \textbf{runtime} becomes an intrinsic attribute of a job. 
+On the contrary to the input data which is always subject to peculiarities of the various systems and software, the \textbf{runtime} is always present as a simple field in workload logs of HPC systems, such as those available at the workload archive [ref to feitelson].
+
+This problem statement implies a latent question : How to communicate the prediction to the rest of the system (e.g. single-value, probability density, confidence factor)? Alternatives will be discussed but ultimately, the focus will be on single-valued predictions.
+As mentionned previously, our approach is to use machine learning techniques. We will be inferring runtime from the the job characteristics by learning from system logs, and since this is a value in $[0,+\infty ]$, this is a standard supervised learning problem, namely regression.
+
+We will be careful to only learn our models on logs from homogenous systems, or homogenous subsets of systems which are sizeable enough to learn from.
 As for downplaying the impact of communication costs, we will further restrict our work to machines which do not possess overly complex topology or distribute computing nodes across more than a handful of routers.
-In essence, we are targeting large beowulf clusters such in-building desktop computer farms, supercomputers and GPU farms.
+In essence, we are targeting large Beowulf clusters, supercomputers, GPU farms and mainframe clusters.
+
 
 \section{Motivation}
 
@@ -121,12 +128,13 @@ As mentioned before, existing solutions use much simpler heuristics. We will now
 
 \subsection{\textbf{reqtime} vs \textbf{runtime} on a real system}
 \label{sub:reqtime_vs_runtime_on_a_real_system}
-The following study is conducted on a log containing 20 months worth of data from the Curie supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
+The following study is conducted on a log[ref log] containing 20 months worth of data from the Curie[ref curie] supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
 The system has several highly homogenous partitions, to which jobs are allocated according to user preference.
-[ref figure] shows the marginal distributions of \textbf{reqtimes} and \textbf{runtimes} on this system.
+Figure [ref figure] shows the marginal distributions of \textbf{reqtimes} and \textbf{runtimes} on this system.
+
 \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{../../wallimage-0.png}
+        \includegraphics[width=\textwidth/3]{../../wallimage-0.png}
         \caption{Marginal Histograms of \textbf{reqtime} and \textbf{runtime} of jobs on the CEA Curie log.}
         \label{fig:_wall_run_for_report_pdf}
 \end{figure}
@@ -167,7 +175,7 @@ TODO: -give the references and explain the probabilistic backfilling thing..
 
 \section{Our approach}
 \label{sec:our_approach}
-
+WHY ML? well, there is simple little patterns everywhere 
 \subsection{Random Forests}
 \label{sub:random_forests}
 TODO: -explain our approach, why it could lead to better results (external info+signal locality(ref hmm thesis for locality..))
