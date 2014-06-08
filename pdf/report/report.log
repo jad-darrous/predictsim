@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 13:55
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 13:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -359,7 +359,11 @@ Overfull \hbox (277.53853pt too wide) in paragraph at lines 137--138
  []\T1/ptm/m/n/10 /3/3[] 
  []
 
-(./report.bbl) [2] [3
+(./report.bbl
+
+LaTeX Warning: Empty `thebibliography' environment on input line 3.
+
+) [2] [3
 
  <../../wallimage-0.png>] (./report.aux)
 
@@ -380,7 +384,7 @@ f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/
 times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pf
 b>
-Output written on report.pdf (3 pages, 79166 bytes).
+Output written on report.pdf (3 pages, 79172 bytes).
 PDF statistics:
  37 PDF objects out of 1000 (max. 8388607)
  24 compressed objects within 1 object stream
