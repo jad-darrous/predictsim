@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 14:09
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 19:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -349,32 +349,90 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
 )
 <../../wallimage-0.png, id=8, 2107.875pt x 1053.9375pt>
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   *
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+Dimensions can be in units of em, ex, in, pt, pc,
+cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
+I'll assume that you meant to say pt, for printer's points.
+To recover gracefully from this error, it's best to
+delete the erroneous units; e.g., type `2' to delete
+two letters. (See Chapter 27 of The TeXbook.)
+
+! Missing number, treated as zero.
+<to be read again> 
+                   \relax 
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+A number should have been here; I inserted `0'.
+(If you can't figure out why I needed to see a number,
+look up `weird error' in the index to The TeXbook.)
+
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   \relax 
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+Dimensions can be in units of em, ex, in, pt, pc,
+cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
+I'll assume that you meant to say pt, for printer's points.
+To recover gracefully from this error, it's best to
+delete the erroneous units; e.g., type `2' to delete
+two letters. (See Chapter 27 of The TeXbook.)
+
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   *
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+Dimensions can be in units of em, ex, in, pt, pc,
+cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
+I'll assume that you meant to say pt, for printer's points.
+To recover gracefully from this error, it's best to
+delete the erroneous units; e.g., type `2' to delete
+two letters. (See Chapter 27 of The TeXbook.)
+
+! Missing number, treated as zero.
+<to be read again> 
+                   \relax 
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+A number should have been here; I inserted `0'.
+(If you can't figure out why I needed to see a number,
+look up `weird error' in the index to The TeXbook.)
+
+! Illegal unit of measure (pt inserted).
+<to be read again> 
+                   \relax 
+l.135 ...th=0.3*\textwidth]{../../wallimage-0.png}
+                                                  
+Dimensions can be in units of em, ex, in, pt, pc,
+cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
+I'll assume that you meant to say pt, for printer's points.
+To recover gracefully from this error, it's best to
+delete the erroneous units; e.g., type `2' to delete
+two letters. (See Chapter 27 of The TeXbook.)
+
 File: ../../wallimage-0.png Graphic file (type png)
-
 <use ../../wallimage-0.png>
-Package pdftex.def Info: ../../wallimage-0.png used on input line 137.
-(pdftex.def)             Requested size: 505.89pt x 252.93408pt.
-
-Overfull \hbox (277.53853pt too wide) in paragraph at lines 137--138
- []\T1/ptm/m/n/10 /3/3[] 
- []
-
-(./report.bbl
+Package pdftex.def Info: ../../wallimage-0.png used on input line 135.
+(pdftex.def)             Requested size: 0.3pt x 0.14473pt.
+ (./report.bbl
 
 LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
-) [2] [3
-
- <../../wallimage-0.png>] (./report.aux)
+) [2] [3 <../../wallimage-0.png>] (./report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3755 strings out of 493304
- 50805 string characters out of 6139871
+ 3756 strings out of 493304
+ 50820 string characters out of 6139871
  127284 words of memory out of 5000000
- 7097 multiletter control sequences out of 15000+600000
+ 7098 multiletter control sequences out of 15000+600000
  45859 words of font info for 76 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  39i,10n,23p,1030b,478s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -384,7 +442,7 @@ f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/
 times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pf
 b>
-Output written on report.pdf (3 pages, 79155 bytes).
+Output written on report.pdf (3 pages, 79972 bytes).
 PDF statistics:
  37 PDF objects out of 1000 (max. 8388607)
  24 compressed objects within 1 object stream
