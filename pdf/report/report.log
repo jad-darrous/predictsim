@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 21:29
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 21:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -358,81 +358,15 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-0.def
 File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
 )
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   *
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Missing number, treated as zero.
-<to be read again> 
-                   \relax 
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   *
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Missing number, treated as zero.
-<to be read again> 
-                   \relax 
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.135 ...ring\rule{0.8*\textwidth}{0.3*\textwidth}
-                                                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
 <../../wallimage-0.png, id=8, 2107.875pt x 1053.9375pt>
 File: ../../wallimage-0.png Graphic file (type png)
 
 <use ../../wallimage-0.png>
-Package pdftex.def Info: ../../wallimage-0.png used on input line 136.
+Package pdftex.def Info: ../../wallimage-0.png used on input line 137.
 (pdftex.def)             Requested size: 505.89pt x 252.93408pt.
 
-Overfull \hbox (261.97874pt too wide) in paragraph at lines 135--137
- [] 
+Overfull \hbox (261.97874pt too wide) in paragraph at lines 137--138
+ [][] 
  []
 
 [2 <../../wallimage-0.png>] (./report.bbl
@@ -460,7 +394,7 @@ f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/
 times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pf
 b>
-Output written on report.pdf (3 pages, 80120 bytes).
+Output written on report.pdf (3 pages, 79781 bytes).
 PDF statistics:
  37 PDF objects out of 1000 (max. 8388607)
  24 compressed objects within 1 object stream
