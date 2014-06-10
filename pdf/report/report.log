@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  8 JUN 2014 22:11
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.3)  10 JUN 2014 14:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -341,58 +341,60 @@ Overfull \hbox (245.81128pt too wide) detected at line 59
 
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10.95> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 82.
-LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 91.
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
-
-
-
-]
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 107.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 107.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 107.
-
-(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-0.def
-File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
-)
-<../../wallimage-0.png, id=8, 2107.875pt x 1053.9375pt>
+<../../wallimage-0.png, id=1, 2107.875pt x 1053.9375pt>
 File: ../../wallimage-0.png Graphic file (type png)
 
 <use ../../wallimage-0.png>
-Package pdftex.def Info: ../../wallimage-0.png used on input line 134.
+Package pdftex.def Info: ../../wallimage-0.png used on input line 93.
 (pdftex.def)             Requested size: 505.89pt x 252.93408pt.
- (./report.bbl [2]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 94.
 
-LaTeX Warning: Empty `thebibliography' environment on input line 3.
+<../../wallimage-1.png, id=2, 2107.875pt x 1053.9375pt>
+File: ../../wallimage-1.png Graphic file (type png)
 
-) [3
+<use ../../wallimage-1.png>
+Package pdftex.def Info: ../../wallimage-1.png used on input line 102.
+(pdftex.def)             Requested size: 505.89pt x 252.93408pt.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 103.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 103.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 103.
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
- <../../wallimage-0.png>] (./report.aux)
+
+
+] [2 <../../wallimage-0.png>]
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-0.def
+File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
+) (./report.bbl
+[3 <../../wallimage-1.png>]) [4
+
+] (./report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3805 strings out of 493304
- 51642 string characters out of 6139871
- 129388 words of memory out of 5000000
- 7140 multiletter control sequences out of 15000+600000
- 45859 words of font info for 76 fonts, out of 8000000 for 9000
- 957 hyphenation exceptions out of 8191
+ 3814 strings out of 495028
+ 51828 string characters out of 6181498
+ 125143 words of memory out of 5000000
+ 6898 multiletter control sequences out of 15000+600000
+ 47571 words of font info for 77 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
  39i,10n,23p,1030b,478s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/
 times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pf
-b>
-Output written on report.pdf (3 pages, 79912 bytes).
+b></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (4 pages, 110213 bytes).
 PDF statistics:
- 37 PDF objects out of 1000 (max. 8388607)
- 24 compressed objects within 1 object stream
+ 45 PDF objects out of 1000 (max. 8388607)
+ 29 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

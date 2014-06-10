@@ -86,7 +86,7 @@ X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),usemask=Fals
 #X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),asrecarray=True,flatten=True)
 
 #__True runtime
-y=data['run_time']
+yf=data['run_time'].astype('<f4')
 
 #__tsafir runtime
 tsafir=X['tsafir_mean']
@@ -112,41 +112,59 @@ if encoding=="onehot":
     print(X.dtype)
     print("the values are:")
     print(X)
-    X=X.view(np.float32).reshape(X.shape + (-1,))
-    X=np.hstack((X,onehot_features))
+    #Xf=X.view(np.float32).reshape(X.shape + (-1,))
+
+    #dtype=[('submit_time', '<f4'), ('proc_req', '<i8'), ('time_req', '<f4'), ('tsafir_mean', '<f4'), ('last_runtime', '<i8'), ('last_runtime2', '<f4'), ('thinktime', '<f4'), ('running_maxlength', '<f4'), ('running_sumlength', '<f4'), ('amount_running', '<i8'), ('running_average_runtime', '<f4'), ('running_allocatedcores', '<i8')]
+
+    Xf_proc_req                = np.reshape(X['proc_req'].astype('<f4'),(-1,1))
+    Xf_time_req                = np.reshape(X['time_req'].astype('<f4'),(-1,1))
+    Xf_tsafir_mean             = np.reshape(X['tsafir_mean'].astype('<f4'),(-1,1))
+    Xf_last_runtime            = np.reshape(X['last_runtime'].astype('<f4'),(-1,1))
+    Xf_last_runtime2           = np.reshape(X['last_runtime2'].astype('<f4'),(-1,1))
+    Xf_thinktime               = np.reshape(X['thinktime'].astype('<f4'),(-1,1))
+    Xf_running_maxlength       = np.reshape(X['running_maxlength'].astype('<f4'),(-1,1))
+    Xf_running_sumlength       = np.reshape(X['running_sumlength'].astype('<f4'),(-1,1))
+    Xf_amount_running          = np.reshape(X['amount_running'].astype('<f4'),(-1,1))
+    Xf_running_average_runtime = np.reshape(X['running_average_runtime'].astype('<f4'),(-1,1))
+    Xf_running_allocatedcores  = np.reshape(X['running_allocatedcores'].astype('<f4'),(-1,1))
+
+    Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,onehot_features))
 else:
-    X=X.view(np.float32).reshape(X.shape + (-1,))
+    Xf=X.view(np.float32).reshape(X.shape + (-1,))
 
-from IPython import embed
-embed()
 
-start=int(len(X)*.7)
-i=int(len(X)*.8)
-Xlearn=X[start:i:1,:]
-Xtest=X[i:len(X),:]
-ylearn=y[start:i:1]
-ytest=y[i:len(y)]
-tsafirtest=tsafir[i:len(y)]
+
+#dirty fix for nan values
+#Xf=np.nan_to_num(X)
+#yf=np.nan_to_num(y)
+
+start=int(len(Xf)*.7)
+i=int(len(Xf)*.8)
+Xlearn=Xf[start:i:1,:]
+Xtest=Xf[i:len(Xf),:]
+ylearn=yf[start:i:1]
+ytest=yf[i:len(yf)]
+tsafirtest=tsafir[i:len(yf)]
 
 #TSAFIR BASELINE
-print(ytest.shape)
-print(Xtest[:,18].shape)
-err=Xtest[:,18]-ytest
-print(err.shape)
+print("baseline mean: %s" %(np.mean(tsafirtest)))
+print("calculating baseline squared error:")
+tsafir_squares=np.mean((tsafirtest-ytest)**2)
+print("tsafir_squares="+str(tsafir_squares))
 
-tsafir_squares=np.mean(err**2)
 
 #RANDOM FOREST
 if tool=="random_forest":
-    print("creating rand forests regressor")
+    print("creating random forests regressor")
     forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
     print("learning random forests")
     forest.fit(Xlearn,ylearn)
     print("Prediction!")
     pred=forest.predict(Xtest)
+    print("prediction mean: %s" %(pred))
     err=pred-ytest
     forest_squares=np.mean(err**2)
-    print(forest_squares)
+    print("forest_squares: %s" %forest_squares)
 elif tool=="svm":
     print("creating SVR")
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
@@ -157,6 +175,12 @@ elif tool=="svm":
     err=svr_pred-ytest
     svr_squares=np.mean(err**2)
     print(svr_squares)
+
+
+pred=np.reshape(pred,(-1,1))
+tsaf=np.reshape(tsafirtest,(-1,1))
+ytest=np.reshape(ytest,(-1,1))
+np.savetxt("prediction_randomforest_40_trees",np.hstack((pred,tsafir,ytest)))
 
 #interactive?
 if arguments['--interactive']==True:

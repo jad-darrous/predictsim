@@ -1,0 +1,36 @@
+
+In [42]: np.savetxt("feature_importances",forest.feature_importances_)
+
+In [43]: X_onehot_user_id.shape
+Out[43]: (312815, 582)
+
+In [44]: X_one
+X_onehot_day_of_month  X_onehot_day_of_week   X_onehot_group_id      X_onehot_last_status   X_onehot_last_status2  X_onehot_user_id
+
+In [44]: X_onehot_day
+X_onehot_day_of_month  X_onehot_day_of_week   
+
+In [44]: X_onehot_day_of_month.shape
+Out[44]: (312815, 31)
+
+In [45]: X_one
+X_onehot_day_of_month  X_onehot_day_of_week   X_onehot_group_id      X_onehot_last_status   X_onehot_last_status2  X_onehot_user_id
+
+In [45]: X_onehot_day
+X_onehot_day_of_month  X_onehot_day_of_week   
+
+In [45]: X_onehot_day_of_week.shape
+Out[45]: (312815, 7)
+
+In [46]: X_one
+X_onehot_day_of_month  X_onehot_day_of_week   X_onehot_group_id      X_onehot_last_status   X_onehot_last_status2  X_onehot_user_id
+
+In [46]: X_onehot_last_status.shape
+Out[46]: (312815, 1)
+
+In [47]: X_onehot_last_status2.shape
+Out[47]: (312815, 1)
+
+In [48]: X_onehot_user_id.shape
+Out[48]: (312815, 582)
+

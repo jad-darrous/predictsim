@@ -1,3 +1,11 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citeauthoryear{Nissimov and
+  Feitelson}{2008}]{nissimov:probabilistic-backfilling}
+Avi Nissimov and Dror~G. Feitelson.
+\newblock Probabilistic backfilling.
+\newblock In {\em Proceedings of the 13th International Conference on Job
+  Scheduling Strategies for Parallel Processing}, JSSPP'07, pages 102--115,
+  Berlin, Heidelberg, 2008. Springer-Verlag.
+
 \end{thebibliography}
