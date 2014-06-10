@@ -119,7 +119,7 @@ Given a specific homogeneous HPC Cluster with negligible communication costs, ho
 
 The choice of dealing with homogeneous distributed machines without communication costs in a first approach has the interesting property of separating the data treatment from the scheduling and interaction with the system.
 In this case, the \textbf{runtime} becomes an intrinsic attribute of a job.
-On the contrary to the input data which is always subject to peculiarities of the various systems and software, the \textbf{runtime} is always present as a simple field in workload logs of HPC systems, such as those available at the workload archive [ref to feitelson].
+On the contrary to the input data which is always subject to peculiarities of the various systems and software, the \textbf{runtime} is always present as a simple field in workload logs of HPC systems, such as those available at the workload archive ~\cite{feitelson:workloadarchivepaper}.
 
 This problem statement implies a latent question: How to communicate the prediction to the rest of the system (e.g.\ single-value, probability density, confidence factor)? Alternatives will be discussed but ultimately, the focus will be on single-valued predictions.
 As mentioned previously, our approach is to use machine learning techniques. We will be inferring runtime from the job characteristics by learning from system logs, and since this is a value in $[0,+\infty ]$, this is a supervised learning problem, namely regression.

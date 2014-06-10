@@ -1,5 +1,10 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citeauthoryear{Feitelson \bgroup \em et al.\egroup
+  }{2012}]{feitelson:workloadarchivepaper}
+Dror~G. Feitelson, Dan Tsafrir, and David Krakov.
+\newblock Experience with the parallel workloads archive, 2012.
+
 \bibitem[\protect\citeauthoryear{Nissimov and
   Feitelson}{2008}]{nissimov:probabilistic-backfilling}
 Avi Nissimov and Dror~G. Feitelson.
