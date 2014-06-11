@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.3)  11 JUN 2014 17:01
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.3)  11 JUN 2014 17:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -206,6 +206,9 @@ LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 
 LaTeX Warning: Label `sec:conclusions' multiply defined.
 
+
+LaTeX Warning: Label `fig:ratio' multiply defined.
+
 )
 \openout1 = `report.aux'.
 
@@ -371,9 +374,6 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 LaTeX Warning: Citation `workloadarchive' on page 2 undefined on input line 122
 .
 
-
-LaTeX Warning: Citation `tsafir' on page 2 undefined on input line 139.
-
 (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-0.def
 File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
 )
@@ -385,33 +385,40 @@ LaTeX Warning: Citation `workloadarchive' on page 2 undefined on input line 148
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
+<../../truc.png, id=18, 1011.78pt x 505.89pt>
+File: ../../truc.png Graphic file (type png)
+ <use ../../truc.png>
+Package pdftex.def Info: ../../truc.png used on input line 162.
+(pdftex.def)             Requested size: 505.89pt x 252.94437pt.
+ [3 <../../wallimage-1.png>]
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 189.
 
-LaTeX Warning: Citation `tsafir' on page 3 undefined on input line 165.
-
-[3 <../../wallimage-1.png>]
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 183.
-
-
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsptm.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 183.
- (./report.bbl
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 189.
+
+
+LaTeX Warning: Citation `decisiontree' on page 4 undefined on input line 199.
+
+(./report.bbl [4 <../../truc.png>]
 Underfull \hbox (badness 6876) in paragraph at lines 28--32
 []\T1/ptm/m/n/10 Ahuva W. Mu'alem and
  []
 
-) [4] (./report.aux)
+) [5
+
+] (./report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3838 strings out of 495028
- 52179 string characters out of 6181498
- 125296 words of memory out of 5000000
- 6919 multiletter control sequences out of 15000+600000
+ 3843 strings out of 495028
+ 52262 string characters out of 6181498
+ 125294 words of memory out of 5000000
+ 6923 multiletter control sequences out of 15000+600000
  47571 words of font info for 77 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  39i,10n,23p,1030b,478s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -422,10 +429,10 @@ fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
 utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (4 pages, 124618 bytes).
+Output written on report.pdf (5 pages, 129881 bytes).
 PDF statistics:
- 49 PDF objects out of 1000 (max. 8388607)
- 32 compressed objects within 1 object stream
+ 54 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

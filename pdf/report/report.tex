@@ -37,7 +37,7 @@
 
 
 \title{Master 1 MoSIG Research Project Report\\
-Learning Job Runtimes in Homogeneous HPC Systems}
+Learning Job Runtimes in HPC Systems}
 \author{Valentin Reis\\
 Supervised by: Denis Trystram \& Eric Gaussier.\\
 }
@@ -139,7 +139,7 @@ Intuitively, in order to use this extensive theoretical body, we would need to r
 It has been shown  ~\cite{tsafir} that even in the classical approach (which is to use policies that are robust to this uncertainty), there is added value when this variable is refined.
 In all cases, reducing uncertainty in \textbf{runtime} is critical to the success of the approach used to schedule jobs.
 
-As mentioned before, existing solutions use much simpler heuristics. We will now focus on a particular system, and outline the reasons why, in the absence of a predictive technique applied the input data, a simple heuristic is applied.
+As mentioned before, existing solutions use much simpler heuristics. We will now focus on a particular system in order show why a simple scheduling heuristic is applied.
 % subsection importance_of_runtime (end)
 
 \subsection{Reqtime vs Runtime on a real system}
@@ -157,6 +157,14 @@ Further looking into the relationship between reqtime and runtime, Figure~ \ref{
 
 As mentioned previously, the latent question when predicting the \textbf{runtime} is how to provide the information to the scheduling algorithm. This section presents a few alternatives and state of the art methods in each case.
 
+\begin{figure*}[b]
+  \centering
+  \includegraphics[width=\textwidth]{../../truc.png}
+  \caption{Histogram of the error made in the prediction for both the averaging and random forest methods.}
+  \label{fig:ratio}
+\end{figure*}
+
+
 \subsection{Predicting a value}
 \label{sub:predicting_a_value}
 
@@ -173,8 +181,6 @@ This method makes full use of the dependency between successive runtimes, but do
 An algorithms that uses a probability distribution of single job runtimes ~\cite{probabilistic-backfilling} have been proposed, with an accompanying distribution prediction tool ~\cite{hmm}. This tool is similar to the previous method of averaging the two previous runtimes for the job's user, in the sense that it only relies on the runtime information. It treats successive runtimes of a given user as the observations of a Hidden Markov Model. It does not use the job description.
 
 % subsection predicting_a_distribution (end)
-
-
 \section{A Regression Approach}
 \label{sec:our_approach}
 We make the observation that single job runtime prediction might be improved by using both the `runtime locality' (i.e. the dependency between successive runtimes) and the job's features. We will experiment with a method that will allow us to bridge this gap.
@@ -202,7 +208,9 @@ The CART algorithm functions in the following manner:
 
 \subsection{Explainability}
 \label{sub:explainability}
-This approach has the advantage of being explainable. Nodes which are, on average, higher up the decision trees are more important in the decision process. This will be useful to gain insight on how the model works.
+This approach has the advantage of producing an explainable model.
+Nodes which are, on average, higher up the decision trees are more important in the decision process.
+By ranking input vector attributes according to their average height in the trees, we will be able to gain insight on which feature is the most crucial to predicting the runtime.
 % subsection explainability (end)
 
 % section our_approach (end)

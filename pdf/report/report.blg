@@ -4,48 +4,47 @@ The top-level auxiliary file: report.aux
 The style file: named.bst
 Database file #1: report.bib
 Warning--I didn't find a database entry for "workloadarchive"
-Warning--I didn't find a database entry for "tsafir"
 Warning--I didn't find a database entry for "decisiontree"
 Warning--there's a number but no series in handbook-of-scheduling
-You've used 7 entries,
+You've used 8 entries,
             2439 wiz_defined-function locations,
-            611 strings with 5774 characters,
-and the built_in function-call counts, 2767 in all, are:
-= -- 295
-> -- 86
+            618 strings with 5978 characters,
+and the built_in function-call counts, 3183 in all, are:
+= -- 340
+> -- 104
 < -- 5
-+ -- 27
-- -- 26
-* -- 221
-:= -- 446
-add.period$ -- 24
-call.type$ -- 7
-change.case$ -- 40
-chr.to.int$ -- 7
-cite$ -- 8
-duplicate$ -- 122
-empty$ -- 217
-format.name$ -- 36
-if$ -- 586
++ -- 33
+- -- 32
+* -- 260
+:= -- 510
+add.period$ -- 27
+call.type$ -- 8
+change.case$ -- 47
+chr.to.int$ -- 8
+cite$ -- 9
+duplicate$ -- 136
+empty$ -- 247
+format.name$ -- 43
+if$ -- 670
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 7
-newline$ -- 38
-num.names$ -- 23
-pop$ -- 31
+missing$ -- 8
+newline$ -- 43
+num.names$ -- 26
+pop$ -- 35
 preamble$ -- 1
-purify$ -- 47
+purify$ -- 55
 quote$ -- 0
-skip$ -- 96
+skip$ -- 109
 stack$ -- 0
-substring$ -- 144
-swap$ -- 33
+substring$ -- 174
+swap$ -- 35
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 52
+type$ -- 60
 warning$ -- 1
-while$ -- 25
-width$ -- 10
-write$ -- 100
-(There were 4 warnings)
+while$ -- 29
+width$ -- 9
+write$ -- 113
+(There were 3 warnings)
