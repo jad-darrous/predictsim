@@ -1,0 +1,13 @@
+You need these R packages for this toolbox:
+
+via R:
+install.packages("gridExtra","reshape2","ggplot2","plotrix",'tcl', 'argparse')
+
+or via debian packages:
+sudo apt-get install r-cran-reshape2 r-cran-ggplot2 r-cran-plotrix
+unfortunately grid extra isnt in the debian repos(for wheezy):
+in R: install.packages('gridExtra')
+
+You need to source source_reminder for the tools to be in your path.
+
+Use the template from /Rscript/Template.R to add a script. It contains the full indications for interfacing your R scripts with the surrounding tools.
