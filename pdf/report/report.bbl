@@ -1,16 +1,47 @@
 \begin{thebibliography}{}
 
-\bibitem[\protect\citeauthoryear{Feitelson \bgroup \em et al.\egroup
-  }{2012}]{feitelson:workloadarchivepaper}
-Dror~G. Feitelson, Dan Tsafrir, and David Krakov.
-\newblock Experience with the parallel workloads archive, 2012.
+\bibitem[\protect\citeauthoryear{Breiman}{2001}]{randomforest}
+Leo Breiman.
+\newblock Random forests.
+\newblock {\em Machine Learning}, 45(1):5--32, 2001.
+
+\bibitem[\protect\citeauthoryear{Dutot \bgroup \em et al.\egroup
+  }{2004}]{handbook-of-scheduling}
+Pierre-François Dutot, Grégory Mounié, and Denis Trystram.
+\newblock {\em {H}andbook of {S}cheduling}, chapter Scheduling Parallel Tasks -
+  Approximation Algorithms.
+\newblock Number~26. CRC press, joseph leung edition, 2004.
+
+\bibitem[\protect\citeauthoryear{Gibbons}{1997}]{gibbons}
+Richard Gibbons.
+\newblock A historical application profiler for use by parallel schedulers.
+\newblock In DrorG. Feitelson and Larry Rudolph, editors, {\em Job Scheduling
+  Strategies for Parallel Processing}, volume 1291 of {\em Lecture Notes in
+  Computer Science}, pages 58--77. Springer Berlin Heidelberg, 1997.
+
+\bibitem[\protect\citeauthoryear{Kullback and Leibler}{1951}]{kullback}
+S.~Kullback and R.~A. Leibler.
+\newblock On information and sufficiency.
+\newblock {\em The Annals of Mathematical Statistics}, 22(1):79--86, 03 1951.
+
+\bibitem[\protect\citeauthoryear{Mu'alem and Feitelson}{2001}]{backfilling}
+Ahuva~W. Mu'alem and Dror~G. Feitelson.
+\newblock Utilization, predictability, workloads, and user runtime estimates in
+  scheduling the ibm sp2 with backfilling.
+\newblock {\em IEEE Trans. Parallel Distrib. Syst.}, 12(6):529--543, June 2001.
 
 \bibitem[\protect\citeauthoryear{Nissimov and
-  Feitelson}{2008}]{nissimov:probabilistic-backfilling}
+  Feitelson}{2008}]{probabilistic-backfilling}
 Avi Nissimov and Dror~G. Feitelson.
 \newblock Probabilistic backfilling.
 \newblock In {\em Proceedings of the 13th International Conference on Job
   Scheduling Strategies for Parallel Processing}, JSSPP'07, pages 102--115,
   Berlin, Heidelberg, 2008. Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Nissimov}{2006}]{hmm}
+Avi Nissimov.
+\newblock {Locality and its usage in parallel job runtime distribution modeling
+  using HMM}.
+\newblock Master's thesis, The Hebrew University, 2006.
 
 \end{thebibliography}
