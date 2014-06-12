@@ -5,45 +5,45 @@ The style file: named.bst
 Database file #1: report.bib
 Warning--I didn't find a database entry for "workloadarchive"
 Warning--there's a number but no series in handbook-of-scheduling
-You've used 12 entries,
+You've used 13 entries,
             2439 wiz_defined-function locations,
-            639 strings with 6703 characters,
-and the built_in function-call counts, 5035 in all, are:
-= -- 515
-> -- 230
+            644 strings with 6897 characters,
+and the built_in function-call counts, 5397 in all, are:
+= -- 550
+> -- 253
 < -- 5
-+ -- 80
-- -- 78
-* -- 430
-:= -- 831
-add.period$ -- 39
-call.type$ -- 12
-change.case$ -- 85
-chr.to.int$ -- 12
-cite$ -- 13
-duplicate$ -- 192
-empty$ -- 353
-format.name$ -- 94
-if$ -- 1024
++ -- 88
+- -- 86
+* -- 461
+:= -- 897
+add.period$ -- 42
+call.type$ -- 13
+change.case$ -- 93
+chr.to.int$ -- 13
+cite$ -- 14
+duplicate$ -- 205
+empty$ -- 373
+format.name$ -- 103
+if$ -- 1093
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 13
-newline$ -- 63
-num.names$ -- 38
-pop$ -- 70
+missing$ -- 14
+newline$ -- 68
+num.names$ -- 41
+pop$ -- 77
 preamble$ -- 1
-purify$ -- 98
+purify$ -- 107
 quote$ -- 0
-skip$ -- 152
+skip$ -- 162
 stack$ -- 0
-substring$ -- 251
-swap$ -- 43
+substring$ -- 256
+swap$ -- 45
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 88
+type$ -- 96
 warning$ -- 1
-while$ -- 41
-width$ -- 14
-write$ -- 163
+while$ -- 43
+width$ -- 16
+write$ -- 175
 (There were 2 warnings)

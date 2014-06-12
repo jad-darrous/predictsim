@@ -61,7 +61,7 @@ Learning Job Runtimes in HPC Systems}
 
 
 \begin{abstract}
-  In many HPC infrastructures, the descriptions of the tasks to be executed are subject to high uncertainty. We show that users are unreliable when estimating the run time of their jobs, and look into alternative solutions. Predictive techniques are investigated in order to infer the run time of jobs from their full description and system history. Two Machine Learning techniques, Random Forests and SVMs are applied and compared against the state of the art.
+  In many HPC infrastructures, the descriptions of the tasks to be executed are subject to high uncertainty. We show that users are unreliable when estimating the run time of their jobs, and look into alternative solutions. Predictive techniques are investigated in order to infer the run time of jobs from their full description and system history. A Machine Learning technique, Random Forests is applied and compared against the state of the art. We show that the prediction obtained with this approach has good properties with respect to relevant metrics.
 \end{abstract}
 
 \section{Introduction}
@@ -160,7 +160,7 @@ As mentioned previously, the latent question when predicting the \textbf{runtime
 \begin{figure*}[b]
   \centering
   \includegraphics[width=\textwidth]{../../truc.png}
-  \caption{Histogram of the error made in predicting for both the baseline(averaging the two last known runtimes of the user) and random forest methods.}
+  \caption{Histogram of the error made in the predictionfor both the baseline and random forest methods, on the 20\% of the last jobs of the CURIE dataset.}
   \label{fig:ratio}
 \end{figure*}
 
@@ -229,31 +229,30 @@ We run the CART algorithm on a dataset built from the CURIE log which was analyz
 
 \subsection{Feature List}
 \label{sub:feature_list}
-Figure~\cite{fig:features} shows the exact data vectors we use when running the random forests.
+Figure~\ref{fig:features} shows the exact data vectors we use when running the random forests.
 
 \begin{figure}[!ht]
   \centering
-  \begin{tabular}{|l|}
+  \begin{tabular}{|l|l|}
     \hline
-    Features \\
+    ID & Features \\
     \hline
-    Processor Request  \\
-    Reqtime  \\
-    Average of two last Runtimes of job user \\
-    Last known runtime of user\\
-    Second to Last known runtime of job's user \\
-    Thinktime preceding this job \\
-    Maximum length of already running job of job's user\\
-    Sum of already running jobs of job's user\\
-    Amount of jobs of this user running \\
-    Average runtime by curr.\ running jobs of user\\
-    Total cores currently used by user\\
-    User ID \\
-    Group ID\\
-    Day of Week\\
-    Day of Month\\
-    Last known job exiting status of user\\
-    Second to  Last known job exiting status of user\\
+    1  &  Processor Request  \\
+    2  &  Reqtime  \\
+    3  &  Average of two last Runtimes of job user \\
+    4  &  Last known runtime of user\\
+    5  &  Second to Last known runtime of job's user \\
+    6  &  Thinktime preceding this job \\
+    7  &  Maximum length of already running job of job's user\\
+    8  &  Sum of already running jobs of job's user\\
+    9  &  Amount of jobs of this user running \\
+    10 &  Average runtime by curr.\ running jobs of user\\
+    11 &  Total cores currently used by user\\
+    12 &  User ID \\
+    13 &  Group ID\\
+    14 &  Day of Week\\
+    15 &  Last known job exiting status of user\\
+    16 &  Second to  Last known job exiting status of user\\
     \hline
   \end{tabular}
   \caption{Vector features for random forest regression.}
@@ -270,27 +269,46 @@ The experiments are run using the scikit-learn~\cite{scikit-learn} package. Feat
 We compare the results from our method with the runtime averaging baseline.
 Figure~\ref{fig:ratio} shows the histogram of the error to the true value of runtime of the real runtimes.
 We can see that our method provides a rather thin-tailed distribution of the error.
-This is a rather interesting attribute because efficient scheduling policies and even backfilling are impacted by this error in a convex manner.
-For instance, a very important overestimation of the runtime of a jobmay cause it to be highly delayed in a list-based scheduling policy that tries to optimize fairness.
-In the same vein, a highly underestimated runtime may lead to a very harmful delaying of many jobs in a queue after the backfill
-Sum of squares for tsafrir: $1.24186e+13$
-Sum of squares for randomforest: $9.897605e+12$
+This is a rather interesting attribute because some scheduling policies are impacted by this error in a convex manner.
+An exemple is provided in the case of a list-based scheduling algorithm which optimizes fairness between users. In such a system, we are concerned with the stretch ratio of a job:
+
+\[
+  \mbox{Stretch Ratio } = \frac{\mbox{Time from job submit to job completion}}{\textbf{Runtime}}
+\]
+
+On a highly loaded system with many users who submit jobs with runtimes of the order of a minute, a user who has a ten second job which is falsely estimated at an hour will see his stretch ratio highly degraded.
+So far we can not see any convexity in the cost function associated with our error. In practice, we are often concerned with minimizing the maximum stretch ratio value across all jobs and users. Using the maximum value introduces convexity and we would now like to avoid extreme values of the error at all costs.
+
+Because of this argument for the convexity of a relevant measure of the error produced by the predictor, we argue that the classic least-squares method for estimating the quality of our predictions is appropriate.
+In this sense, we outperform the simple averaging of the two previous runtimes of the user, as shown in figure~\ref{fig:lsq}.
+
+\begin{figure}[ht]
+  \centering
+
+  \begin{tabular}{|l|l|}
+    \hline
+    Baseline  &  $9.897605e+12$  \\
+    \hline
+    Random Forest &  $1.24186e+13$ \\
+    \hline
+  \end{tabular}
+  \caption{Least square measure of the error of both prediction techniques on the 20\% of the last jobs of the CURIE log}
+  \label{fig:lsq}
+\end{figure}
+
 
 \subsection{Feature importances}
 \label{sub:feature_importances}
-TODO:
-We discuss feature importances \lots Figure~\ref{fig:importances}
+Figure~\ref{fig:importances} shows the relative importance of the different attributes. It shows that the two most relevant attributes are the baseline and the \textbf{reqtime}.
 
 \begin{figure}[ht]
   %\centering
-  \vspace{-50}
-  \includegraphics[width=0.5\textwidth]{../../analysis/pie.png}
-  \vspace{-60}
+  \includegraphics[width=0.5\textwidth]{interpretation.png}
   \caption{Relative importance of features in the Random Forests algorithm.}
   \label{fig:importances}
   %\vspace{-50}
 \end{figure}
-%\usepackage{subcaption}
+
 
 
 % subsection feature_importances (end)
@@ -300,18 +318,12 @@ We discuss feature importances \lots Figure~\ref{fig:importances}
 
 \section{Conclusions and Extensions}
 \label{sec:conclusions}
-
 We intend to run the experiments again with systematic full splitting on categorical attributes.
-%TODO:conclure..
-
 % section conclusions (end)
-
 
 \section{Acknowledgements}
 \label{sec:conclusions}
-%I would like to thank both my advisors for their the time they spent to meet and discuss this work in spite of their very busy schedules! In particular, thanks to Denis who is the reason I am doing a research master today..
-
-%TODO:remercier..
+I would like to thank both my advisors for the opportunity to work on this problem and the time they spent to meet and discuss this work in spite of their very busy schedules!
 
 % section conclusions (end)
 

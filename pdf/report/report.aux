@@ -5,14 +5,14 @@
 \citation{workloadarchive}
 \citation{handbook-of-scheduling}
 \citation{tsafir}
-\citation{workloadarchive}
-\citation{backfilling}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Problem Statement}{2}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Motivation}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Importance of \textbf  {runtime}}{2}}
 \newlabel{sub:importance_of_runtime}{{2.1}{2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Marginal Histograms of the \textbf  {reqtime} and \textbf  {runtime} of all jobs from the CEA CURIE log.}}{2}}
 \newlabel{fig:_wall_run_for_report_pdf}{{1}{2}}
+\citation{workloadarchive}
+\citation{backfilling}
 \citation{gibbons}
 \citation{tsafir}
 \citation{probabilistic-backfilling}
@@ -37,10 +37,9 @@
 \newlabel{sub:random_forests}{{4.1}{4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Interpretation of the model}{4}}
 \newlabel{sub:explainability}{{4.2}{4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Histogram of the error made in predicting for both the baseline(averaging the two last known runtimes of the user) and random forest methods.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Histogram of the error made in the predictionfor both the baseline and random forest methods, on the 20\% of the last jobs of the CURIE dataset.}}{4}}
 \newlabel{fig:ratio}{{3}{4}}
 \citation{tsafir}
-\citation{fig:features}
 \citation{simpy}
 \citation{scikit-learn}
 \bibstyle{named}
@@ -48,6 +47,7 @@
 \bibcite{decisiontrees}{\citeauthoryear {Breiman \bgroup \em  et al.\egroup }{1984}}
 \bibcite{randomforest}{\citeauthoryear {Breiman}{2001}}
 \bibcite{handbook-of-scheduling}{\citeauthoryear {Dutot \bgroup \em  et al.\egroup }{2004}}
+\bibcite{gibbons}{\citeauthoryear {Gibbons}{1997}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Preliminary Results}{5}}
 \newlabel{sec:preliminary_results}{{5}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Feature List}{5}}
@@ -56,20 +56,22 @@
 \newlabel{fig:features}{{4}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Comparison with the baseline}{5}}
 \newlabel{sub:comparison_with_average_baseline}{{5.2}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Least square measure of the error of both prediction techniques on the 20\% of the last jobs of the CURIE log}}{5}}
+\newlabel{fig:lsq}{{5}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Feature importances}{5}}
 \newlabel{sub:feature_importances}{{5.3}{5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Relative importance of features in the Random Forests algorithm.}}{5}}
-\newlabel{fig:importances}{{5}{5}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions and Extensions}{5}}
 \newlabel{sec:conclusions}{{6}{5}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Acknowledgements}{5}}
 \newlabel{sec:conclusions}{{7}{5}}
-\bibcite{gibbons}{\citeauthoryear {Gibbons}{1997}}
 \bibcite{kullback}{\citeauthoryear {Kullback and Leibler}{1951}}
 \bibcite{backfilling}{\citeauthoryear {Mu'alem and Feitelson}{2001}}
 \bibcite{simpy}{\citeauthoryear {Muller and Vignaux}{2003}}
 \bibcite{probabilistic-backfilling}{\citeauthoryear {Nissimov and Feitelson}{2008}}
 \bibcite{hmm}{\citeauthoryear {Nissimov}{2006}}
+\bibcite{interpret}{\citeauthoryear {{Palczewska} \bgroup \em  et al.\egroup }{2013}}
 \bibcite{scikit-learn}{\citeauthoryear {Pedregosa \bgroup \em  et al.\egroup }{2011}}
 \bibcite{rabiner}{\citeauthoryear {Rabiner}{1989}}
 \bibcite{tsafir}{\citeauthoryear {Tsafrir \bgroup \em  et al.\egroup }{2007}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Relative importance of features in the Random Forests algorithm.}}{6}}
+\newlabel{fig:importances}{{6}{6}}

@@ -55,6 +55,13 @@ Avi Nissimov.
   using HMM}.
 \newblock Master's thesis, The Hebrew University, 2006.
 
+\bibitem[\protect\citeauthoryear{{Palczewska} \bgroup \em et al.\egroup
+  }{2013}]{interpret}
+A.~{Palczewska}, J.~{Palczewski}, R.~{Marchese Robinson}, and D.~{Neagu}.
+\newblock {Interpreting random forest classification models using a feature
+  contribution method}.
+\newblock {\em ArXiv e-prints}, December 2013.
+
 \bibitem[\protect\citeauthoryear{Pedregosa \bgroup \em et al.\egroup
   }{2011}]{scikit-learn}
 F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,

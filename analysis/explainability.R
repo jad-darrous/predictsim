@@ -89,7 +89,18 @@ setwd(execution_wd)
 df <- read.table(args$filename,comment.char=';')
 names(df) <- c('force')
 gid=length(df$force)-11-582-7-2
-df$name=c("proc_req","time_req","tsafir_mean","last_runtime","last_runtime2","thinktime","running_maxlength","running_sumlength","amount_running","running_average_runtime","running_allocatedcores",rep("uid",582),rep("gid",gid),rep("dow",7),rep("status",1),rep("status2",1))
+#df$name=c("proc_req","time_req","tsafir_mean","last_runtime","last_runtime2","thinktime","running_maxlength","running_sumlength","amount_running","running_average_runtime","running_allocatedcores",rep("uid",582),rep("gid",gid),rep("dow",7),rep("status",1),rep("status2",1))
+df$name=c("1","2","3","4","5","6","7","8","9","10","11",rep("12",582),rep("13",gid),rep("14",7),rep("15",1),rep("16",1))
+uidf=sum(df[which(df$name=="12"),]$force)
+gdf=sum(df[which(df$name=="13"),]$force)
+dow=sum(df[which(df$name=="14"),]$force)
+newrow = c(1:4)
+df=df[which(df$name!="12"  & df$name!="13" &df$name!="14"),]
+df = rbind(df,c(uidf,"12"))
+df = rbind(df,c(gdf,"13"))
+df = rbind(df,c(dow,"14"))
+df$force=as.numeric(df$force)
+
 summary(df$force)
 
 library("ggplot2")
@@ -99,9 +110,11 @@ library("ggplot2")
 
 
 #pause_output(options_vector)
-ggplot(df, aes(x = factor(1),y=force, fill = name)) +
-geom_bar(width=1,stat="identity")+
-coord_polar(theta = "y")
+ggplot(df, aes(x = name,y=force)) +
+#geom_bar()
+geom_bar(stat="identity")+xlab("Attribute")+ylab("Importance")+ggtitle("Relative Importance of Attributes")
+#geom_bar(width=1,stat="identity")+
+#coord_polar(theta = "y")
 
 
 #type stuff here.
