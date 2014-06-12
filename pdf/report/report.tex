@@ -91,7 +91,7 @@ When assessing the relevance of the specific information we choose to produce fr
   %\centering\rule{0.8*\textwidth}{0.3*\textwidth}
   \centering
   \includegraphics[width=\textwidth]{../../wallimage-0.png}
-  \caption{Marginal Histograms of the \textbf{reqtime} and \textbf{runtime} of all jobs from the CEA Curie log.}
+  \caption{Marginal Histograms of the \textbf{reqtime} and \textbf{runtime} of all jobs from the CEA CURIE log.}
   \label{fig:_wall_run_for_report_pdf}
 \end{figure*}
 
@@ -100,7 +100,7 @@ When assessing the relevance of the specific information we choose to produce fr
 \begin{figure*}[b]
   \centering
   \includegraphics[width=\textwidth]{../../wallimage-1.png}
-  \caption{Histogram of the $\frac{\textbf{runtime}}{\textbf{reqtime}}$ ratio in the Curie log.}
+  \caption{Histogram of the $\frac{\textbf{runtime}}{\textbf{reqtime}}$ ratio in the CURIE log.}
   \label{fig:ratio}
 \end{figure*}
 
@@ -144,7 +144,7 @@ As mentioned before, existing solutions use much simpler heuristics. We will now
 
 \subsection{Reqtime vs Runtime on a real system}
 \label{sub:reqtime_vs_runtime_on_a_real_system}
-The following study is conducted on a log[ref log] containing 20 months worth of data from the Curie[ref curie] supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
+The following study is conducted on a log[ref log] containing 20 months worth of data from the CURIE[ref curie] supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
 It contains more than 300,000 jobs, submitted from February 2011 to October 2012 by 900 users in the `cleaned' version from the workload archive~\cite{workloadarchive}.
 The log has several homogeneous CPU partitions and CPU+GPU partitions, however in a each partition, all nodes are identical.
 Jobs are allocated to partitions using user preference. The system is managed using the SLURM (Simple Linux Utility for Resource Management) software.
@@ -208,80 +208,83 @@ The CART algorithm functions in the following manner:
       \item Randomly partition the training data.
       \item Build decision trees on each partition.
     \end{itemize}
-      \item Predict a value by combining (e.g.\ average or linear combination) the results from all the trees.
+  \item Predict a value by combining (e.g.\ average or linear combination) the results from all the trees.
 \end{itemize}
 % subsection random_forests (end)
 
-\subsection{Explainability}
+\subsection{Interpretation of the model}
 \label{sub:explainability}
 This approach has the advantage of producing an explainable model.
 Nodes which are, on average, higher up the decision trees are more important in the decision process.
 By ranking input vector attributes according to their average height in the trees, we will be able to gain insight about which feature is the most crucial to predicting the runtime.
-% subsection explainability (end)
+However, given the important height and complexity of the trees, it is hard to produce more information.
+There exist techniques ~\cite{interpret} to interpret further the model, however they are not implemented in the free and open-source Random Forest packages, and we did not use them due to time constraints.
+% subsection interpretation of the model (end)
 
 % section our_approach (end)
 
 \section{Preliminary Results}
 \label{sec:preliminary_results}
-We run the CART algorithm on a data set built from the Curie dataset which was analyzed in~\ref{sub:reqtime_vs_runtime_on_a_real_system}. In a first approach, we choose to validate our approach by training the algorithm with the first 80\% of the job/runtime associations and predicting the last 20\% of the runtimes. We then compare our results with an existing popular baseline, namely averaging the two last available runtime values from the job user~\cite{tsafir}, in order to validate our method.
+We run the CART algorithm on a dataset built from the CURIE log which was analyzed in~\ref{sub:reqtime_vs_runtime_on_a_real_system}. In a first approach, we choose to validate our approach by training the algorithm with the first 80\% of the job/runtime associations and predicting the last 20\% of the runtimes. We then compare our results with an existing popular baseline, namely averaging the two last available runtime values from the job user~\cite{tsafir}, in order to validate our method.
 
 \subsection{Feature List}
 \label{sub:feature_list}
-We build data vectors with the following features:
+Figure~\cite{fig:features} shows the exact data vectors we use when running the random forests.
 
-\begin{tabular}{|l|}
-  \hline
-  Features \\
-  \hline
-  Processor Request  \\
-  Reqtime  \\
-  Average of two last Runtimes of job user \\
-  Last known runtime of user\\
-  Second to Last known runtime of job's user \\
-  Thinktime preceding this job \\
-  Maximum length of already running job of job's user\\
-  Sum of already running jobs of job's user\\
-  Amount of jobs of this user running \\
-  Average runtime by curr.\ running jobs of user\\
-  Total cores currently used by user\\
-  User ID \\
-  Group ID\\
-  Day of Week\\
-  Day of Month\\
-  Last known job exiting status of user\\
-  Second to  Last known job exiting status of user\\
+\begin{figure}[!ht]
+  \centering
+  \begin{tabular}{|l|}
+    \hline
+    Features \\
+    \hline
+    Processor Request  \\
+    Reqtime  \\
+    Average of two last Runtimes of job user \\
+    Last known runtime of user\\
+    Second to Last known runtime of job's user \\
+    Thinktime preceding this job \\
+    Maximum length of already running job of job's user\\
+    Sum of already running jobs of job's user\\
+    Amount of jobs of this user running \\
+    Average runtime by curr.\ running jobs of user\\
+    Total cores currently used by user\\
+    User ID \\
+    Group ID\\
+    Day of Week\\
+    Day of Month\\
+    Last known job exiting status of user\\
+    Second to  Last known job exiting status of user\\
+    \hline
+  \end{tabular}
+  \caption{Vector features for random forest regression.}
+  \label{fig:features}
+\end{figure}
 
-  \hline
-\end{tabular}
+Features concerning the characteristics of the previous jobs of the user are not present in the CURIE log. extracted by replaying the log with the simpy~\cite{simpy} discrete event simulation package.
 
-Features \ldots and \ldots are extracted by replaying the log with the simpy~\cite{simpy} discrete event simulation package.
-
-The experiments are run using the scikit-learn~\cite{scikit-learn} package. Features $User ID$, $ Group ID$, $ Day of Week$, $ Last Status$, $ Second to Last status$ are encoded in a one-hot fashion, as the package we use only builds binary decision trees on continuous attributes.
-We intend to run the experiments again with systematic full splitting on categorical attributes.
-
+The experiments are run using the scikit-learn~\cite{scikit-learn} package. Features $User ID$, $ Group ID$, $ Day of Week$, $ Last Status$, $ Second to Last status$ are encoded in a one-hot fashion \footnote{The one hot encoding of a n-valued categorical attribute consists of n binary attributes where each one corresponds to a category.}, as the package we use only builds binary decision trees on continuous attributes.
 % subsection feature_list (end)
 
 \subsection{Comparison with the baseline}
 \label{sub:comparison_with_average_baseline}
-TODO:
-We compare the results from our method with the baseline \ldots Figure~\ref{fig:ratio}
+We compare the results from our method with the runtime averaging baseline.
+Figure~\ref{fig:ratio} shows the histogram of the error to the true value of runtime of the real runtimes.
+We can see that our method provides a rather thin-tailed distribution of the error.
+This is a rather interesting attribute because efficient scheduling policies and even backfilling are impacted by this error in a convex manner. For instance, a very important overestimation of the runtime of a jobmay cause it to be highly delayed in a list-based scheduling policy that tries to optimize fairness. In the same vein, a highly underestimated runtime may lead
 Sum of squares for tsafrir: $1.24186e+13$
 Sum of squares for randomforest: $9.897605e+12$
-
-
 
 \subsection{Feature importances}
 \label{sub:feature_importances}
 TODO:
 We discuss feature importances \lots Figure~\ref{fig:importances}
+
 \begin{figure}[ht]
-        %\centering
-        \includegraphics[width=0.6\textwidth]{../../pie.png}
-        \caption{Relative importance of features in the Random Forests algorithm.}
-        \label{fig:importances}
+  %\centering
+  \includegraphics[width=0.6\textwidth]{../../pie.png}
+  \caption{Relative importance of features in the Random Forests algorithm.}
+  \label{fig:importances}
 \end{figure}
-
-
 
 % subsection feature_importances (end)
 % subsection comparison_with_average_baseline (end)
@@ -291,6 +294,7 @@ We discuss feature importances \lots Figure~\ref{fig:importances}
 \section{Conclusions and Extensions}
 \label{sec:conclusions}
 
+We intend to run the experiments again with systematic full splitting on categorical attributes.
 %TODO:conclure..
 
 % section conclusions (end)

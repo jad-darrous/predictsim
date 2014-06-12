@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  12 JUN 2014 08:37
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.3)  12 JUN 2014 11:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -399,13 +399,22 @@ File: omsptm.fd
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 189.
 
+
+LaTeX Warning: Citation `interpret' on page 4 undefined on input line 221.
+
 [4 <../../truc.png>]
-Underfull \hbox (badness 2582) in paragraph at lines 259--261
+
+LaTeX Warning: Citation `fig:features' on page 5 undefined on input line 232.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 265.
+
+Underfull \hbox (badness 2582) in paragraph at lines 265--267
 []\T1/ptm/m/n/10 The ex-per-i-ments are run us-ing the scikit-learn [] Pe-
  []
 
 ! Undefined control sequence.
-l.276 We discuss feature importances \lots
+l.280 We discuss feature importances \lots
                                            Figure~\ref{fig:importances}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -413,13 +422,27 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-<../../pie.png, id=27, 505.89pt x 505.89pt>
-File: ../../pie.png Graphic file (type png)
- <use ../../pie.png>
-Package pdftex.def Info: ../../pie.png used on input line 279.
-(pdftex.def)             Requested size: 303.53708pt x 303.54405pt.
 
-Overfull \hbox (59.62582pt too wide) in paragraph at lines 279--280
+LaTeX Warning: File `../../pie.png' not found on input line 284.
+
+
+! Package pdftex.def Error: File `../../pie.png' not found.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.284 ...phics[width=0.6\textwidth]{../../pie.png}
+                                                  
+Using draft setting for this image.
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 284.
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+)
+Overfull \hbox (59.62582pt too wide) in paragraph at lines 284--285
 [][] 
  []
 
@@ -428,12 +451,12 @@ Underfull \hbox (badness 7540) in paragraph at lines 5--8
 []\T1/ptm/m/n/10 Leo Breiman, Jerome Fried-man,
  []
 
-
+[5]
 Underfull \hbox (badness 6876) in paragraph at lines 34--38
 []\T1/ptm/m/n/10 Ahuva W. Mu'alem and
  []
 
-[5 <../../pie.png>]
+
 Underfull \hbox (badness 10000) in paragraph at lines 60--65
 []\T1/ptm/m/n/10 F. Pe-dregosa, G. Varo-quaux,
  []
@@ -446,24 +469,25 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3856 strings out of 493304
- 52484 string characters out of 6139871
- 130723 words of memory out of 5000000
- 7184 multiletter control sequences out of 15000+600000
- 47571 words of font info for 77 fonts, out of 8000000 for 9000
- 957 hyphenation exceptions out of 8191
+ 3898 strings out of 495028
+ 53018 string characters out of 6181498
+ 126445 words of memory out of 5000000
+ 6969 multiletter control sequences out of 15000+600000
+ 56452 words of font info for 90 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
  39i,10n,23p,1030b,478s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
-utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (6 pages, 153498 bytes).
+type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/sym
+bol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (6 pages, 144172 bytes).
 PDF statistics:
- 60 PDF objects out of 1000 (max. 8388607)
- 37 compressed objects within 1 object stream
+ 61 PDF objects out of 1000 (max. 8388607)
+ 39 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
