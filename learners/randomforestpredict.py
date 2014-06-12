@@ -95,18 +95,25 @@ if encoding=="onehot":
     print("encoding in onehot")
     mms = preprocessing.MinMaxScaler()
     enc_user_id = preprocessing.OneHotEncoder()
-    X_onehot_user_id =np.array( enc_user_id.fit_transform(np.reshape(X['user_id'],(-1,1))).toarray())
-    enc_group_id = preprocessing.OneHotEncoder()
-    X_onehot_group_id =np.array( enc_group_id.fit_transform(np.reshape(X['group_id'],(-1,1))).toarray())
-    enc_day_of_week = preprocessing.OneHotEncoder()
-    X_onehot_day_of_week =np.array( enc_day_of_week.fit_transform(np.reshape(X['day_of_week'],(-1,1))).toarray())
-    enc_day_of_month = preprocessing.OneHotEncoder()
-    X_onehot_day_of_month =np.array( enc_day_of_month.fit_transform(np.reshape(X['day_of_month'],(-1,1))).toarray())
-    enc_last_status = preprocessing.OneHotEncoder()
-    X_onehot_last_status =np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X['last_status'],(-1,1)))).toarray())
-    enc_last_status2 = preprocessing.OneHotEncoder()
-    X_onehot_last_status2 =np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X['last_status2'],(-1,1)))).toarray())
-    onehot_features=np.hstack((X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
+
+    X_onehot_user_id      = np.array( enc_user_id.fit_transform(np.reshape(X['user_id'],(-1,1))).toarray())
+    enc_group_id          = preprocessing.OneHotEncoder()
+
+    X_onehot_group_id     = np.array( enc_group_id.fit_transform(np.reshape(X['group_id'],(-1,1))).toarray())
+    enc_day_of_week       = preprocessing.OneHotEncoder()
+
+    X_onehot_day_of_week  = np.array( enc_day_of_week.fit_transform(np.reshape(X['day_of_week'],(-1,1))).toarray())
+    enc_day_of_month      = preprocessing.OneHotEncoder()
+
+    X_onehot_day_of_month = np.array( enc_day_of_month.fit_transform(np.reshape(X['day_of_month'],(-1,1))).toarray())
+    enc_last_status       = preprocessing.OneHotEncoder()
+
+    X_onehot_last_status  = np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X['last_status'],(-1,1)))).toarray())
+    enc_last_status2      = preprocessing.OneHotEncoder()
+
+    X_onehot_last_status2 = np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X['last_status2'],(-1,1)))).toarray())
+    onehot_features       = np.hstack((X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
+
     X=drop_fields(X,['user_id','group_id','day_of_week','day_of_month','last_status','last_status2'])
     print("the format of X before going to np.array is:")
     print(X.dtype)

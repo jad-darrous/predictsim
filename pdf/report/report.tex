@@ -39,7 +39,7 @@
 \title{Master 1 MoSIG Research Project Report\\
 Learning Job Runtimes in HPC Systems}
 \author{Valentin Reis\\
-Supervised by: Denis Trystram \& Eric Gaussier.\\
+  Supervised by: Denis Trystram \& Eric Gaussier.\\
 }
 
 \begin{document}
@@ -48,20 +48,20 @@ Supervised by: Denis Trystram \& Eric Gaussier.\\
 
 {% Mosig student
   {\hbox to0pt{\vbox{\baselineskip=10dd\hrule\hbox
-to\hsize{\vrule\kern3pt\vbox{\kern3pt
-\hbox{{\small I understand what plagiarism entails and I declare that this report }}
-\hbox{{\small is my own, original work. }}
-\hbox{{\small Name, date and signature: }}
-\kern3pt
-}\hfil%\kern3pt
-\vrule
-}\hrule}
-}}
+        to\hsize{\vrule\kern3pt\vbox{\kern3pt
+            \hbox{{\small I understand what plagiarism entails and I declare that this report }}
+            \hbox{{\small is my own, original work. }}
+            \hbox{{\small Name, date and signature: }}
+            \kern3pt
+          }\hfil%\kern3pt
+          \vrule
+      }\hrule}
+  }}
 }
 
 
 \begin{abstract}
- In many HPC infrastructures, the descriptions of the tasks to be executed are subject to high uncertainty. We show that users are unreliable when estimating the run time of their jobs, and look into alternative solutions. Predictive techniques are investigated in order to infer the run time of jobs from their full description and system history. Two Machine Learning techniques, Random Forests and SVMs are applied and compared against the state of the art.
+  In many HPC infrastructures, the descriptions of the tasks to be executed are subject to high uncertainty. We show that users are unreliable when estimating the run time of their jobs, and look into alternative solutions. Predictive techniques are investigated in order to infer the run time of jobs from their full description and system history. Two Machine Learning techniques, Random Forests and SVMs are applied and compared against the state of the art.
 \end{abstract}
 
 \section{Introduction}
@@ -90,18 +90,18 @@ When assessing the relevance of the specific information we choose to produce fr
 \begin{figure*}[b]
   %\centering\rule{0.8*\textwidth}{0.3*\textwidth}
   \centering
-        \includegraphics[width=\textwidth]{../../wallimage-0.png}
-        \caption{Marginal Histograms of the \textbf{reqtime} and \textbf{runtime} of all jobs from the CEA Curie log.}
-\label{fig:_wall_run_for_report_pdf}
+  \includegraphics[width=\textwidth]{../../wallimage-0.png}
+  \caption{Marginal Histograms of the \textbf{reqtime} and \textbf{runtime} of all jobs from the CEA Curie log.}
+  \label{fig:_wall_run_for_report_pdf}
 \end{figure*}
 
 
 
 \begin{figure*}[b]
-        \centering
-        \includegraphics[width=\textwidth]{../../wallimage-1.png}
-        \caption{Histogram of the $\frac{\textbf{runtime}}{\textbf{reqtime}}$ ratio in the Curie log.}
-        \label{fig:ratio}
+  \centering
+  \includegraphics[width=\textwidth]{../../wallimage-1.png}
+  \caption{Histogram of the $\frac{\textbf{runtime}}{\textbf{reqtime}}$ ratio in the Curie log.}
+  \label{fig:ratio}
 \end{figure*}
 
 \subsection{Job runtimes}
@@ -132,11 +132,11 @@ In essence, we are targeting large Beowulf clusters, supercomputers, GPU farms a
 
 \subsection{Importance of \textbf{runtime}}
 \label{sub:importance_of_runtime}
-Once again, we emphasise the role of the \textbf{runtime} in scheduling tasks. Virtually all results from scheduling theory use the `clairvoyant' model ~\cite{handbook-of-scheduling}, where \textbf{runtimes} of jobs with respect to all possible affectations on the system are known in advance.
+Once again, we emphasise the role of the \textbf{runtime} in scheduling tasks. Virtually all results from scheduling theory use the `clairvoyant' model~\cite{handbook-of-scheduling}, where \textbf{runtimes} of jobs with respect to all possible affectations on the system are known in advance.
 %TODO: ref clairvoyant? ok?
 Intuitively, in order to use this extensive theoretical body, we would need to reduce uncertainty in this variable.
 %TODO:ref Denis FCFS wait? ok?
-It has been shown  ~\cite{tsafir} that even in the classical approach (which is to use policies that are robust to this uncertainty), there is added value when this variable is refined.
+It has been shown~\cite{tsafir} that even in the classical approach (which is to use policies that are robust to this uncertainty), there is added value when this variable is refined.
 In all cases, reducing uncertainty in \textbf{runtime} is critical to the success of the approach used to schedule jobs.
 
 As mentioned before, existing solutions use much simpler heuristics. We will now focus on a particular system in order show why a simple scheduling heuristic is applied.
@@ -145,12 +145,12 @@ As mentioned before, existing solutions use much simpler heuristics. We will now
 \subsection{Reqtime vs Runtime on a real system}
 \label{sub:reqtime_vs_runtime_on_a_real_system}
 The following study is conducted on a log[ref log] containing 20 months worth of data from the Curie[ref curie] supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
-It contains more than 300,000 jobs, submitted from February 2011 to October 2012 by 900 users in the `cleaned' version from the workload archive ~\cite{workloadarchive}.
+It contains more than 300,000 jobs, submitted from February 2011 to October 2012 by 900 users in the `cleaned' version from the workload archive~\cite{workloadarchive}.
 The log has several homogeneous CPU partitions and CPU+GPU partitions, however in a each partition, all nodes are identical.
 Jobs are allocated to partitions using user preference. The system is managed using the SLURM (Simple Linux Utility for Resource Management) software.
-Figure ~\ref{fig:_wall_run_for_report_pdf} shows the marginal distributions of \textbf{reqtimes} and \textbf{runtimes} on this system. The marginal distributions are already revealing, we can see that many \textbf{reqtimes} are in the 24h bin.
+Figure~\ref{fig:_wall_run_for_report_pdf} shows the marginal distributions of \textbf{reqtimes} and \textbf{runtimes} on this system. The marginal distributions are already revealing, we can see that many \textbf{reqtimes} are in the 24h bin.
 The reason for this is that 24h is both the maximal value and the default one: on this system, users may choose not to provide an estimate for their job's \textbf{runtimes}, in which case the maximum value is used by the scheduler.
-Further looking into the relationship between reqtime and runtime, Figure~ \ref{fig:ratio} shows how the ratio $\frac{\textbf{runtime}}{\textbf{reqtime}}$ is distributed. This histogram indicates that a majority of users either: have very little idea about the expected \textbf{runtime} of their jobs, or overestimate very strongly its value on purpose. Sophisticated scheduling methods are not applied: under such uncertainty in the \textbf{runtime},  their performance is equivalent to the simple heuristic which is applied, namely FCFS with Backfilling ~\cite{backfilling}.
+Further looking into the relationship between reqtime and runtime, Figure~\ref{fig:ratio} shows how the ratio $\frac{\textbf{runtime}}{\textbf{reqtime}}$ is distributed. This histogram indicates that a majority of users either: have very little idea about the expected \textbf{runtime} of their jobs, or overestimate very strongly its value on purpose. Sophisticated scheduling methods are not applied: under such uncertainty in the \textbf{runtime},  their performance is equivalent to the simple heuristic which is applied, namely FCFS with Backfilling~\cite{backfilling}.
 % subsection reqtime_vs_runtime_on_a_real_system (end)
 
 \section{State of the art in \textbf{runtime} prediction}
@@ -168,9 +168,9 @@ As mentioned previously, the latent question when predicting the \textbf{runtime
 \subsection{Predicting a value}
 \label{sub:predicting_a_value}
 
-Predicting values has been first attempted ~\cite{gibbons} by binning jobs in a predefined partitioning of their feature space and averaging values in each bin to provide an estimate. In this method, the partitionning has to be provided by the Resource Management Software or the system administrator. This method assumes the data to be identically distributed and independent. It does not make use of dependency between successive jobs. Moreover, the binning has to be obtained trough careful statistical analysis of the specific system and population.
+Predicting values has been first attempted~\cite{gibbons} by binning jobs in a predefined partitioning of their feature space and averaging values in each bin to provide an estimate. In this method, the partitionning has to be provided by the Resource Management Software or the system administrator. This method assumes the data to be identically distributed and independent. It does not make use of dependency between successive jobs. Moreover, the binning has to be obtained trough careful statistical analysis of the specific system and population.
 
-A more simple approach ~\cite{tsafir} averages the two last available runtimes of the job's user.
+A more simple approach~\cite{tsafir} averages the two last available runtimes of the job's user.
 This method makes full use of the dependency between successive runtimes, but does not make use of the jobs's description. Its main selling point are it's simplicity and accuracy.
 
 % subsection predicting_a_value (end)
@@ -178,31 +178,37 @@ This method makes full use of the dependency between successive runtimes, but do
 \subsection{Predicting a distribution}
 \label{sub:predicting_a_distribution}
 
-An algorithms that uses a probability distribution of single job runtimes ~\cite{probabilistic-backfilling} have been proposed, with an accompanying distribution prediction tool ~\cite{hmm}. This tool is similar to the previous method of averaging the two previous runtimes for the job's user, in the sense that it only relies on the runtime information. It treats successive runtimes of a given user as the observations of a Hidden Markov Model. It does not use the job description.
+An algorithms that uses a probability distribution of single job runtimes~\cite{probabilistic-backfilling} have been proposed, with an accompanying distribution prediction tool~\cite{hmm}. This tool is similar to the previous method of averaging the two previous runtimes for the job's user, in the sense that it only relies on the runtime information. It treats successive runtimes of a given user as the observations of a Hidden Markov Model~\cite{rabiner}. It does not use the job description.
 
 % subsection predicting_a_distribution (end)
 \section{A Regression Approach}
 \label{sec:our_approach}
-We make the observation that single job runtime prediction might be improved by using both the `runtime locality' (i.e. the dependency between successive runtimes) and the job's features. We will experiment with a method that will allow us to bridge this gap.
+We make the observation that single job runtime prediction might be improved by using both the `runtime locality' (i.e.\ the dependency between successive runtimes) and the job features. We will experiment with a method that will allow us to bridge this gap.
 The chosen method is to perform regression on vectors containing the following features:
 \begin{itemize}
-  \item the continuous and discrete attributes from the job's description, such as \textbf{reqtime}, number of cores required,or time of the day of the sumbission.
-  \item the attributes of the last $n$ jobs of this user, where $n$ is to be chosen as to balance between the cost of fitting the model and its accuracy.
-  \item predicted values which come from other techniques, such as averaging the two previous values.
+  \item The continuous and discrete attributes from the job's description, such as \textbf{reqtime}, number of cores required,or time of the day of the sumbission.
+  \item The attributes of the last $n$ jobs of this user, where $n$ is to be chosen as to balance between the cost of fitting the model and its accuracy.
+  \item Attributes from the user and the system, such as the amount of nodes the user is currently using on the system, or the mean runtimes of jobs of the user.
+  \item Predicted values which come from other techniques, such as averaging the two previous runtime values.
 \end{itemize}
 This approach has the advantage of being rather adaptable to various formulations of the job description.
 No two HPC systems are identical, therefore this provides a clear added value, as it is now the algorithm's responsibility deal with the particularities of the input data on each system.
 It is however difficult to provide validation of this aspect of the specific algorithm we will use, and this will not be in the scope of this paper.
 
-\subsection{Random Forest Regression}
+\subsection{Random Forests}
 \label{sub:random_forests}
-The specfic ML algorithm we use is Random Forest Regression, and in particular the CART ~\cite{randomforest} method. This technique builds upon Decision Tree Learning ~\cite{decisiontree}.
-Decision Tree Learning partitions the feature space: in the tree, the splitting is performed by using a threshold for continuous features and a all-way split on categorical features. Leaves are regressed values.
+The specfic ML algorithm we use is called Random Forests, and in particular the CART~\cite{randomforest} method.
+This technique is an ensemble learning method based upon Decision Tree Learning~\cite{decisiontrees}.
+Decision Trees partition the feature space: in a tree, the splitting is performed by using a threshold for continuous features and a all-way split on categorical features.
+Decision Trees are usually learned on a training set with a recursive top-down greedy algorithm which optimizes a function of the tree and the training set.
+Such a function can be for instance the Information Gain~\cite{kullback} of the tree on the training set. A criterion on the purity of leaves and/or amount of vectors which fall therein is used to stop the construction. Training set real output values are then averaged in each leaf to give predictions: When regressing a data point, it is sent trough the tree and the algorithm outputs the value of the corresponding leaf.
 The CART algorithm functions in the following manner:
 \begin{itemize}
-  \item Randomly partition the training data.
-  \item Build decision trees on each partition using a recursive greedy algorithm, which optimizes a function of the tree and the training set. Such a function can be for instance the Information Gain ~\cite{kullback} of the tree on the training set.
-  \item Predict a value by combining (e.g. average or linear combination) the results from all the trees.
+  \item Training: \begin{itemize}
+      \item Randomly partition the training data.
+      \item Build decision trees on each partition.
+    \end{itemize}
+      \item Predict a value by combining (e.g.\ average or linear combination) the results from all the trees.
 \end{itemize}
 % subsection random_forests (end)
 
@@ -210,20 +216,44 @@ The CART algorithm functions in the following manner:
 \label{sub:explainability}
 This approach has the advantage of producing an explainable model.
 Nodes which are, on average, higher up the decision trees are more important in the decision process.
-By ranking input vector attributes according to their average height in the trees, we will be able to gain insight on which feature is the most crucial to predicting the runtime.
+By ranking input vector attributes according to their average height in the trees, we will be able to gain insight about which feature is the most crucial to predicting the runtime.
 % subsection explainability (end)
 
 % section our_approach (end)
 
 \section{Preliminary Results}
 \label{sec:preliminary_results}
+We run the CART algorithm on a data set built from the Curie dataset which was analyzed in~\ref{sub:reqtime_vs_runtime_on_a_real_system}. In a first approach, we choose to validate our approach by training the algorithm with the first 80\% of the job/runtime associations and predicting the last 20\% of the runtimes. We then compare our results with an existing popular baseline, namely averaging the two last available runtime values from the job user~\cite{tsafir}, in order to validate our method.
+
+\subsection{Feature List}
+\label{sub:feature_list}
+We build data vectors with the following features:
+\begin{itemize}
+  \item TODO:big list or table.
+\end{itemize}
+Features \ldots and \ldots are extracted by replaying the log with the simpy~\cite{simpy} discrete event simulation package.
+
+The experiments are run using the scikit-learn~\cite{scikit-learn} package. Features \ldots are encoded in a one-hot fashion.
+
+% subsection feature_list (end)
+
+\subsection{Comparison with the baseline}
+\label{sub:comparison_with_average_baseline}
+We compare the results from our method with the baseline
 
 
-%TODO:results..
+
+\subsection{Feature importances}
+\label{sub:feature_importances}
+
+
+
+% subsection feature_importances (end)
+% subsection comparison_with_average_baseline (end)
 
 % section preliminary_results (end)
 
-\section{Conclusions}
+\section{Conclusions and Extensions}
 \label{sec:conclusions}
 
 %TODO:conclure..
@@ -233,6 +263,7 @@ By ranking input vector attributes according to their average height in the tree
 
 \section{Acknowledgements}
 \label{sec:conclusions}
+%I would like to thank both my advisors for their the time they spent to meet and discuss this work in spite of their very busy schedules! In particular, thanks to Denis who is the reason I am doing a research master today..
 
 %TODO:remercier..
 

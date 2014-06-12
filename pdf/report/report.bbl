@@ -1,5 +1,11 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citeauthoryear{Breiman \bgroup \em et al.\egroup
+  }{1984}]{decisiontrees}
+Leo Breiman, Jerome Friedman, Charles~J Stone, and Richard~A Olshen.
+\newblock {\em Classification and regression trees}.
+\newblock CRC press, 1984.
+
 \bibitem[\protect\citeauthoryear{Breiman}{2001}]{randomforest}
 Leo Breiman.
 \newblock Random forests.
@@ -30,6 +36,11 @@ Ahuva~W. Mu'alem and Dror~G. Feitelson.
   scheduling the ibm sp2 with backfilling.
 \newblock {\em IEEE Trans. Parallel Distrib. Syst.}, 12(6):529--543, June 2001.
 
+\bibitem[\protect\citeauthoryear{Muller and Vignaux}{2003}]{simpy}
+K~Muller and Tony Vignaux.
+\newblock Simpy: Simulating systems in python.
+\newblock {\em ONLamp. com Python Devcenter}, 2003.
+
 \bibitem[\protect\citeauthoryear{Nissimov and
   Feitelson}{2008}]{probabilistic-backfilling}
 Avi Nissimov and Dror~G. Feitelson.
@@ -43,6 +54,20 @@ Avi Nissimov.
 \newblock {Locality and its usage in parallel job runtime distribution modeling
   using HMM}.
 \newblock Master's thesis, The Hebrew University, 2006.
+
+\bibitem[\protect\citeauthoryear{Pedregosa \bgroup \em et al.\egroup
+  }{2011}]{scikit-learn}
+F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
+  M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
+  D.~Cournapeau, M.~Brucher, M.~Perrot, and E.~Duchesnay.
+\newblock Scikit-learn: Machine learning in {P}ython.
+\newblock {\em Journal of Machine Learning Research}, 12:2825--2830, 2011.
+
+\bibitem[\protect\citeauthoryear{Rabiner}{1989}]{rabiner}
+Lawrence Rabiner.
+\newblock A tutorial on hidden markov models and selected applications in
+  speech recognition.
+\newblock {\em Proceedings of the IEEE}, 77(2):257--286, 1989.
 
 \bibitem[\protect\citeauthoryear{Tsafrir \bgroup \em et al.\egroup
   }{2007}]{tsafir}

@@ -60,7 +60,7 @@ verb(args,"Parameters to the script")
 setwd(rfold)
 rfold_wd=getwd()
 for (filename in userfiles) {
-	source(filename)
+  source(filename)
 }
 
 
@@ -88,9 +88,21 @@ setwd(execution_wd)
 
 df <- read.table(args$filename,comment.char=';')
 names(df) <- c('force')
-df$force=as.numeric(df$force)
+gid=length(df$force)-11-582-7-2
+df$name=c("proc_req","time_req","tsafir_mean","last_runtime","last_runtime2","thinktime","running_maxlength","running_sumlength","amount_running","running_average_runtime","running_allocatedcores",rep("uid",582),rep("gid",gid),rep("dow",7),rep("status",1),rep("status2",1))
 summary(df$force)
-print(unlist(sort.int(df$force, index.return=TRUE)[2]))
+
+library("ggplot2")
+#ggplot(df[which(df$name != "uid" & df$name !="gid"),], aes(x = factor(1),y=force, fill = name)) +
+#geom_bar(width=1,stat="identity")
+#coord_polar(theta = "x")
+
+
+#pause_output(options_vector)
+ggplot(df, aes(x = factor(1),y=force, fill = name)) +
+geom_bar(width=1,stat="identity")+
+coord_polar(theta = "y")
+
 
 #type stuff here.
 
