@@ -160,7 +160,7 @@ As mentioned previously, the latent question when predicting the \textbf{runtime
 \begin{figure*}[b]
   \centering
   \includegraphics[width=\textwidth]{../../truc.png}
-  \caption{Histogram of the error made in the prediction for both the averaging and random forest methods.}
+  \caption{Histogram of the error made in predicting for both the baseline(averaging the two last known runtimes of the user) and random forest methods.}
   \label{fig:ratio}
 \end{figure*}
 
@@ -228,23 +228,58 @@ We run the CART algorithm on a data set built from the Curie dataset which was a
 \subsection{Feature List}
 \label{sub:feature_list}
 We build data vectors with the following features:
-\begin{itemize}
-  \item TODO:big list or table.
-\end{itemize}
+
+\begin{tabular}{|l|}
+  \hline
+  Features \\
+  \hline
+  Processor Request  \\
+  Reqtime  \\
+  Average of two last Runtimes of job user \\
+  Last known runtime of user\\
+  Second to Last known runtime of job's user \\
+  Thinktime preceding this job \\
+  Maximum length of already running job of job's user\\
+  Sum of already running jobs of job's user\\
+  Amount of jobs of this user running \\
+  Average runtime by curr.\ running jobs of user\\
+  Total cores currently used by user\\
+  User ID \\
+  Group ID\\
+  Day of Week\\
+  Day of Month\\
+  Last known job exiting status of user\\
+  Second to  Last known job exiting status of user\\
+
+  \hline
+\end{tabular}
+
 Features \ldots and \ldots are extracted by replaying the log with the simpy~\cite{simpy} discrete event simulation package.
 
-The experiments are run using the scikit-learn~\cite{scikit-learn} package. Features \ldots are encoded in a one-hot fashion.
+The experiments are run using the scikit-learn~\cite{scikit-learn} package. Features $User ID$, $ Group ID$, $ Day of Week$, $ Last Status$, $ Second to Last status$ are encoded in a one-hot fashion, as the package we use only builds binary decision trees on continuous attributes.
+We intend to run the experiments again with systematic full splitting on categorical attributes.
 
 % subsection feature_list (end)
 
 \subsection{Comparison with the baseline}
 \label{sub:comparison_with_average_baseline}
-We compare the results from our method with the baseline
+TODO:
+We compare the results from our method with the baseline \ldots Figure~\ref{fig:ratio}
+Sum of squares for tsafrir: $1.24186e+13$
+Sum of squares for randomforest: $9.897605e+12$
 
 
 
 \subsection{Feature importances}
 \label{sub:feature_importances}
+TODO:
+We discuss feature importances \lots Figure~\ref{fig:importances}
+\begin{figure}[ht]
+        %\centering
+        \includegraphics[width=0.6\textwidth]{../../pie.png}
+        \caption{Relative importance of features in the Random Forests algorithm.}
+        \label{fig:importances}
+\end{figure}
 
 
 
