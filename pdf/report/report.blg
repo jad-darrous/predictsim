@@ -3,47 +3,47 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: named.bst
 Database file #1: report.bib
-Warning--I didn't find a database entry for "workloadarchive"
 Warning--there's a number but no series in handbook-of-scheduling
+Warning--empty journal in workloadarchive
 You've used 13 entries,
             2439 wiz_defined-function locations,
-            644 strings with 6897 characters,
-and the built_in function-call counts, 5397 in all, are:
-= -- 550
-> -- 253
+            638 strings with 6837 characters,
+and the built_in function-call counts, 5348 in all, are:
+= -- 541
+> -- 258
 < -- 5
-+ -- 88
-- -- 86
-* -- 461
-:= -- 897
++ -- 90
+- -- 88
+* -- 451
+:= -- 894
 add.period$ -- 42
 call.type$ -- 13
-change.case$ -- 93
+change.case$ -- 94
 chr.to.int$ -- 13
-cite$ -- 14
-duplicate$ -- 205
-empty$ -- 373
-format.name$ -- 103
-if$ -- 1093
+cite$ -- 15
+duplicate$ -- 204
+empty$ -- 365
+format.name$ -- 104
+if$ -- 1081
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 14
 newline$ -- 68
 num.names$ -- 41
-pop$ -- 77
+pop$ -- 82
 preamble$ -- 1
-purify$ -- 107
+purify$ -- 108
 quote$ -- 0
-skip$ -- 162
+skip$ -- 161
 stack$ -- 0
-substring$ -- 256
-swap$ -- 45
+substring$ -- 237
+swap$ -- 44
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 96
-warning$ -- 1
-while$ -- 43
+warning$ -- 2
+while$ -- 41
 width$ -- 16
-write$ -- 175
+write$ -- 173
 (There were 2 warnings)

@@ -109,7 +109,7 @@ r_sq=r^2
 t_ssq=sign(t)*t_sq
 r_ssq=sign(r)*r_sq
 l=length(t)
-values=c(t,r)
+values=c(t_abs,r_abs)
 belongs=c(rep("baseline",l),rep("randomforest",l))
 df <-data.frame(values,belongs)
 colnames(df) <- c("value", "type")
@@ -117,9 +117,32 @@ summary(df)
 
 print("dbg")
 library(ggplot2)
-#ggplot(df, aes(x=value)) +geom_histogram(aes(fill=type),position="dodge",binwidth=3600)+theme_classic()
-#ggplot(df, aes(x=value)) +geom_histogram(aes(fill=type),position="dodge")
-ggplot(df, aes(x=value)) +geom_density(aes(fill=type),alpha=0.2)
+#ggplot(df, aes(x=value)) +geom_histogram(aes(y=..density..),alpha=0.2) +geom_density(fill=NA,alpha=0.2)
+m <- ggplot(df, aes(x=value))
+m +
+geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
+coord_trans(y = "sqrt")+
+scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
+xlab("Squared error (hours)")+
+ylab("Density")+
+ggtitle("Kernel density estimation of the squared error.")+
+annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
+annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
+theme_bw()
+
+
+
+#m + geom_histogram(aes(y=..density..,fill=type),binwidth=1800) + geom_density(aes(fill=type, y = ..scaled..), colour="black",alpha=0.2)
+#ggplot(df, aes(x=value)) +geom_histogram(aes(fill=type,y=..density..),alpha=0.2,position="dodge") +geom_density(aes(fill=type),kernel="rectangular",alpha=0.2)
+#ggplot(df, aes(x=value,y=..density..)) +geom_histogram(aes(fill=type),alpha=0.2,position="dodge") +geom_density(aes(fill=type),kernel="rectangular",alpha=0.2)
+
+#ggplot(df, aes(value)) +geom_density(aes(fill=type),kernel="rectangular")
+
+
+#ggplot(df, aes(x=type,y=value)) +geom_boxplot()
+
+
+
 
 
 ###################END BLOCK#####################

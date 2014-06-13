@@ -18,17 +18,18 @@ Pierre-François Dutot, Grégory Mounié, and Denis Trystram.
   Approximation Algorithms.
 \newblock Number~26. CRC press, joseph leung edition, 2004.
 
+\bibitem[\protect\citeauthoryear{Feitelson \bgroup \em et al.\egroup
+  }{2012}]{workloadarchive}
+Dror~G. Feitelson, Dan Tsafrir, and David Krakov.
+\newblock Experience with the parallel workloads archive.
+\newblock 2012.
+
 \bibitem[\protect\citeauthoryear{Gibbons}{1997}]{gibbons}
 Richard Gibbons.
 \newblock A historical application profiler for use by parallel schedulers.
 \newblock In DrorG. Feitelson and Larry Rudolph, editors, {\em Job Scheduling
   Strategies for Parallel Processing}, volume 1291 of {\em Lecture Notes in
   Computer Science}, pages 58--77. Springer Berlin Heidelberg, 1997.
-
-\bibitem[\protect\citeauthoryear{Kullback and Leibler}{1951}]{kullback}
-S.~Kullback and R.~A. Leibler.
-\newblock On information and sufficiency.
-\newblock {\em The Annals of Mathematical Statistics}, 22(1):79--86, 03 1951.
 
 \bibitem[\protect\citeauthoryear{Mu'alem and Feitelson}{2001}]{backfilling}
 Ahuva~W. Mu'alem and Dror~G. Feitelson.

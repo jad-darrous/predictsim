@@ -112,7 +112,8 @@ library("ggplot2")
 #pause_output(options_vector)
 ggplot(df, aes(x = name,y=force)) +
 #geom_bar()
-geom_bar(stat="identity")+xlab("Attribute")+ylab("Importance")+ggtitle("Relative Importance of Attributes")
+geom_bar(stat="identity")+xlab("Attribute")+ylab("Importance")+ggtitle("Relative Importance of Attributes")+
+theme_bw()
 #geom_bar(width=1,stat="identity")+
 #coord_polar(theta = "y")
 
