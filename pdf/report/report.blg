@@ -3,48 +3,47 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: named.bst
 Database file #1: report.bib
-Warning--to sort, need author or key in PBS
 Warning--there's a number but no series in handbook-of-scheduling
 Warning--empty journal in workloadarchive
-You've used 16 entries,
+You've used 18 entries,
             2439 wiz_defined-function locations,
-            661 strings with 7358 characters,
-and the built_in function-call counts, 6460 in all, are:
-= -- 665
-> -- 285
-< -- 6
-+ -- 98
-- -- 96
-* -- 535
-:= -- 1049
-add.period$ -- 51
-call.type$ -- 16
-change.case$ -- 110
-chr.to.int$ -- 16
+            678 strings with 7837 characters,
+and the built_in function-call counts, 7792 in all, are:
+= -- 808
+> -- 352
+< -- 9
++ -- 123
+- -- 120
+* -- 639
+:= -- 1262
+add.period$ -- 61
+call.type$ -- 18
+change.case$ -- 130
+chr.to.int$ -- 18
 cite$ -- 20
-duplicate$ -- 254
-empty$ -- 462
-format.name$ -- 116
-if$ -- 1328
+duplicate$ -- 311
+empty$ -- 549
+format.name$ -- 143
+if$ -- 1616
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 16
-newline$ -- 82
-num.names$ -- 47
-pop$ -- 100
+missing$ -- 19
+newline$ -- 93
+num.names$ -- 56
+pop$ -- 117
 preamble$ -- 1
-purify$ -- 127
+purify$ -- 149
 quote$ -- 0
-skip$ -- 207
+skip$ -- 248
 stack$ -- 0
-substring$ -- 304
-swap$ -- 59
-text.length$ -- 6
+substring$ -- 370
+swap$ -- 82
+text.length$ -- 9
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 120
-warning$ -- 3
-while$ -- 50
-width$ -- 19
-write$ -- 211
-(There were 3 warnings)
+type$ -- 136
+warning$ -- 2
+while$ -- 62
+width$ -- 22
+write$ -- 246
+(There were 2 warnings)

@@ -3,22 +3,26 @@
 \citation{SLURM}
 \citation{TORQUE}
 \citation{OAR}
+\citation{SLURM}
+\citation{OAR}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Research Direction}{1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Job run-times}{1}}
+\citation{handbook-of-scheduling}
 \citation{workloadarchive}
 \citation{handbook-of-scheduling}
 \citation{tsafir}
+\citation{backfilling}
+\citation{gibbons}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Problem Statement}{2}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Motivation}{2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Motivation for Prediction}{2}}
+\newlabel{motiv}{{2}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Importance of run-time}{2}}
 \newlabel{sub:importance_of_run-time}{{2.1}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Required-time vs Run-time on a real system}{2}}
 \newlabel{sub:required-time_vs_run-time_on_a_real_system}{{2.2}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Marginal Histograms of the required-time and run-time of all jobs from the CEA CURIE log.}}{2}}
-\newlabel{fig:_wall_run_for_report_pdf}{{1}{2}}
-\citation{backfilling}
-\citation{gibbons}
+\@writefile{toc}{\contentsline {section}{\numberline {3}State of the art in run-time prediction}{2}}
+\newlabel{ssa}{{3}{2}}
 \citation{tsafir}
 \citation{probabilistic-backfilling}
 \citation{hmm}
@@ -26,13 +30,14 @@
 \citation{randomforest}
 \citation{decisiontrees}
 \citation{kullback}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Histogram of the ${\begingroup run-time\endgroup \over required-time}$ ratio in the CURIE log.}}{3}}
-\newlabel{fig:ratio}{{2}{3}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}State of the art in run-time prediction}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Marginal Histograms of the required-time and run-time of all jobs from the CEA CURIE log.}}{3}}
+\newlabel{fig:_wall_run_for_report_pdf}{{1}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Predicting a value}{3}}
 \newlabel{sub:predicting_a_value}{{3.1}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Predicting a distribution}{3}}
 \newlabel{sub:predicting_a_distribution}{{3.2}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Histogram of the ${\begingroup \unhbox \voidb@x \hbox {Run-time}\endgroup \over \unhbox \voidb@x \hbox {Required-time}}$ ratio in the CURIE log.}}{3}}
+\newlabel{fig:ratio}{{2}{3}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}A Regression Approach}{3}}
 \newlabel{sec:our_approach}{{4}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Random Forests}{3}}
@@ -40,31 +45,33 @@
 \citation{interpret}
 \citation{tsafir}
 \citation{simpy}
+\citation{scikit-learn}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Interpretation of the model}{4}}
 \newlabel{sub:explainability}{{4.2}{4}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Preliminary Results}{4}}
 \newlabel{sec:preliminary_results}{{5}{4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Feature List}{4}}
 \newlabel{sub:feature_list}{{5.1}{4}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Vector features for random forest regression.}}{4}}
-\newlabel{tab:features}{{1}{4}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Kernel Density Estimation of the squared error made in the prediction for both the baseline and random forest methods, on the 20\% of the last jobs of the CURIE dataset.}}{4}}
 \newlabel{fig:error}{{3}{4}}
-\citation{scikit-learn}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Vector features for random forest regression.}}{5}}
+\newlabel{tab:features}{{1}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Comparison with the baseline}{5}}
 \newlabel{sub:comparison_with_average_baseline}{{5.2}{5}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Performance of both prediction techniques on the 20\% of the last jobs of the CURIE log}}{5}}
+\newlabel{fig:lsq}{{2}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Feature importance}{5}}
 \newlabel{sub:feature_importances}{{5.3}{5}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces MSE measure of both prediction techniques on the 20\% of the last jobs of the CURIE log}}{5}}
-\newlabel{fig:lsq}{{2}{5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Relative importance of features in the Random Forests algorithm.}}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Relative importance of features in the trained Random Forest model.}}{5}}
 \newlabel{fig:importances}{{4}{5}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions and Perspectives}{5}}
-\newlabel{sec:conclusions}{{6}{5}}
+\newlabel{sec:ccl}{{6}{5}}
+\citation{handbook-of-scheduling}
 \bibstyle{named}
 \bibdata{report}
 \bibcite{decisiontrees}{\citeauthoryear {Breiman \bgroup \em  et al.\egroup }{1984}}
 \bibcite{randomforest}{\citeauthoryear {Breiman}{2001}}
+\bibcite{OAR}{\citeauthoryear {Capit \bgroup \em  et al.\egroup }{2005}}
 \bibcite{handbook-of-scheduling}{\citeauthoryear {Dutot \bgroup \em  et al.\egroup }{2004}}
 \bibcite{workloadarchive}{\citeauthoryear {Feitelson \bgroup \em  et al.\egroup }{2012}}
 \bibcite{gibbons}{\citeauthoryear {Gibbons}{1997}}
@@ -74,10 +81,11 @@
 \bibcite{probabilistic-backfilling}{\citeauthoryear {Nissimov and Feitelson}{2008}}
 \bibcite{hmm}{\citeauthoryear {Nissimov}{2006}}
 \bibcite{interpret}{\citeauthoryear {{Palczewska} \bgroup \em  et al.\egroup }{2013}}
-\bibcite{PBS}{\citeauthoryear {PBS}{}}
 \bibcite{scikit-learn}{\citeauthoryear {Pedregosa \bgroup \em  et al.\egroup }{2011}}
 \bibcite{rabiner}{\citeauthoryear {Rabiner}{1989}}
 \bibcite{FCFS}{\citeauthoryear {Schwiegelshohn and Yahyapour}{1998}}
+\bibcite{TORQUE}{\citeauthoryear {Staples}{2006}}
 \bibcite{tsafir}{\citeauthoryear {Tsafrir \bgroup \em  et al.\egroup }{2007}}
+\bibcite{SLURM}{\citeauthoryear {Yoo \bgroup \em  et al.\egroup }{2003}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Acknowledgements}{6}}
-\newlabel{sec:conclusions}{{7}{6}}
+\newlabel{sec:ack}{{7}{6}}

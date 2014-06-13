@@ -103,8 +103,20 @@ print((1/N)*sum((df$true_run-df$random_forest)^2))
 
 t=df$true_run-df$tsafir
 r=df$true_run-df$random_forest
+
+
+
 t_abs=abs(t)
 r_abs=abs(r)
+print("mean tsaf")
+print(mean(t_abs))
+print("mean rf")
+print(mean(r_abs))
+print("var tsaf")
+print(sqrt(var(t_abs)/length(r_abs)))
+print("var rf")
+print(sqrt(var(r_abs)/length(r_abs)))
+
 t_sq=t^2
 r_sq=r^2
 t_ssq=sign(t)*t_sq

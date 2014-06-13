@@ -38,8 +38,7 @@
 % Put where the files are available in the appropriate places.
 
 
-\title{Master 1 MoSIG Research Project Report\\
-Learning Job Run-times in HPC Systems}
+\title{Learning Job Run-times in HPC Systems}
 \author{Valentin Reis\\
   Supervised by: Eric Gaussier \& Denis Trystram.\\
 }
@@ -65,16 +64,16 @@ Learning Job Run-times in HPC Systems}
 \begin{abstract}
   In many HPC infrastructures, the descriptions of the tasks to be executed are subject to high uncertainties.
   In this work, we show that users are unreliable when estimating the run time of their jobs, and we look for alternatives.
-  Predictive techniques are investigated in order to infer the run time of jobs from both their description and system history. A Machine Learning technique (Random Forests) is applied and compared against the state of the art.
-  Experiments emphasize that the predictions obtained with this approach have correct properties with respect to relevant metrics, and outperform pre-existing approaches.
+  Predictive techniques for inferring the run time of jobs from either their description or system history are surveyed, and a Machine Learning technique (Random Forests) is used to combine these approaches.
+  Experiments emphasize that the predictions obtained with our approach have correct properties with respect to relevant metrics, and outperform state of the art approaches.
 \end{abstract}
 
 \section{Introduction}
 High Performance Computing (HPC) systems are more and more complex.
 %TODO
-There is a need for studies and tools for efficient use, at the frontier of two different fields: scheduling and allocation of jobs, and system and middleware. We outline two of the main difficulties that Resource Management Software (RMS) in this field have to face.
+There is a need for studies and tools for efficient use, at the frontier of two different fields: Scheduling and allocation of jobs, and Systems and Middleware. We outline two of the main difficulties that Resource Management Software (RMS) in this field have to face.
 
-First, the ephemeral nature and broad range of existing architectures of those systems make it difficult to develop and apply of theoretical results.
+First, the ephemeral nature and broad range of existing architectures of these systems make it difficult to develop and apply of theoretical results.
 New schemes for distributing resources frequently appear in the industry. Current systems can have complex network topologies and memory/hard drive sharing architectures. Moreover, the topology of those systems can now change on a hourly to monthly basis, since the hardware of distributed systems can be reconfigured or extended continually.
 Finding scheduling and resource management strategies that can deal with complex systems and adapt to their evolutions is a big challenge.
 
@@ -89,41 +88,45 @@ Among other properties, such as robustness to lack of information about the amou
 \subsection{Research Direction}
 The general direction followed within this research project is to deal with the input data of the RMS.
 The treatment of this data seems to us separable enough from the actual scheduling problem so that working towards this objective may be rewarding.
-No innovative ways to query the data from the users will be studied and we will instead rely on existing logs from HPC systems. We seek to apply Machine Learning (ML) techniques in order to reduce the uncertainty of (and extract information from) the input data of the HPC systems.
-The goal is to present the input data in the most valuable way possible to a scheduling algorithm. The question of how to use this data in a scheduling algorithm will not be adressed beyond providing references to appropriate scheduling algorithms.
-
+Methods to query information from the users will be studied. We will instead rely on existing logs from HPC systems and seek to apply Machine Learning (ML) techniques in order to reduce the uncertainty of (and extract information from) the data.
+The goal is to present the input data in the most valuable way possible to a scheduling algorithm. The question of how to use this data in a scheduling algorithm will not be addressed beyond providing references to appropriate scheduling algorithms.
 
 \subsection{Job run-times}
-Most HPC resource management software (including the SLURM~\cite{SLURM}, TORQUE~\cite{TORQUE}, and OAR~\cite{OAR} software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job with respect to its hardware requirements.
-This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{required-time} in the rest of the paper. Most of these software use the required-time of a job as an upper bound on its run time, and kill it should required-time be violated. As a consequence, users overestimate this value when they to provide it. The following section will present a statistical analysis pertaining to this relationship.
+Most HPC resource management software (including SLURM~\cite{SLURM}, TORQUE~\cite{TORQUE}, and OAR~\cite{OAR}) do ask information about jobs to users, such as topological requests in terms of processing units and memory, name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job with respect to its hardware requirements.
+This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{required-time} in the rest of this paper.
+Most of these software use the required-time of a job as an upper bound on its run time, and kill it if this required-time is violated~\footnote{See~\cite{SLURM} and~\cite{OAR}}.
+As a consequence, users overestimate this value when they to provide it. Section~\ref{motiv} will present a statistical analysis pertaining to this relationship.
 
-The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \~ref{truc}. We will refer to this quantity as the \textbf{run-time} of a job.
+The actual run time of a job with respect to a given topology is of great interest, as scheduling policies are highly dependent on this information to provide good solutions~\cite{handbook-of-scheduling}. We will refer to this quantity as the \textbf{run-time} of a job.
 It must be stated clearly that in the context of topological heterogeneity, the run-time of a job is only defined with respect to a specific processing environment to which it might be affected.
 The parameters determining the run-time can include, and is not limited to, network topology of the processing units, availability of shared memory, message passing costs, and the operating system(s) supporting the computations.
 
 \subsection{Problem Statement}
-In this paper, the broad question of refining the data is reduced to a single variable, the run-time. The problem statement that is dealt with in this paper is the following.
+In this paper, the question of refining the data is reduced to a single variable, the run-time. The problem statement that is dealt with in this paper is the following.
 
 Given a specific homogeneous HPC Cluster with negligible communication costs, how to best predict the value of the run-time of a job?
 
 The choice of dealing with homogeneous distributed machines without communication costs in a first approach has the interesting property of separating the data treatment from the scheduling and interaction with the system.
 In this case, the run-time becomes an intrinsic attribute of a job.
-On the contrary to the input data, which is subject to peculiarities of the various systems and software, the run-time is consistently present as a simple field in workload logs of HPC systems, such as those available at the Parallel Workload Archive~\cite{workloadarchive}.
+On the contrary to the input data, which are subject to peculiarities of the various systems and software, the run-time is consistently present as a simple field in workload logs of HPC systems, such as those available at the Parallel Workload Archive~\cite{workloadarchive}.
 
 This problem statement implies a latent question: How to communicate the prediction to the rest of the system (e.g., single-value, probability density, confidence factor)? Alternatives will be discussed but ultimately, the focus will be on single-valued predictions.
-As mentioned previously, our approach is to use machine learning techniques. We will be inferring run-time from the job characteristics by learning from system logs, and since this is a value in $[0,+\infty ]$, this is a supervised learning problem, namely regression.
+As mentioned previously, our approach is to use machine learning techniques. We will be inferring run-time from the job characteristics by learning from system logs, and since this is a value in $[0,+\infty [$, this is a supervised learning problem, namely regression.
 
 We will be careful to only learn our models on logs from homogeneous systems, or homogeneous subsets of systems that are sizeable enough to learn from.
-As for downplaying the impact of communication costs, we will further restrict our work to machines that do not possess overly complex topology or distribute computing nodes across more than a handful of routers.
-In essence, this paper targets large Beowulf clusters, supercomputers, GPU farms and mainframe clusters.
+As for downplaying the impact of communication costs, we will further restrict our work to machines that do not possess complex topology or distribute computing nodes across more than a handful of routers.
+In essence, this paper targets large clusters, supercomputers, GPU farms and mainframe clusters.
 
-\section{Motivation}
+This paper is organised in the following manner: Section~\ref{motiv} provides motivation for predicting the run-time. Section ~\ref{ssa} surveys existing prediction techniques, and Section~\ref{sec:our_approach} introduces our approach. Preliminary results are introduced in Section~\ref{sec:preliminary_results} and we conclude on our findings in Section~\ref{sec:ccl}.
+
+\section{Motivation for Prediction}
+\label{motiv}
 
 \subsection{Importance of run-time}
 \label{sub:importance_of_run-time}
 Once again, we emphasise the role of the run-time in scheduling. Virtually all results from scheduling theory use the `clairvoyant' model~\cite{handbook-of-scheduling}, where run-times of jobs with respect to all possible affectations on the system are known in advance.
 Intuitively, in order to use this extensive theoretical body, we would need to reduce uncertainty in this variable.
-It has even been shown~\cite{tsafir} to some extent that in the classical approach (using policies such as FCFS ,which are robust to this uncertainty), there is added value when this variable is refined.
+It has even been shown~\cite{tsafir} to some extent that in the classical approach (using policies such as FCFS, which are robust to this uncertainty), there is added value when this variable is refined.
 In all cases, reducing uncertainty in run-time is critical to the success of the approach used to schedule jobs.
 
 As mentioned before, existing solutions use much simpler heuristics. We will now focus on a particular system in order show why a simple scheduling heuristic is applied.
@@ -131,11 +134,11 @@ As mentioned before, existing solutions use much simpler heuristics. We will now
 
 \subsection{Required-time vs Run-time on a real system}
 \label{sub:required-time_vs_run-time_on_a_real_system}
-The following study is conducted on a log[ref log] containing 20 months worth of data from the CURIE supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
+The following study is conducted on a log containing 20 months worth of data from the CURIE supercomputer operated by the French government-funded research organization CEA (Commissariat à l'Énergie Atomique).
 It contains more than 300,000 jobs, submitted from February 2011 to October 2012 by 900 users in the `cleaned' version, which is referenced in the archive as \textit{CEA-Curie-2011-2.1-cln.swf}.
 The log has several homogeneous CPU partitions and CPU+GPU partitions, however in each partition all nodes are identical.
-Jobs are allocated to partitions using user preference. The system is managed using the SLURM (Simple Linux Utility for Resource Management) RMS.
-Figure~\ref{fig:_wall_run_for_report_pdf} shows the marginal distributions of required-times and run-times on this system. The marginal distributions are already revealing, we can see that about half of the required-times are in the 24 hour bin.
+Jobs are allocated to partitions using user preference. The system is managed using the SLURM RMS.
+Figure~\ref{fig:_wall_run_for_report_pdf} shows the marginal distributions of required-times and run-times on this system. The marginal distributions are already revealing: almost half of the required-times are in the 24 hour bin.
 
 \begin{figure}[ht]
   %\centering\rule{0.8*\textwidth}{0.3*\textwidth}
@@ -145,13 +148,13 @@ Figure~\ref{fig:_wall_run_for_report_pdf} shows the marginal distributions of re
   \label{fig:_wall_run_for_report_pdf}
 \end{figure}
 
-The reason for this is that 24h is both the maximal value and the default one: on this system, users may choose not to provide an estimate for their job's run-times, in which case the maximum value is used by the scheduler.
-Further looking into the relationship between required-time and run-time, Figure~\ref{fig:ratio} shows how the ratio $\frac{run-time}{required-time}$ is distributed.
+The reason behind this highly filled bin is that 24h is both the maximal value and the default one. On this system, users may choose not to provide an estimate for their job's run-times, in which case the maximum value is used by the scheduler. We already see here that the asking for the required-time is not a suitable option.
+Further looking into the relationship between required-time and run-time, Figure~\ref{fig:ratio} shows how the $\frac{\mbox{Run-time}}{\mbox{Required-time}}$ ratio is distributed.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.5\textwidth]{reqrun-1.png}
-  \caption{Histogram of the $\frac{run-time}{required-time}$ ratio in the CURIE log.}
+  \caption{Histogram of the $\frac{\mbox{Run-time}}{\mbox{Required-time}}$ ratio in the CURIE log.}
   \label{fig:ratio}
 \end{figure}
 
@@ -159,6 +162,7 @@ This histogram indicates that a majority of users either: have very little idea 
 % subsection required-time_vs_run-time_on_a_real_system (end)
 
 \section{State of the art in run-time prediction}
+\label{ssa}
 
 As mentioned previously, the latent question when predicting the run-time is how to provide the information to the scheduling algorithm. This section presents alternatives and state of the art methods for both the single value and distribution prediction cases.
 
@@ -172,10 +176,10 @@ As mentioned previously, the latent question when predicting the run-time is how
   \subsection{Predicting a value}
   \label{sub:predicting_a_value}
 
-  Single-value prediction has first been attempted~\cite{gibbons} by binning jobs in a predefined partitioning of their feature space and averaging values in each partition to provide an estimate. In this method, the partitioning has to be provided by the Resource Management Software or the system administrator. This method assumes the job characteristics to be identically distributed and independent. It does not make use of dependency between successive jobs. Moreover, the binning has to be obtained trough careful statistical analysis of the specific system and population.
+  Single-value prediction has first been attempted~\cite{gibbons} by partitioning jobs in a predefined partitioning of their feature space and averaging values in each partition to provide an estimate. In this method, the partitioning has to be provided by the RMS or the system administrator. This method assumes the job characteristics to be identically distributed and independent. It does not make use of dependency between successive jobs. Moreover, the binning has to be obtained trough careful statistical analysis of the specific system and population.
 
   A more simple approach~\cite{tsafir} averages the two last available run-times of the job's user.
-  This method makes full use of the dependency between successive run-times, but does not make use of the job's description. Its main selling point are it's simplicity and accuracy.
+  This method makes full use of the dependency between successive run-times, but does not make use of the job's description. Its main selling point are its simplicity and accuracy.
 
   An advantage of single value prediction lies in the existence of many scheduling algorithms that can use.
 
@@ -244,11 +248,11 @@ As mentioned previously, the latent question when predicting the run-time is how
       ID & Features \\
       \hline
       1  &  Processor Request  \\
-      2  &  Reqtime  \\
+      2  &  Required-time  \\
       3  &  Average of two last Run-times of job user \\
       4  &  Last known run-time of user\\
       5  &  Second to Last known run-time of job's user \\
-      6  &  Thinktime preceding this job \\
+      6  &  Time since last job's end, if known. \\
       7  &  Maximum length of already running job of job's user\\
       8  &  Sum of already running jobs of job's user\\
       9  &  Amount of jobs of this user running \\
@@ -265,9 +269,9 @@ As mentioned previously, the latent question when predicting the run-time is how
     \label{tab:features}
   \end{table}
 
-  Features concerning the characteristics of the previous jobs of the user are not present in the CURIE log.\ are extracted by replaying the log with the simpy~\cite{simpy} discrete event simulation package.
+  Features concerning the characteristics of the previous jobs of the user are not present in the CURIE log.\ are extracted by replaying the log with the Simpy~\cite{simpy} discrete event simulation package.
 
-  The experiments are run using the scikit-learn~\cite{scikit-learn} package. Categorical features \textit{user ID}, \textit{group ID}, \textit{day of week}, \textit{last Status}, and \textit{second to Last status} are encoded in a one-hot fashion\footnote{The one hot encoding of a n-valued categorical attribute consists of n binary attributes where each one corresponds to a category.}, as the package we use only builds binary decision trees on continuous attributes.
+  The experiments are run using the Scikit-Learn~\cite{scikit-learn} package. Categorical features \textit{user ID}, \textit{group ID}, \textit{day of week}, \textit{last Status}, and \textit{second to Last status} are encoded in a one-hot fashion\footnote{The one hot encoding of a n-valued categorical attribute consists of n binary attributes where each one corresponds to a category.}, as the package we use only builds binary decision trees on continuous attributes.
   % subsection feature_list (end)
 
   \subsection{Comparison with the baseline}
@@ -282,7 +286,7 @@ As mentioned previously, the latent question when predicting the run-time is how
     \mbox{Stretch Ratio } = \frac{\mbox{Time from job submit to job completion}}{\mbox{Run-time}}
   \]
 
-  On a highly loaded system with many users submitting jobs with run-times of the order of a minute, a user who has a short, ten second job that is falsely estimated to a run-time of an hour will see his job highly delayed. His stretch ratio will be highly degraded.
+  On a highly loaded system with many users submitting jobs with run-times of the order of a minute, a user who has a short, ten second job that is falsely estimated to a run-time of an hour will see his job highly delayed. Its stretch ratio will be highly degraded.
   So far we can not see any convexity in the cost function associated with our error. In practice, we are often concerned with minimizing the maximum stretch ratio value across all jobs and users. Using the maximum value introduces convexity and we would now like to avoid extreme values of the error at all costs.
 
   Because of such arguments for the convexity of a relevant measure of the error produced by the predictor, we argue that the classic Mean Squared Error (MSE) metric is appropriate for estimating the quality of our predictions. The MSE metric of a predicted set of runtime values $\{r_{pred,i}\}$ with respect to a set of true values $\{r_{i}\}$, for $i$ in $[\![ 1,N]\!]$ is:
@@ -291,31 +295,36 @@ As mentioned previously, the latent question when predicting the run-time is how
     MSE(\{r_{pred,i}\})=\frac{1}{N}\sum_{i=1}^{N}  ({r_{pred,i}}-{r_{i}})^2
   \]
   This is a general treatment of the question of how to measure the quality of the prediction: when validating a prediction technique on a specific scheduling algorithm, a measure specific to this algorithm should be used. Nonetheless, as minimizing the prospect of extraordinary events is a rather practical concern of system administrators, a convex measure is proper.
-  According to the MSE metric, our method outperforms the simple averaging of the two previous run-times of the user, as shown in Table~\ref{fig:lsq}.
+  According to the MSE measure, our method outperforms the simple averaging of the two previous run-times of the user, as shown in Table~\ref{fig:lsq}. However, the Mean Absolute Error(MAE) is higher. The standard error is lowered by our method.
 
   \begin{table}[ht]
     \centering
-    \begin{tabular}{|l|l|}
+    \begin{tabular}{|l|l|l|}
       \hline
-      Technique  & MSE metric ($\mbox{s}^2$)   \\
+      %Measure & MSE measure ($\mbox{s}^2$)   \\
+      Measure & Baseline & Random Forest &
       \hline
-      Baseline  & \num{198497515}\\
+      MSE & \num{198497515} & \num{158202218} &
       \hline
-      Random Forest & \num{158202218}\\
+      MAE & \num{4680.836} & \num{5551.237} &
+      \hline
+      Standard Error& \num{53.12812} & \num{45.12378} &
+      %\hline
+      %Random Forest & \num{158202218}\\
       \hline
     \end{tabular}
-    \caption{MSE measure of both prediction techniques on the 20\% of the last jobs of the CURIE log}
+    \caption{Performance of both prediction techniques on the 20\% of the last jobs of the CURIE log}
       \label{fig:lsq}
     \end{table}
 
     \subsection{Feature importance}
     \label{sub:feature_importances}
-    Figure~\ref{fig:importances} shows the relative importance of the job attributes. It indicates that the two most relevant attributes are the baseline prediction and the required-time of a job. In this sense, the model succeeds in combining job characteristics and temporal dependence.
+    Figure~\ref{fig:importances} shows the relative importance of the job attributes. It indicates that the two most relevant attributes are the baseline prediction and the required-time of a job. In this sense, the model succeeds in combining job characteristics and temporal dependence. Low dependency on the User ID and Group ID attributes may be attributed to the one-hot encoding we performed.
 
     \begin{figure}[ht]
       \centering
       \includegraphics[width=0.5\textwidth]{interpretation.png}
-      \caption{Relative importance of features in the Random Forests algorithm.}
+      \caption{Relative importance of features in the trained Random Forest model.}
       \label{fig:importances}
     \end{figure}
     % subsection feature_importances (end)
@@ -324,7 +333,7 @@ As mentioned previously, the latent question when predicting the run-time is how
     % section preliminary_results (end)
 
     \section{Conclusions and Perspectives}
-    \label{sec:conclusions}
+    \label{sec:ccl}
     We have shown that single-valued run-time prediction can be improved by using both job characteristics and run-time locality. Our method joins these aspects by performing regression on an extended set of features. It outperforms a popular existing method according to the sum-of-squares metric, which we argue is appropriate given its convexity.
     A series of extensions to this work are possible:
     \begin{itemize}
@@ -332,12 +341,12 @@ As mentioned previously, the latent question when predicting the run-time is how
       \item Try the same method again with systematic full splitting on categorical attributes. This might add to the usefulness of the categorical attributes.
       \item Validate the approach on more data sets.
       \item Explore applications of the same methodology of mixing signal locality and job characteristics to single job run-time \textit{distribution} prediction.
-      \item Justify our approach by further adding to the existing literature concerning the usefulness of run-time prediction. An experimental and/or theoretical study could be done to assess the impact of the squared error on various popular and/or highly effective (e.g., PTAS algorithms to the strip packing problem) scheduling algorithms that optimize various objectives. The impact of the signed error to run-time could also be studied, indeed some algorithms such as FCFS with backfilling have asymmetric cost functions to errors in run-time values. This could lead to a theoretical or experimental model of a cost function that could be used in a decision theoretic framework with distribution-based prediction.
+      \item Justify our approach by further adding to the existing literature concerning the usefulness of run-time prediction. An experimental and/or theoretical study could be done to assess the impact of the squared error on various popular and/or highly effective (e.g., classic algorithms to the strip packing problem ~\cite{handbook-of-scheduling}) scheduling algorithms that optimize various objectives. The impact of the signed error to run-time could also be studied, indeed some algorithms such as FCFS with backfilling have asymmetric cost functions to errors in run-time values. This could lead to a theoretical or experimental model of a cost function that could be used in a decision theoretic framework with distribution-based prediction. Such an asymmetric cost function could also be used when learning the decision trees.
     \end{itemize}
     % section conclusions (end)
 
     \section{Acknowledgements}
-    \label{sec:conclusions}
+    \label{sec:ack}
     I would like to thank both my advisors for the opportunity to work on this problem and the time they spent to meet and discuss it in spite of their busy schedules. Thank you Denis for convincing me to do a research master!
 
     % section conclusions (end)

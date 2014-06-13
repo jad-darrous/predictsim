@@ -11,6 +11,13 @@ Leo Breiman.
 \newblock Random forests.
 \newblock {\em Machine Learning}, 45(1):5--32, 2001.
 
+\bibitem[\protect\citeauthoryear{Capit \bgroup \em et al.\egroup }{2005}]{OAR}
+Nicolas Capit, Georges Da~Costa, Yiannis Georgiou, Guillaume Huard, Cyrille
+  Martin, Gr{\'e}gory Mouni{\'e}, Pierre Neyron, and Olivier Richard.
+\newblock A batch scheduler with high level components.
+\newblock In {\em Cluster Computing and the Grid, 2005. CCGrid 2005. IEEE
+  International Symposium on}, volume~2, pages 776--783. IEEE, 2005.
+
 \bibitem[\protect\citeauthoryear{Dutot \bgroup \em et al.\egroup
   }{2004}]{handbook-of-scheduling}
 Pierre-François Dutot, Grégory Mounié, and Denis Trystram.
@@ -68,10 +75,6 @@ A.~{Palczewska}, J.~{Palczewski}, R.~{Marchese Robinson}, and D.~{Neagu}.
   contribution method}.
 \newblock {\em ArXiv e-prints}, December 2013.
 
-\bibitem[\protect\citeauthoryear{PBS}{}]{PBS}
-{MS Windows NT} kernel description.
-\newblock \url{http://www.mcs.anl.gov/research/projects/openpbs/}.
-
 \bibitem[\protect\citeauthoryear{Pedregosa \bgroup \em et al.\egroup
   }{2011}]{scikit-learn}
 F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
@@ -93,6 +96,12 @@ Uwe Schwiegelshohn and Ramin Yahyapour.
   Discrete Algorithms}, SODA '98, pages 629--638, Philadelphia, PA, USA, 1998.
   Society for Industrial and Applied Mathematics.
 
+\bibitem[\protect\citeauthoryear{Staples}{2006}]{TORQUE}
+Garrick Staples.
+\newblock Torque resource manager.
+\newblock In {\em Proceedings of the 2006 ACM/IEEE Conference on
+  Supercomputing}, SC '06, New York, NY, USA, 2006. ACM.
+
 \bibitem[\protect\citeauthoryear{Tsafrir \bgroup \em et al.\egroup
   }{2007}]{tsafir}
 Dan Tsafrir, Yoav Etsion, and Dror~G Feitelson.
@@ -100,5 +109,11 @@ Dan Tsafrir, Yoav Etsion, and Dror~G Feitelson.
   runtime estimates.
 \newblock {\em Parallel and Distributed Systems, IEEE Transactions on},
   18(6):789--803, 2007.
+
+\bibitem[\protect\citeauthoryear{Yoo \bgroup \em et al.\egroup }{2003}]{SLURM}
+Andy~B Yoo, Morris~A Jette, and Mark Grondona.
+\newblock Slurm: Simple linux utility for resource management.
+\newblock In {\em Job Scheduling Strategies for Parallel Processing}, pages
+  44--60. Springer, 2003.
 
 \end{thebibliography}
