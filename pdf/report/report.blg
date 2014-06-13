@@ -1,49 +1,50 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2014/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: named.bst
 Database file #1: report.bib
+Warning--to sort, need author or key in PBS
 Warning--there's a number but no series in handbook-of-scheduling
 Warning--empty journal in workloadarchive
-You've used 13 entries,
+You've used 16 entries,
             2439 wiz_defined-function locations,
-            638 strings with 6837 characters,
-and the built_in function-call counts, 5348 in all, are:
-= -- 541
-> -- 258
-< -- 5
-+ -- 90
-- -- 88
-* -- 451
-:= -- 894
-add.period$ -- 42
-call.type$ -- 13
-change.case$ -- 94
-chr.to.int$ -- 13
-cite$ -- 15
-duplicate$ -- 204
-empty$ -- 365
-format.name$ -- 104
-if$ -- 1081
+            661 strings with 7358 characters,
+and the built_in function-call counts, 6460 in all, are:
+= -- 665
+> -- 285
+< -- 6
++ -- 98
+- -- 96
+* -- 535
+:= -- 1049
+add.period$ -- 51
+call.type$ -- 16
+change.case$ -- 110
+chr.to.int$ -- 16
+cite$ -- 20
+duplicate$ -- 254
+empty$ -- 462
+format.name$ -- 116
+if$ -- 1328
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 14
-newline$ -- 68
-num.names$ -- 41
-pop$ -- 82
+missing$ -- 16
+newline$ -- 82
+num.names$ -- 47
+pop$ -- 100
 preamble$ -- 1
-purify$ -- 108
+purify$ -- 127
 quote$ -- 0
-skip$ -- 161
+skip$ -- 207
 stack$ -- 0
-substring$ -- 237
-swap$ -- 44
-text.length$ -- 5
+substring$ -- 304
+swap$ -- 59
+text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 96
-warning$ -- 2
-while$ -- 41
-width$ -- 16
-write$ -- 173
-(There were 2 warnings)
+type$ -- 120
+warning$ -- 3
+while$ -- 50
+width$ -- 19
+write$ -- 211
+(There were 3 warnings)

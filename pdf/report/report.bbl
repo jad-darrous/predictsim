@@ -31,6 +31,11 @@ Richard Gibbons.
   Strategies for Parallel Processing}, volume 1291 of {\em Lecture Notes in
   Computer Science}, pages 58--77. Springer Berlin Heidelberg, 1997.
 
+\bibitem[\protect\citeauthoryear{Kullback and Leibler}{1951}]{kullback}
+S.~Kullback and R.~A. Leibler.
+\newblock On information and sufficiency.
+\newblock {\em The Annals of Mathematical Statistics}, 22(1):79--86, 03 1951.
+
 \bibitem[\protect\citeauthoryear{Mu'alem and Feitelson}{2001}]{backfilling}
 Ahuva~W. Mu'alem and Dror~G. Feitelson.
 \newblock Utilization, predictability, workloads, and user runtime estimates in
@@ -63,6 +68,10 @@ A.~{Palczewska}, J.~{Palczewski}, R.~{Marchese Robinson}, and D.~{Neagu}.
   contribution method}.
 \newblock {\em ArXiv e-prints}, December 2013.
 
+\bibitem[\protect\citeauthoryear{PBS}{}]{PBS}
+{MS Windows NT} kernel description.
+\newblock \url{http://www.mcs.anl.gov/research/projects/openpbs/}.
+
 \bibitem[\protect\citeauthoryear{Pedregosa \bgroup \em et al.\egroup
   }{2011}]{scikit-learn}
 F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
@@ -76,6 +85,13 @@ Lawrence Rabiner.
 \newblock A tutorial on hidden markov models and selected applications in
   speech recognition.
 \newblock {\em Proceedings of the IEEE}, 77(2):257--286, 1989.
+
+\bibitem[\protect\citeauthoryear{Schwiegelshohn and Yahyapour}{1998}]{FCFS}
+Uwe Schwiegelshohn and Ramin Yahyapour.
+\newblock Analysis of first-come-first-serve parallel job scheduling.
+\newblock In {\em Proceedings of the Ninth Annual ACM-SIAM Symposium on
+  Discrete Algorithms}, SODA '98, pages 629--638, Philadelphia, PA, USA, 1998.
+  Society for Industrial and Applied Mathematics.
 
 \bibitem[\protect\citeauthoryear{Tsafrir \bgroup \em et al.\egroup
   }{2007}]{tsafir}

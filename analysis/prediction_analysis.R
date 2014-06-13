@@ -96,8 +96,9 @@ names(df) <- c('true_run','tsafir','random_forest')
 #print(df$true_run[1])
 
 #print(sum(df$true_run**2))
-print(sum((df$true_run-df$tsafir)^2))
-print(sum((df$true_run-df$random_forest)^2))
+N=length(df$true_run)
+print((1/N)*sum((df$true_run-df$tsafir)^2))
+print((1/N)*sum((df$true_run-df$random_forest)^2))
 
 
 t=df$true_run-df$tsafir
@@ -123,9 +124,9 @@ m +
 geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
 coord_trans(y = "sqrt")+
 scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
-xlab("Squared error (hours)")+
+xlab("Absolute error (hours)")+
 ylab("Density")+
-ggtitle("Kernel density estimation of the squared error.")+
+ggtitle("Kernel density estimation of the absolute error.")+
 annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
 annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
 theme_bw()
