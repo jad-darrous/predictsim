@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014/Debian) (preloaded format=pdflatex 2014.6.13)  13 JUN 2014 19:31
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.4.21)  16 JUN 2014 03:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -25,45 +25,67 @@ Conference Style, version of 6 September 1995 (revised Nov 2010)
 Named Citation Style, version of 30 November 1994
 ) (/usr/share/texlive/texmf-dist/tex/latex/siunitx/siunitx.sty
 (/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3.sty
-Package: expl3 2014/05/20 v4814 L3 programming layer (loader) 
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
-Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
-Package ifpdf Info: pdfTeX in PDF mode is detected.
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3names.sty
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3bootstrap.sty
+Package: l3bootstrap 2014/01/04 v4640 L3 Experimental bootstrap code
 )
-(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3-code.tex
-Package: expl3 2014/05/20 v4814 L3 programming layer (code) 
-L3 Module: l3bootstrap 2014/05/16 v4782 L3 Bootstrap code
-
+Package: l3names 2014/01/04 v4640 L3 Namespace for primitives
+)
 (/usr/share/texlive/texmf-dist/tex/latex/etex-pkg/etex.sty
 Package: etex 1998/03/26 v2.0 eTeX basic definition package (PEB)
 \et@xins=\count87
 )
-L3 Module: l3names 2014/05/04 v4728 L3 Namespace for primitives
-L3 Module: l3basics 2014/05/04 v4728 L3 Basic definitions
-L3 Module: l3expan 2014/04/30 v4712 L3 Argument expansion
-L3 Module: l3tl 2014/05/04 v4728 L3 Token lists
-L3 Module: l3seq 2014/04/30 v4712 L3 Sequences and stacks
-L3 Module: l3int 2014/05/16 v4776 L3 Integers
+Package: expl3 2014/01/07 v4646 L3 Experimental code bundle wrapper
+
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3basics.sty
+Package: l3basics 2014/01/04 v4642 L3 Basic definitions
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3expan.sty
+Package: l3expan 2014/01/04 v4642 L3 Argument expansion
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3tl.sty
+Package: l3tl 2013/12/27 v4625 L3 Token lists
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3seq.sty
+Package: l3seq 2013/12/14 v4623 L3 Sequences and stacks
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3int.sty
+Package: l3int 2013/08/02 v4583 L3 Integers
 \c_max_int=\count88
 \l_tmpa_int=\count89
 \l_tmpb_int=\count90
 \g_tmpa_int=\count91
 \g_tmpb_int=\count92
-L3 Module: l3quark 2014/05/04 v4728 L3 Quarks
-L3 Module: l3prg 2014/05/04 v4728 L3 Control structures
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3quark.sty
+Package: l3quark 2013/12/14 v4623 L3 Quarks
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3prg.sty
+Package: l3prg 2014/01/04 v4642 L3 Control structures
 \g__prg_map_int=\count93
-L3 Module: l3clist 2014/05/04 v4728 L3 Comma separated lists
-L3 Module: l3token 2014/05/04 v4728 L3 Experimental token manipulation
-L3 Module: l3prop 2014/04/30 v4712 L3 Property lists
-L3 Module: l3msg 2014/05/04 v4728 L3 Messages
-L3 Module: l3file 2014/05/05 v4737 L3 File and I/O operations
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3clist.sty
+Package: l3clist 2013/07/28 v4581 L3 Comma separated lists
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3token.sty
+Package: l3token 2013/08/25 v4587 L3 Experimental token manipulation
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3prop.sty
+Package: l3prop 2013/12/14 v4623 L3 Property lists
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3msg.sty
+Package: l3msg 2013/07/28 v4581 L3 Messages
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3file.sty
+Package: l3file 2013/10/13 v4596 L3 File and I/O operations
 \l_iow_line_count_int=\count94
 \l__iow_target_count_int=\count95
 \l__iow_current_line_int=\count96
 \l__iow_current_word_int=\count97
 \l__iow_current_indentation_int=\count98
-L3 Module: l3skip 2014/05/05 v4738 L3 Dimensions and skips
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3skip.sty
+Package: l3skip 2013/07/28 v4581 L3 Dimensions and skips
 \c_zero_dim=\dimen103
 \c_max_dim=\dimen104
 \l_tmpa_dim=\dimen105
@@ -82,10 +104,14 @@ L3 Module: l3skip 2014/05/05 v4738 L3 Dimensions and skips
 \l_tmpb_muskip=\muskip13
 \g_tmpa_muskip=\muskip14
 \g_tmpb_muskip=\muskip15
-L3 Module: l3keys 2014/05/08 v4753 L3 Key-value interfaces
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3keys.sty
+Package: l3keys 2013/12/08 v4614 L3 Experimental key-value interfaces
 \g__keyval_level_int=\count99
 \l_keys_choice_int=\count100
-L3 Module: l3fp 2014/04/30 v4712 L3 Floating points
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3fp.sty
+Package: l3fp 2014/01/04 v4642 L3 Floating points
 \c__fp_leading_shift_int=\count101
 \c__fp_middle_shift_int=\count102
 \c__fp_trailing_shift_int=\count103
@@ -95,13 +121,17 @@ L3 Module: l3fp 2014/04/30 v4712 L3 Floating points
 \c__fp_Bigg_leading_shift_int=\count107
 \c__fp_Bigg_middle_shift_int=\count108
 \c__fp_Bigg_trailing_shift_int=\count109
-L3 Module: l3box 2014/05/04 v4728 L3 Experimental boxes
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3box.sty
+Package: l3box 2013/07/28 v4581 L3 Experimental boxes
 \c_empty_box=\box26
 \l_tmpa_box=\box27
 \l_tmpb_box=\box28
 \g_tmpa_box=\box29
 \g_tmpb_box=\box30
-L3 Module: l3coffins 2014/05/04 v4728 L3 Coffin code layer
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3coffins.sty
+Package: l3coffins 2013/12/14 v4624 L3 Coffin code layer
 \l__coffin_internal_box=\box31
 \l__coffin_internal_dim=\dimen109
 \l__coffin_offset_x_dim=\dimen110
@@ -121,11 +151,17 @@ L3 Module: l3coffins 2014/05/04 v4728 L3 Coffin code layer
 \l__coffin_display_offset_dim=\dimen116
 \l__coffin_display_x_dim=\dimen117
 \l__coffin_display_y_dim=\dimen118
-L3 Module: l3color 2014/04/30 v4712 L3 Experimental color support
-L3 Module: l3luatex 2014/04/30 v4712 L3 Experimental LuaTeX-specific functions
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3color.sty
+Package: l3color 2012/08/29 v4156 L3 Experimental color support
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3luatex.sty
+Package: l3luatex 2013/07/28 v4581 L3 Experimental LuaTeX-specific functions
 \g__cctab_allocate_int=\count110
 \g__cctab_stack_int=\count111
-L3 Module: l3candidates 2014/05/04 v4734 L3 Experimental additions to l3kernel
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3candidates.sty
+Package: l3candidates 2014/01/06 v4643 L3 Experimental additions to l3kernel
 \l__box_top_dim=\dimen119
 \l__box_bottom_dim=\dimen120
 \l__box_left_dim=\dimen121
@@ -142,9 +178,13 @@ L3 Module: l3candidates 2014/05/04 v4734 L3 Experimental additions to l3kernel
 \l__coffin_top_corner_dim=\dimen131
 \l__coffin_scaled_total_height_dim=\dimen132
 \l__coffin_scaled_width_dim=\dimen133
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
-Package: xparse 2014/05/05 v4740 L3 Experimental document command parser
+Package: xparse 2013/12/31 v4634 L3 Experimental document command parser
 \l__xparse_current_arg_int=\count112
 \l__xparse_m_args_int=\count113
 \l__xparse_mandatory_args_int=\count114
@@ -170,7 +210,7 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \backup@length=\skip51
 )
 (/usr/share/texlive/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
-Package: l3keys2e 2014/05/05 v4740 LaTeX2e option processing using LaTeX3 keys
+Package: l3keys2e 2013/12/31 v4634 LaTeX2e option processing using LaTeX3 keys
 )
 Variant \tl_if_blank:VTF already defined; not changing it on line 50
 \l__siunitx_tmp_box=\box41
@@ -353,7 +393,7 @@ Variant \prop_get:NVNTF already defined; not changing it on line 373
 Package: translator 2010/06/12 ver 1.10
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
-Package: keyval 2014/05/08 v1.15 key=value parser (DPC)
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks16
 )
 (/usr/share/texlive/texmf-dist/tex/latex/beamer/translator/translator-language-
@@ -361,7 +401,7 @@ mappings.tex))) (/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty
 Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
-Package: inputenc 2014/04/30 v1.2b Input encoding file
+Package: inputenc 2008/03/30 v1.1d Input encoding file
 \inpenc@prehook=\toks17
 \inpenc@posthook=\toks18
 
@@ -437,7 +477,7 @@ LaTeX Info: Redefining \today on input line 736.
 \dt@b=\toks23
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
-Package: graphicx 2014/04/25 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
@@ -468,8 +508,8 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 Package: dblfloatfix 2012/12/31 v1.0a (JAW)
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/fixltx2e.sty
-Package: fixltx2e 2014/05/13 v1.1q fixes to LaTeX
-LaTeX Info: Redefining \em on input line 429.
+Package: fixltx2e 2006/09/13 v1.1m fixes to LaTeX
+LaTeX Info: Redefining \em on input line 420.
 )
 \@dblbotnum=\count162
 \c@dblbotnumber=\count163
@@ -816,25 +856,24 @@ Underfull \hbox (badness 1466) in paragraph at lines 93--98
 638,
  []
 
-) [6] (./report.aux) )
-(\end occurred when \iftrue on line 174 was incomplete) 
+) [6] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 11692 strings out of 495021
- 238977 string characters out of 6181344
- 266924 words of memory out of 5000000
- 14717 multiletter control sequences out of 15000+600000
+ 11794 strings out of 493304
+ 242195 string characters out of 6139871
+ 272648 words of memory out of 5000000
+ 15001 multiletter control sequences out of 15000+600000
  64553 words of font info for 109 fonts, out of 8000000 for 9000
- 14 hyphenation exceptions out of 8191
- 39i,12n,35p,10394b,482s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texm
-f-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/usyr.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (6 pages, 432909 bytes).
+ 957 hyphenation exceptions out of 8191
+ 40i,12n,35p,10419b,482s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.en
+c}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/t
+imes/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pf
+b>
+Output written on report.pdf (6 pages, 432919 bytes).
 PDF statistics:
  56 PDF objects out of 1000 (max. 8388607)
  36 compressed objects within 1 object stream

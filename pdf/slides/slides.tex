@@ -1,0 +1,514 @@
+\documentclass{beamer}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{titling}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{fullpage}
+
+\lstset{
+    basicstyle=\scriptsize,
+    %basicstyle=\small,
+    commentstyle=\footnotesize,
+    frameround=trBL,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=10pt,
+    keywordstyle=\bf
+}
+\newcommand{\subtitle}[1]{%
+    \posttitle{%
+    \par\end{center}
+\begin{center}\large#1\end{center}
+\vskip0.5em}%
+}
+
+\newcommand{\Sscript}[2]{
+    \begin{itemize}
+        \item[]\lstinputlisting[caption=#2,label=#1,language=Scilab]{src/#1.sci}
+    \end{itemize}
+}
+\newcommand{\Rscript}[2]{
+    \begin{itemize}
+        \item[]\lstinputlisting[caption=#2,label=#1,language=R]{#1}
+    \end{itemize}
+}
+\newcommand{\Jscript}[2]{
+    \begin{itemize}
+        \item[]\lstinputlisting[caption=#2,label=#1,language=Java]{src/#1.java}
+    \end{itemize}
+}
+\lstdefinelanguage{codeoutput} { %this is the name that you are going to use when you want to use the formatting
+    basicstyle=\ttfamily\scriptsize, %font family & size
+}
+\newcommand{\Oscript}[2]{
+    \begin{itemize}
+        \item[]\lstinputlisting[caption=#2,label=#1,language=codeoutput]{src/#1}
+    \end{itemize}
+}
+
+\setlength{\abovecaptionskip}{1pt plus 1pt minus 1pt} % Chosen fairly arbitrarily
+
+\title{Math for Computer Science Homework 2}
+\subtitle{Two Villages Problem}
+\author{Reis Valentin  \and Moura Simon}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+%table of contents
+%\newpage
+%\tableofcontents
+\newpage
+
+%\begin{abstract}
+%%todo
+%\end{abstract}
+
+\section{Problem Statement}
+We would like to analyze the outcome of the following situation :
+
+Individuals are migrating to a new region one by one. They have to pick a village to settle in. Their decision is based on the number of inhabitants of these villages. When a settler arrives in the region, he or she picks a village at random with probability:
+\[
+    P(\text{ settling in village } X)=\frac{\# \text{ of inhabitants of village } X}{\text{total inhabitants of the region}}
+\]
+He then settles and the population of the village goes up.
+
+\usetikzlibrary{arrows,positioning}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[->,
+            >=stealth',
+            shorten >=1pt,
+            %auto,
+            node distance=3cm,
+            thick,
+            on grid,
+            square/.style={draw,font=\sffamily\Large\bfseries}
+        ]
+        \node[] (dummy) {};
+        \node[square] (va) [left =of dummy] {Village A};
+        \node[square] (vb) [right =of dummy] {Village B};
+        \node[] (d) [below =90pt of dummy] {Biased Coin Toss on P};
+        \node[] (o) [below =40pt of d] {};
+        \path[every node/.style={fill=white}]
+        (d)
+        edge node {$P(A)=\frac{n_a}{n_a+n_b}$} (va.south)
+        edge node {$P(B)=\frac{n_b}{n_a+n_b}$} (vb.south);
+        \path
+        (o)
+        edge node {}  (d);
+    \end{tikzpicture}
+    \caption{One step of the village choosing process.}
+    \label{fig:probchoice}
+\end{figure}
+
+We begin by first simulating this process to get a hang of its behavior. Afterwards, we use an analytical approach.
+\section{Intuition}
+\label{sec:intuition}
+
+\subsection*{Q1:Intuition}
+\label{sub:q1_intuition}
+
+Our intuition tells us that if we start with $n_a=n_b=1$, the system is going to quickly move to some asymmetrical state: at the second iteration, we already have either $P(A)=\frac{n_a}{n_a+n_b}=2*P(B)$ or $P(B)=\frac{n_b}{n_a+n_b}=2*P(A)$ and the asymmetry in probability is reinforced by the process.
+
+% subsection* q1_intuition (end)
+% section intuition (end)
+
+\section{Simulating the process}
+\label{sec:simulating_the_process}
+
+Below is our R implementation of the process. We generate an experiment function with more or less output (step-by-step versus final result only) in order to reduce branching and improve readability of experiment declaration code.
+\Rscript{src/village1.R}{Implementation of the village choosing process.}
+
+\subsection*{Q2: Observing the limit of $\frac{n_a}{n_a+n_b}$}
+\label{sub:q1_observing_the_limit}
+We simulate $10000$ iterations of the settling process:
+\Rscript{src/exp1.R}{$10000$ iterations with $n_a$ and $n_b$ initially at $1$ and step-by-step output}
+Here are the results:
+\begin{figure}[H]
+    \centering
+    \caption{Evolution of village population proportion $\frac{n_a}{n_a+n_b}$ given equiprobable initial values ($n_a=1$ and $n_b$=1) with $n=10000$ iterations.}
+    \label{fig:exp1}
+\end{figure}
+In all observed cases we have such a profile, where the quantity $\frac{n_a}{n_a+n_b}$ stabilizes around a value between 0 and 1. This ratio is rarely observed as close to 0, however it may happen, as in Figure~\ref{fig:exp3}:
+\begin{figure}[H]
+    \centering
+    \caption{Evolution of village populations given equiprobable initial values ($n_a=1$ and $n_b$=1) with $n=10000$ iterations.}
+    \label{fig:exp3}
+\end{figure}
+% subsection* q1_observing_the_limit (end)
+
+\subsection*{Q3: Distribution of the Limit}
+\label{sub:q3_distribution_of_the_limit}
+We compute the distribution of the limit of the process:
+\Rscript{src/exp2.R}{$10000$ iterations with $n_a$ and $n_b$ initially at $1$ and step-by-step output}
+Here is the resulting histogram:
+\begin{figure}[H]
+    \centering
+    \caption{Histogram of the final values of $\frac{n_a}{n_a+n_b}$. $N=10000$ repeats of the experiment, each with $n=1000$ iterations and initial values of $n_a$=1 and $n_b$=1. The bin size for the histogram is $0.02$.}
+    \label{fig:hist}
+\end{figure}
+This histogram suggests that the distribution of the limit of $\frac{n_a}{n_a+n_b}$ with initial values $n_a$=1 and $n_b$=1 is uniform.
+% subsection* q3_distribution_of_the_limit (end)
+
+\subsection*{Q4: Asymmetrical initial values}
+\label{sub:q4_asymetrical_initial_values}
+We run the same experiment with asymmetric initial values: $n_a=2$ and $n_b=1$. Here is the resulting histogram:
+\begin{figure}[H]
+    \centering
+    \caption{Histogram of the final values of $\frac{n_a}{n_a+n_b}$. $N=10000$ repeats of the experiment, each with $n=1000$ iterations and initial values of $n_a$=2 and $n_b$=1. The bin size for the histogram is $0.02$.}
+    \label{fig:hist2}
+\end{figure}
+This histogram suggests that the distribution of the limit of $\frac{n_a}{n_a+n_b}$ with initial values $n_a$=2 and $n_b$=1 follows a linear probability model ($P(x)=\alpha x$) of coefficient $\alpha = 0.5$.
+% subsection* q4_asymmetrical_initial_values (end)
+
+\subsection*{Q5: Impact of initial values}
+\label{sub:q5_impact_of_initial_values}
+In order to measure the impact of the initial values, we compute same experiment again with fixed values.
+We run the experiment initial values: $n_a=200$ and $n_b=100$. This time we display a histogram:
+\begin{figure}[H]
+    \centering
+    \caption{Density plot of the final values of $\frac{n_a}{n_a+n_b}$. $N=30000$ repeats of the experiment, each with $n=1000$ iterations and initial values of $n_a$=200 and $n_b$=100.}
+    \label{fig:hist3}
+\end{figure}
+This histogram suggests that the distribution of the limit of $\frac{n_a}{n_a+n_b}$ with initial values $n_a$=2 and $n_b$=1 follows a Gaussian probability model centered in $200/(100+200)=2/3$. This is coherent  with our first observations: if there is indeed a limit, with $n_a=200$ and $n_b=100$ we force the behavior of the system so that the limit be around this value.
+
+At this point, this is the only thing we can say about the system: that given enough "inertia", it will converge around the initial values.
+% subsection* q5_impact_of_initial_values (end)
+
+% section simulating_the_process (end)
+
+\section{Analytical Approach}
+\label{sec:analytical_approach}
+We now use an analytical approach to this problem. We restrain ourselves to the case of initial values $n_a=1$ and $n_b=1$.
+
+\subsection*{Q6: Distribution after $N$ steps}
+\label{sub:subsection*_name}
+We are going to calculate the distribution of the proportion after $N$ steps of the village choosing process. 
+
+The system of $N$ subsequent steps can be described by a grid in the following manner:
+\usetikzlibrary{arrows,positioning}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[->,
+            >=stealth',
+            shorten >=1pt,
+            %auto,
+            node distance=3cm,
+            thick,
+            on grid,
+            square/.style={draw,font=\sffamily\Large\bfseries}
+        ]
+        \node[] (init) [left =of dummy] {$(1,1)$};
+
+        \node[] (dummy1) [below =65pt of init] {};
+        \node[] (p21) [left =65pt of dummy1] {$(2,1)$};
+        \node[] (p12) [right=65pt of dummy1] {$(1,2)$};
+
+        \node[] (dummy2) [below =65pt of p21] {};
+        \node[] (dummy3) [below =65pt of p12] {};
+        \node[] (p31) [left=65pt of dummy2] {$(3,1)$};
+        \node[] (p22) [below=65pt of dummy1] {$(2,2)$};
+        \node[] (p13) [right=65pt of dummy3] {$(1,3)$};
+
+        \node[] (dummy4) [below =65pt of p31] {};
+        \node[] (dummy5) [below =65pt of p22] {};
+        \node[] (dummy6) [below =65pt of p13] {};
+        \node[] (p41) [left=65pt of dummy4] {$(4,1)$};
+        \node[] (p32) [left=65pt of dummy5] {$(3,2)$};
+        \node[] (p23) [right=65pt of dummy5] {$(2,3)$};
+        \node[] (p14) [right=65pt of dummy6] {$(1,4)$};
+
+        \node[] (dummy7) [below =30pt of p41] {};
+        \node[] (dummy8) [below =30pt of p32] {};
+        \node[] (dummy9) [below =30pt of p23] {};
+        \node[] (dummy10) [below =30pt of p14] {};
+        \node[] (ptp1) [left=20pt of dummy7] {...};
+        \node[] (ptp2) [right=20pt of dummy7] {...};
+        \node[] (ptp3) [left=20pt of dummy8] {...};
+        \node[] (ptp4) [right=20pt of dummy8] {...};
+        \node[] (ptp5) [left=20pt of dummy9] {...};
+        \node[] (ptp6) [right=20pt of dummy9] {...};
+        \node[] (ptp7) [left=20pt of dummy10] {...};
+        \node[] (ptp8) [right=20pt of dummy10] {...};
+
+        \path[every node/.style={fill=white}]
+        (init)
+        edge node {$p_a=\frac{1}{1+1}=\frac{1}{2}$} (p21)
+        edge node {$p_b=\frac{1}{1+1}=\frac{1}{2}$} (p12)
+        (p21)
+        edge node {$p_b=\frac{2}{2+1}=\frac{2}{3}$} (p31)
+        edge node {$p_a=\frac{1}{2+1}=\frac{1}{3}$} (p22)
+        (p12)
+        edge node {$p_b=\frac{1}{1+2}=\frac{1}{3}$} (p22)
+        edge node {$p_a=\frac{2}{1+2}=\frac{2}{3}$} (p13)
+        (p31)
+        edge node {$p_a=\frac{3}{3+1}=\frac{3}{4}$} (p41)
+        edge node {$p_b=\frac{1}{3+1}=\frac{1}{4}$} (p32)
+        (p22)
+        edge node {$p_a=\frac{2}{2+2}=\frac{2}{4}$} (p32)
+        edge node {$p_b=\frac{2}{2+2}=\frac{2}{4}$} (p23)
+        (p13)
+        edge node {$p_a=\frac{1}{1+3}=\frac{1}{4}$} (p23)
+        edge node {$p_b=\frac{3}{1+3}=\frac{3}{4}$} (p14);
+        \path
+        (p41)
+        edge node {} (ptp1)
+        edge node {} (ptp2)
+        (p32)
+        edge node {} (ptp3)
+        edge node {} (ptp4)
+        (p23)
+        edge node {} (ptp5)
+        edge node {} (ptp6)
+        (p14)
+        edge node {} (ptp7)
+        edge node {} (ptp8);
+    \end{tikzpicture}
+    \vspace{20pt}
+    \caption{Graph G: Probabilities of moving from one state of the system to another. $p_a$ (resp. $p_b$) denotes the probability for the villager to move to village A (resp. village B).}
+    \label{fig:grid}
+\end{figure}
+
+The weights associated to the edges of this graph are the probabilities associated to the decision of the corresponding villager to move to village A or B. 
+We are trying to find the distribution of the states of the system at height $N$ of this graph. Let us then refer to the positions in this graph(which is a grid) by the indices $N \in \mathbb{N}$ and $n \in [\![ 0,N-1]\!]$. $N$ corresponds to the index of the diagonal of the grid (horizontal in Figure~\ref{fig:grid}). $n$ corresponds to the indexing in said diagonal (from left to right in Figure~\ref{fig:grid}), This way, the values of the vertices of the graph have always for value $(N-n+1,n+1)$, as illustrated below.
+
+\usetikzlibrary{arrows,positioning,shapes.multipart}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[->,
+            >=stealth',
+            shorten >=1pt,
+            %auto,
+            node distance=3cm,
+            thick,
+            on grid,
+            n/.style={align=center}
+        ]
+        \node[n] (init) [left =of dummy] {$(1,1)$};
+
+        \node[n] (dummy1) [below =65pt of init] {};
+        \node[n] (p21) [left =65pt of dummy1] {$(2,1)$ \\ $n=0,N=1$};
+        \node[n] (p12) [right=65pt of dummy1] {$(1,2)$\\$n=1,N=1$};
+
+        \node[n] (dummy2) [below =65pt of p21] {};
+        \node[n] (dummy3) [below =65pt of p12] {};
+        \node[n] (p31) [left=65pt of dummy2] {$(3,1)$\\$n=0,N=2$};
+        \node[n] (p22) [below=65pt of dummy1] {$(2,2)$\\$n=1,N=2$};
+        \node[n] (p13) [right=65pt of dummy3] {$(1,3)$\\$n=2,N=2$};
+
+        \node[n] (dummy4) [below =65pt of p31] {};
+        \node[n] (dummy5) [below =65pt of p22] {};
+        \node[n] (dummy6) [below =65pt of p13] {};
+        \node[n] (p41) [left=65pt of dummy4] {$(4,1)$\\$n=1,N=3$};
+        \node[n] (p32) [left=65pt of dummy5] {$(3,2)$\\$n=2,N=3$};
+        \node[n] (p23) [right=65pt of dummy5] {$(2,3)$\\$n=3,N=3$};
+        \node[n] (p14) [right=65pt of dummy6] {$(1,4)$\\$n=4,N=3$};
+
+        \node[n] (dummy7) [below =30pt of p41] {};
+        \node[n] (dummy8) [below =30pt of p32] {};
+        \node[n] (dummy9) [below =30pt of p23] {};
+        \node[n] (dummy10) [below =30pt of p14] {};
+        \node[n] (ptp1) [left=20pt of dummy7] {...};
+        \node[n] (ptp2) [right=20pt of dummy7] {...};
+        \node[n] (ptp3) [left=20pt of dummy8] {...};
+        \node[n] (ptp4) [right=20pt of dummy8] {...};
+        \node[n] (ptp5) [left=20pt of dummy9] {...};
+        \node[n] (ptp6) [right=20pt of dummy9] {...};
+        \node[n] (ptp7) [left=20pt of dummy10] {...};
+        \node[n] (ptp8) [right=20pt of dummy10] {...};
+
+        \path
+        (init)
+        edge node {} (p21)
+        edge node {} (p12)
+        (p21)
+        edge node {} (p22)
+        edge node {} (p31)
+        (p12)
+        edge node {} (p22)
+        edge node {} (p13)
+        (p31)
+        edge node {} (p41)
+        edge node {} (p32)
+        (p22)
+        edge node {} (p32)
+        edge node {} (p23)
+        (p13)
+        edge node {} (p23)
+        edge node {} (p14)
+        (p41)
+        edge node {} (ptp1)
+        edge node {} (ptp2)
+        (p32)
+        edge node {} (ptp3)
+        edge node {} (ptp4)
+        (p23)
+        edge node {} (ptp5)
+        edge node {} (ptp6)
+        (p14)
+        edge node {} (ptp7)
+        edge node {} (ptp8);
+    \end{tikzpicture}
+    \vspace{20pt}
+    \caption{Illustration of the chosen indexing of the graph.}
+    \label{fig:grid2}
+\end{figure}
+
+
+The probability associated to a state $(N-n+1,n+1)$ in the grid is equal to the sum of the probabilities associated to all the distincts paths that lead to this state. 
+This is already a strong statement that comes from understanding what is the sample space of the experiment \textit{settling of $N$ villagers}. 
+Elements of this sample space are sequences of outcomes from the \textit{settling of one villager} such that the $k+1$-th outcome integrates the $k$-th outcome in terms of population increase. The probability associated to an outcome \textit{of the settling of $N$ villagers} is the sum of the probabilities associated to such sequences that end up in a specific state.  
+The probability associated to the sequence is the product of the probabilities of every intermediary outcome of the \textit{settling of one villager}.
+
+Therefore, we have the probability of the outcomes of the \textit{settling of N villagers} indexed by $N$ and $n$:
+\[
+P(N,n)= \sum_{\text{distincts paths leading to } (N,n) \text{ from } (0,0) \text{ in }G} \left( \prod_{\text{edges of the path}}{\text{weight of the edge}} \right)
+\]
+
+
+We can observe that such the paths are always descending and that the denominators of the values of the edges are increasing by one at every step. Therefore, we can simplify the graph by removing the denominators:
+\usetikzlibrary{arrows,positioning}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[->,
+            >=stealth',
+            shorten >=1pt,
+            %auto,
+            node distance=3cm,
+            thick,
+            on grid,
+            square/.style={draw,font=\sffamily\Large\bfseries}
+        ]
+        \node[] (init) [left =of dummy] {$(1,1)$};
+
+        \node[] (dummy1) [below =40pt of init] {};
+        \node[] (p21) [left =40pt of dummy1] {$(2,1)$};
+        \node[] (p12) [right=40pt of dummy1] {$(1,2)$};
+
+        \node[] (dummy2) [below =40pt of p21] {};
+        \node[] (dummy3) [below =40pt of p12] {};
+        \node[] (p31) [left=40pt of dummy2] {$(3,1)$};
+        \node[] (p22) [below=40pt of dummy1] {$(2,2)$};
+        \node[] (p13) [right=40pt of dummy3] {$(1,3)$};
+
+        \node[] (dummy4) [below =40pt of p31] {};
+        \node[] (dummy5) [below =40pt of p22] {};
+        \node[] (dummy6) [below =40pt of p13] {};
+        \node[] (p41) [left=40pt of dummy4] {$(4,1)$};
+        \node[] (p32) [left=40pt of dummy5] {$(3,2)$};
+        \node[] (p23) [right=40pt of dummy5] {$(2,3)$};
+        \node[] (p14) [right=40pt of dummy6] {$(1,4)$};
+
+        \node[] (dummy7) [below =30pt of p41] {};
+        \node[] (dummy8) [below =30pt of p32] {};
+        \node[] (dummy9) [below =30pt of p23] {};
+        \node[] (dummy10) [below =30pt of p14] {};
+        \node[] (ptp1) [left=20pt of dummy7] {...};
+        \node[] (ptp2) [right=20pt of dummy7] {...};
+        \node[] (ptp3) [left=20pt of dummy8] {...};
+        \node[] (ptp4) [right=20pt of dummy8] {...};
+        \node[] (ptp5) [left=20pt of dummy9] {...};
+        \node[] (ptp6) [right=20pt of dummy9] {...};
+        \node[] (ptp7) [left=20pt of dummy10] {...};
+        \node[] (ptp8) [right=20pt of dummy10] {...};
+
+        \path[every node/.style={fill=white}]
+        (init)
+        edge node {1} (p21)
+        edge node {1} (p12)
+        (p21)
+        edge node {$1$} (p22)
+        edge node {$2$} (p31)
+        (p12)
+        edge node {$1$} (p22)
+        edge node {$2$} (p13)
+        (p31)
+        edge node {$3$} (p41)
+        edge node {$1$} (p32)
+        (p22)
+        edge node {$2$} (p32)
+        edge node {$2$} (p23)
+        (p13)
+        edge node {$1$} (p23)
+        edge node {$3$} (p14);
+        \path
+        (p41)
+        edge node {} (ptp1)
+        edge node {} (ptp2)
+        (p32)
+        edge node {} (ptp3)
+        edge node {} (ptp4)
+        (p23)
+        edge node {} (ptp5)
+        edge node {} (ptp6)
+        (p14)
+        edge node {} (ptp7)
+        edge node {} (ptp8);
+    \end{tikzpicture}
+    \vspace{20pt}
+    \caption{Graph G' : Numerator of the probabilities of moving from one state of the system to another.}
+    \label{fig:gridf}
+\end{figure}
+And adapt our formula by factoring the denominator in the sum:
+\[
+    P(N,n)= \frac{\sum_{\text{distincts paths leading to } (N,n) \text{ from } (0,0) \text{ in G' }} ( \prod_{\text{edges of the path}}{\text{weight of the edge }})}{(N+1)!} 
+\]
+And we now have that:
+\begin{itemize}
+    \item The weight of the left (villager to village A) descending edge of a vertice is $w_a(N,n)=N+1-n$.
+    \item The weight of the right (villager to village B) descending edge of a vertice is $w_b(N,n)=n+1$.
+\end{itemize}
+This leads to the observation that the product of the weight of any descending path from $(0,0)$ to $(N,n)$ always is the same :
+\begin{itemize}
+    \item There are $n$ decisions to go to village B with weights $1$, $2$, ..., $n-1$, $n$.
+    \item There are $N+1-n$ decisions to go to village A with weights $1$, $2$, ..., $N-n-1$, $N-n$.
+\end{itemize}
+Therefore, the product that we are looking for is $n!(N-n)!$  .
+
+We now have:
+\[
+    P(N,n)= \frac{\left[ \text{ amount of distincts paths leading to } (N,n) \text{ from } (0,0)   \right] \times  n!(N-n)!}{(N+1)!} 
+\]
+
+A classic combinatorics result is the number of distinct paths in a $m \times n$ grid: $\binom{n+m}{n}$.
+
+Therefore:
+
+\[
+    P(N,n)= \binom{N}{n} \frac{ n!(N-n)!  }{(N+1)!} =   \frac{N!n!(N-n)!}{n!(N-n)!(N+1)!} = \frac{1}{N+1}
+\]
+
+The distribution of the proportion after $N$ steps is uniform. Therefore, the distribution of the limit of the proportion, when $N$ grows, is also uniform.
+
+% subsection* subsection*_name (end)
+
+% section analytical_approach (end)
+
+\section{Conclusion}
+
+\subsection*{Q7: Is it Intuitive?}
+\label{sub:q7_is_it_intuitive_}
+
+According to what we had guessed, the limit of the proportion does not necessarily converge around $\frac{1}{2}$. A symmetrical setup of $n_a=1$ and $n_b=1$ does not imply a symmetrical result, in which case we would have obtained some curved distribution centered in $1/2$. The distribution of the limit of the proportion is uniform : every proportion of population of one village to another is equally likely.
+
+% subsection* q7_is_it_intuitive_ (end)
+
+\label{sec:cl}
+
+
+
+% section cl (end)
+\end{document}
