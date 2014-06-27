@@ -186,34 +186,20 @@ if tool=="random_forest":
     ylearn=yf[start:i:1]
     ytest=yf[i:len(yf)]
     tsafirtest=tsafir[i:len(yf)]
-    print("creating random forests regressor")
     forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
     print("learning random forests")
     forest.fit(Xlearn,ylearn)
-    print("Prediction!")
+    print("prediction")
     pred=forest.predict(Xtest)
-    print("prediction mean: %s" %(pred))
-    err=pred-ytest
-    forest_squares=np.mean(err**2)
-    print("forest_squares: %s" %forest_squares)
-    pred=np.reshape(pred,(-1,1))
     np_array_to_file(pred,"prediction_rf")
 elif tool=="tsafrir":
     np_array_to_file(tsafir,"prediction_tsafrir")
 elif tool=="svr":
     print("creating SVR")
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
-    print("learning SVR")
     svr.fit(Xlearn,ylearn)
-    print("Prediction!")
-    svr_pred=svr.predict(Xtest)
-    err=svr_pred-ytest
-    svr_squares=np.mean(err**2)
-    print(svr_squares)
-    pred=np.reshape(pred,(-1,1))
-    tsaf=np.reshape(tsafirtest,(-1,1))
-    ytest=np.reshape(ytest,(-1,1))
-    np.savetxt("prediction_svr",np.hstack((pred,tsafir,ytest)))
+    pred=svr.predict(Xtest)
+    np_array_to_file(pred,"prediction_rf")
 elif tool in ["sgd","passive-aggressive"]:
     from simpy import Environment,simulate,Monitor
     from swfpy import io
@@ -256,6 +242,7 @@ elif tool in ["sgd","passive-aggressive"]:
             pred.append(model.predict(j))
         else:
             pred.append(0)
+
         yield env.timeout(wait_time+run_time)
         #print('4: time is %s,i= %s' % (env.now, i))
         model.partial_fit(np.array([j]),np.array([yf[i]]))
