@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # encoding: utf-8
 '''
-#!/usr/bin/python
 runtime predictor.
 DWTFPL v2.0
 
 Usage:
     meanpredict.py <filename> <extracted_data> randomforest <encoding> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> tsafrir [-i] [-v]
     meanpredict.py <filename> <extracted_data> svr <encoding> [-i] [-v]
     meanpredict.py <filename> <extracted_data> sgd <encoding> <max_runtime> <max_cores> [-i] [-v]
 
@@ -28,20 +28,30 @@ Options:
     job_id user_id last_runtime last_runtime2 last_status last_status2 thinktime running_maxlength running_sumlength amount_running running_average_runtime running_allocatedcores
 '''
 from docopt import docopt
-#retrieving arguments
 arguments = docopt(__doc__, version='1.0.0rc2')
 
-#verbose?
+#____ARGUMENT_MANAGEMENT____
 if arguments['--verbose']==True:
     print(arguments)
 
 if arguments["sgd"]:
     tool="sgd"
+elif arguments["tsafrir"]:
+    tool="tsafrir"
+elif arguments["randomforest"]:
+    tool="randomforest"
+elif arguments["svr"]:
+    tool="svr"
 else:
-    tool=arguments["<tool>"]
+    print "please use a valid tool."
+    raise ValueError("tool")
 
-encoding=arguments["<encoding>"]
+if arguments["<encoding>"]:
+    encoding=arguments["<encoding>"]
+else:
+    encoding=None
 
+#____IMPORTS____
 import numpy as np
 from swfpy import io
 import datetime
@@ -55,7 +65,10 @@ from sklearn import preprocessing
 from numpy.lib.recfunctions import append_fields
 from numpy.lib.recfunctions import drop_fields
 from numpy.lib.recfunctions import merge_arrays
+from np_printutils import array_to_file
+from np_printutils import np_array_to_file
 
+#____FILE I/O____
 print("opening the swf csv file")
 swf_dtype=np.dtype([('job_id',np.int_), ('submit_time',np.float32) ,('wait_time',np.float32) ,('run_time',np.float32) ,('proc_alloc',np.int_) ,('cpu_time_used',np.float32) ,('mem_used',np.float32) ,('proc_req',np.int_) ,('time_req',np.float32) ,('mem_req',np.float32) ,('status',np.int_) ,('user_id',np.int_) ,('group_id',np.int_) ,('exec_id',np.int_) ,('queue_id',np.int_) ,('partition_id',np.int_) ,('previous_job_id',np.int_) ,('think_time',np.float32)])
 with open (arguments["<filename>"], "r") as f:
@@ -67,7 +80,7 @@ with open (arguments["<extracted_data>"], "r") as f:
     extracted_data=np.loadtxt(f, dtype=extracted_data_dtype)
 
 
-#______data field modification vectorized functions:
+#____DATA MANIPULATION____
 #day of month
 print("vectorizing functions for added info")
 dom=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).strftime('%d'))
@@ -149,6 +162,7 @@ if encoding=="onehot":
         Xf_tsafir_mean             = Xf_tsafir_mean/max_runtime
         Xf_last_runtime            = Xf_last_runtime/max_runtime
         Xf_last_runtime2           = Xf_last_runtime2/max_runtime
+
         scale_thinktime=np.vectorize(lambda x:min(x,60*60*24)/(60*60*24))
         Xf_thinktime               = scale_thinktime(Xf_thinktime)
         Xf_running_maxlength       = Xf_running_maxlength/max_runtime
@@ -161,28 +175,17 @@ if encoding=="onehot":
 else:
     Xf=X.view(np.float32).reshape(X.shape + (-1,))
 
-#dirty fix for nan values
-#Xf=np.nan_to_num(X)
-#yf=np.nan_to_num(y)
-
-#Here we have: Xf, yf, tsafir
-start=int(len(Xf)*.7)
-i=int(len(Xf)*.8)
-Xlearn=Xf[start:i:1,:]
-Xtest=Xf[i:len(Xf),:]
-ylearn=yf[start:i:1]
-ytest=yf[i:len(yf)]
-tsafirtest=tsafir[i:len(yf)]
-
-#TSAFIR BASELINE
-print("baseline mean: %s" %(np.mean(tsafirtest)))
-print("calculating baseline squared error:")
-tsafir_squares=np.mean((tsafirtest-ytest)**2)
-print("tsafir_squares="+str(tsafir_squares))
-
-
-#RANDOM FOREST
+#At this point we have: Xf, yf, tsafir
+#___LEARNING___
 if tool=="random_forest":
+    #____OFFLINE RANDOM FORESTS____
+    start=int(len(Xf)*.7)
+    i=int(len(Xf)*.8)
+    Xlearn=Xf[start:i:1,:]
+    Xtest=Xf[i:len(Xf),:]
+    ylearn=yf[start:i:1]
+    ytest=yf[i:len(yf)]
+    tsafirtest=tsafir[i:len(yf)]
     print("creating random forests regressor")
     forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
     print("learning random forests")
@@ -193,6 +196,10 @@ if tool=="random_forest":
     err=pred-ytest
     forest_squares=np.mean(err**2)
     print("forest_squares: %s" %forest_squares)
+    pred=np.reshape(pred,(-1,1))
+    np_array_to_file(pred,"prediction_rf")
+elif tool=="tsafrir":
+    np_array_to_file(tsafir,"prediction_tsafrir")
 elif tool=="svr":
     print("creating SVR")
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
@@ -203,31 +210,25 @@ elif tool=="svr":
     err=svr_pred-ytest
     svr_squares=np.mean(err**2)
     print(svr_squares)
-
     pred=np.reshape(pred,(-1,1))
     tsaf=np.reshape(tsafirtest,(-1,1))
     ytest=np.reshape(ytest,(-1,1))
-    np.savetxt("prediction_randomforest_40_trees",np.hstack((pred,tsafir,ytest)))
-
-
+    np.savetxt("prediction_svr",np.hstack((pred,tsafir,ytest)))
 elif tool in ["sgd","passive-aggressive"]:
     from simpy import Environment,simulate,Monitor
     from swfpy import io
     import logging
     from simpy.util import start_delayed
-
     global_logger = logging.getLogger('global')
     hdlr = logging.FileHandler('extractor.log')
     formatter = logging.Formatter('%(levelname)s %(message)s')
     hdlr.setFormatter(formatter)
     global_logger.addHandler(hdlr)
-
     #logging level
     if arguments['--verbose']==True:
         global_logger.setLevel(logging.INFO)
     else:
         global_logger.setLevel(logging.ERROR)
-
     #Getting a simulation environment
     env = Environment()
     #logging function
@@ -237,7 +238,6 @@ elif tool in ["sgd","passive-aggressive"]:
 
     if tool=="sgd":
         model=SGDRegressor(loss='squared_loss', penalty='l2', alpha=0.0001, l1_ratio=0.15, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, epsilon=0.1, random_state=None, learning_rate='invscaling', eta0=0.01, power_t=0.25, warm_start=False)
-
     if tool=="passive-aggressive":
         model=PassiveAggressiveRegressor(C=1.0, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, loss='epsilon_insensitive', epsilon=0.1, random_state=None, class_weight=None, warm_start=False)
 
@@ -273,16 +273,12 @@ elif tool in ["sgd","passive-aggressive"]:
 
     simulate(env)
 
-    pred=np.array(pred)
     if arguments['--interactive']==True:
         print(arguments)
         from IPython import embed
         embed()
 
-    predout=np.reshape(pred,(-1,1))
-    tsafout=np.reshape(tsafir,(-1,1))
-    yout=np.reshape(yf,(-1,1))
-    np.savetxt("prediction_sgd",np.hstack((predout,tsafout,yout)))
+    array_to_file(pred,"prediction_sgd")
 
 #interactive?
 if arguments['--interactive']==True:
