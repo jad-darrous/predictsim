@@ -203,6 +203,13 @@ elif tool=="svr":
     err=svr_pred-ytest
     svr_squares=np.mean(err**2)
     print(svr_squares)
+
+    pred=np.reshape(pred,(-1,1))
+    tsaf=np.reshape(tsafirtest,(-1,1))
+    ytest=np.reshape(ytest,(-1,1))
+    np.savetxt("prediction_randomforest_40_trees",np.hstack((pred,tsafir,ytest)))
+
+
 elif tool in ["sgd","passive-aggressive"]:
     from simpy import Environment,simulate,Monitor
     from swfpy import io
@@ -245,14 +252,14 @@ elif tool in ["sgd","passive-aggressive"]:
 
         yield env.timeout(submit_time)
         if flag_bootstrapped:
-            print("predicting")
+            #print("predicting")
             pred.append(model.predict(j))
         else:
             pred.append(0)
         yield env.timeout(wait_time+run_time)
-        print('4: time is %s,i= %s' % (env.now, i))
+        #print('4: time is %s,i= %s' % (env.now, i))
         model.partial_fit(np.array([j]),np.array([yf[i]]))
-        print('5: time is %s,i= %s' % (env.now, i))
+        #print('5: time is %s,i= %s' % (env.now, i))
 
         if not flag_bootstrapped:
             flag_bootstrapped=True
@@ -266,15 +273,16 @@ elif tool in ["sgd","passive-aggressive"]:
 
     simulate(env)
 
+    pred=np.array(pred)
     if arguments['--interactive']==True:
         print(arguments)
         from IPython import embed
         embed()
 
-pred=np.reshape(pred,(-1,1))
-tsaf=np.reshape(tsafirtest,(-1,1))
-ytest=np.reshape(ytest,(-1,1))
-np.savetxt("prediction_randomforest_40_trees",np.hstack((pred,tsafir,ytest)))
+    predout=np.reshape(pred,(-1,1))
+    tsafout=np.reshape(tsafir,(-1,1))
+    yout=np.reshape(yf,(-1,1))
+    np.savetxt("prediction_sgd",np.hstack((predout,tsafout,yout)))
 
 #interactive?
 if arguments['--interactive']==True:
