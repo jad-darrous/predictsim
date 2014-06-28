@@ -254,7 +254,7 @@ elif tool in ["sgd","passive-aggressive"]:
         yield env.timeout(submit_time)
         if flag_bootstrapped:
             #print("predicting")
-            pred.append(abs(model.predict(j)))
+            pred.append(min(abs(model.predict(j)),max_runtime))
         else:
             pred.append(0)
 
