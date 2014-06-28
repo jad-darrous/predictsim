@@ -1,20 +1,13 @@
-%%%% ijcai11.tex
-
-\typeout{IJCAI-11 Instructions for Authors}
-
-% These are the instructions for authors for IJCAI-11.
-% They are the same as the ones for IJCAI-07 with superficical wording
-%   changes only.
-
 \documentclass{article}
 % The file ijcai11.sty is the style file for IJCAI-11 (same as ijcai07.sty).
 \usepackage{ijcai11}
 
 % Use the postscript times font!
 \usepackage{times}
+\usepackage{datetime}
 
 % the following package is optional:
-%\usepackage{latexsym} 
+%\usepackage{latexsym}
 
 % Following comment is from ijcai97-submit.tex:
 % The preparation of these files was supported by Schlumberger Palo Alto
@@ -37,19 +30,13 @@
 % Put where the files are available in the appropriate places.
 
 
-\title{Modified IJCAI--11 Formatting Instructions for M1Mosig
-\thanks{These match the formatting instructions of IJCAI-07. The support of IJCAI, Inc. is acknowledged.}}
-\author{Toby Walsh \\ 
-NICTA and UNSW\\
-Sydney, Australia \\
-pcchair11@ijcai.org \\
-\\
-Supervised by: M1 Mosig supervisor name.} % Mosig student
+\title{Master 1 MoSIG Research Project Report\\
+Learning Job Runtimes in Homogenous Clusters}
+\author{Valentin Reis\\
+Supervised by: Denis Trystram \& Eric Gaussier.\\
+}
 
 \begin{document}
-
-
-
 
 \maketitle
 
@@ -58,7 +45,7 @@ Supervised by: M1 Mosig supervisor name.} % Mosig student
 to\hsize{\vrule\kern3pt\vbox{\kern3pt
 \hbox{{\small I understand what plagiarism entails and I declare that this report }}
 \hbox{{\small is my own, original work. }}
-\hbox{{\small Name, date and signature:}}
+\hbox{{\small Name, date and signature: }}
 \kern3pt
 }\hfil%\kern3pt
 \vrule
@@ -68,89 +55,51 @@ to\hsize{\vrule\kern3pt\vbox{\kern3pt
 
 
 \begin{abstract}
-  The {\it IJCAI--11 Proceedings} will be printed from electronic
-  manuscripts submitted by the authors. The electronic manuscript will
-  also be included in the online version of the proceedings. This paper
-  provides the style instructions.
+  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+  tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At
+  vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
+  no sea takimata sanctus est Lorem ipsum dolor sit amet.
 \end{abstract}
 
-
 \section{Introduction}
+High Performance Computing (HPC) systems are complex machinery at the frontier between research in scheduling and systems engineering.
 
-The {\it IJCAI--11 Proceedings} will be printed from electronic
-manuscripts submitted by the authors. These must be PDF ({\em Portable
-Document Format}) files formatted for 8-1/2$''$ $\times$ 11$''$ paper.
+The ephemeral nature, and broad range of existing architectures of such systems make the development and application of theoretical results difficult.
+New schemes for distributing resources (e.g.\ memory caches, hard drives, processing units, RAM memory) are ubiquitous. Moreover, the topology of a HPC system can change on a monthly or weekly basis, with the addition of new hardware.
+Finding scheduling, and resource management strategies which can adapt to those changes is a current research problem.
 
-\subsection{Length of Papers}
+In addition, the input data these systems have to work with presents many peculiarities. The nature of the information which users provide is very often loose, ( e.g.\ with only upper and/or lower bounds provided ). For instance, and this will be the focus of this paper, the run time of a given job on a specific system is seldom known in advance, however an upper bound may be given by the user.
 
-Each accepted full paper is allocated six pages in the conference 
-proceedings. Up to two additional pages may be purchased at a price 
-of \$275 per page for any accepted paper. However, all 
-{\em submissions} must 
-be a maximum of six pages in length.
+As a consequence of these difficulties most free, open-source and commercial resource management software use simple heuristics, which at best provide bounds on their performance, and at worst guarantee a few functional properties.
+An example of such a strategy is the First Come First Serve (FCFS) strategy to schedule parallel jobs on a homogenous cluster of machines. Among other properties (such as robustness to weak information about the amount of time a job will run on the system), this strategy guarantees the avoidance of starvation.
+
+As mentionned previously, one of the aspects that must be dealt with in order to apply more sophisticated techniques to schedule jobs on these systems is the uncertainty in the data provided by the users of those systems.
+
+\subsection{Research Direction}
+The general direction we are headed in, in the course of this research project, is to deal with the input data of the resource management systems.
+In particular, we seek to apply Machine Learning techniques in order to reduce uncertainty in the data and extract information and/or structure relevant for subsequent use by a scheduling algorithm. We will be working only with the problem of presenting input data in the most valuable way possible to a scheduling algorithm, and will not deal with how to use this data beyond simple cases. As for showing the added value of the specific the information we choose to extract, references from the HPC scheduling litterature will provide ground to stand on.
+
+\subsection{Job runtimes}
+Most HPC resource management software (including the SLURM, OpenPBS, OpenLava and OAR software) do ask information about jobs to users, such as topological requests in terms of processing units and memory, the name of the executable, miscellaneous functional requirements and, last but not least, the expected run time of the job. This user-provided estimate of the run time of a job on a specific system will be referred as \textbf{reqtime} in the rest of the paper. Most of these software use the \textbf{reqtime} of a job as an upper bound on its run time, and kill it should \textbf{reqtime} be violated. As a consequence, this information is over-estimated by the users, if they choose to provide it. The following section will look in depth at this relationship.
+
+The true run time of a job with respect to a given affected topology is of great interest, as the scheduling policies are highly dependent on this information to provide good solutions \ref{truc}. We will refer to this quantity as the \textbf{runtime} of a job.
+It must be clear that the \textbf{runtime} of a job is only defined with respect to a specific processing environment to which it might be affected.
+This can include and is not limited to, the network topology of the processing units, the availability of shared memory, message passing costs, and the operating system supporting the computations.
+
+
+\subsection{Problem Statement}
+The general problem statement we are dealing with is the following:
 
 
 \subsection{Word Processing Software}
 
-As detailed below, IJCAI has prepared and made available a set of
-\LaTeX{} macros and a Microsoft Word template for use in formatting
-your paper. If you are using some other word processing software (such
-as WordPerfect, etc.), please follow the format instructions given
-below and ensure that your final paper looks as much like this sample
-as possible.
-
-\section{Style and Format}
-
-\LaTeX{} and Word style files that implement these instructions
-can be retrieved electronically. (See Appendix~\ref{stylefiles} for
-instructions on how to obtain these files.)
+\section{Motivation}
 
 \subsection{Layout}
 
-Print manuscripts two columns to a page, in the manner in which these
-instructions are printed. The exact dimensions for pages are:
-\begin{itemize}
-\item left and right margins: .75$''$
-\item column width: 3.375$''$
-\item gap between columns: .25$''$
-\item top margin---first page: 1.375$''$
-\item top margin---other pages: .75$''$
-\item bottom margin: 1.25$''$
-\item column height---first page: 6.625$''$
-\item column height---other pages: 9$''$
-\end{itemize}
-
-All measurements assume an 8-1/2$''$ $\times$ 11$''$ page size. For
-A4-size paper, use the given top and left margins, column width,
-height, and gap, and modify the bottom and right margins as necessary.
 
 \subsection{Format of Electronic Manuscript}
 
-For the production of the electronic manuscript, you must use Adobe's
-{\em Portable Document Format} (PDF). A PDF file can be generated, for
-instance, on Unix systems using {\tt ps2pdf} or on Windows systems
-using Adobe's Distiller. There is also a website with free software
-and conversion services: {\tt http://www.ps2pdf.com/}. For reasons of
-uniformity, use of Adobe's {\em Times Roman} font is strongly suggested. In
-\LaTeX2e{}, this is accomplished by putting
-\begin{quote} 
-\mbox{\tt $\backslash$usepackage\{times\}}
-\end{quote}
-in the preamble.\footnote{You may want also to use the package {\tt
-latexsym}, which defines all symbols known from the old \LaTeX{}
-version.}
-  
-Additionally, it is of utmost importance to specify the American {\bf
-letter} format (corresponding to 8-1/2$''$ $\times$ 11$''$) when
-formatting the paper. When working with {\tt dvips}, for instance, one
-should specify {\tt -t letter}.
-
-\subsection{Title and Author Information}
-
-Center the title on the entire width of the page in a 14-point bold
-font. Below it, center the author name(s) in a 12-point bold font, and
-then center the address(es) in a 12-point regular font. Credit to a
-sponsoring agency can appear on the first page as a footnote.
 
 \subsubsection{Blind Review}
 
@@ -313,7 +262,7 @@ ijcai11.doc}. This template is the same as the one used for
 IJCAI--07.
 
 These Microsoft Word and \LaTeX{} files contain the source of the
-present document and may serve as a formatting sample.  
+present document and may serve as a formatting sample.
 
 Further information on using these styles for the preparation of
 papers for IJCAI--11 can be obtained by contacting {\tt
