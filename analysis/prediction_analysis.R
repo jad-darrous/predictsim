@@ -105,7 +105,6 @@ t=df$true_run-df$tsafir
 r=df$true_run-df$random_forest
 
 
-
 t_abs=abs(t)
 r_abs=abs(r)
 print("mean tsaf")
@@ -128,10 +127,22 @@ df <-data.frame(values,belongs)
 colnames(df) <- c("value", "type")
 summary(df)
 
-print("dbg")
-library(ggplot2)
-#ggplot(df, aes(x=value)) +geom_histogram(aes(y=..density..),alpha=0.2) +geom_density(fill=NA,alpha=0.2)
-m <- ggplot(df, aes(x=value))
+plot_rec_curves <- function(...,labelnames=FALSE){
+
+  print(data)
+    dc <- c(...)
+
+    for (i in 1:length(dc)){
+
+      #TODO!
+        dc[[i]]$Logname=labelnames[i]
+        colnames(dc[i])<-c("value","type")
+    }
+  print(dc)
+    d=do.call(rbind,dc)
+  print(d)
+
+m <- ggplot(d, aes(x=value))
 m +
 geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
 coord_trans(y = "sqrt")+
@@ -142,7 +153,10 @@ ggtitle("Kernel density estimation of the absolute error.")+
 annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
 annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
 theme_bw()
+}
 
+data=apply(args$swf_filenames,1,read.table)
+plot_rec_curves(data,args$swf_filenames)
 
 
 #m + geom_histogram(aes(y=..density..,fill=type),binwidth=1800) + geom_density(aes(fill=type, y = ..scaled..), colour="black",alpha=0.2)
