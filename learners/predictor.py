@@ -79,10 +79,9 @@ with open (arguments["<filename>"], "r") as f:
     data=np.loadtxt(f, dtype=swf_dtype)
 
 print("opening the extracted data csv file")
-extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_)])
+extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_),('t_since_last_sub',np.int_),('running_totalcores',np.int_),('last_runtime3',np.int_),('last_runtime4',np.int_)])
 with open (arguments["<extracted_data>"], "r") as f:
     extracted_data=np.loadtxt(f, dtype=extracted_data_dtype)
-
 
 #____DATA MANIPULATION____
 #day of month
@@ -101,7 +100,8 @@ tsafir=np.vectorize(mean2last)
 
 print("calculating added info: tsafir mean, day of week, day of month")
 X=drop_fields(data,['job_id','wait_time','run_time','proc_alloc','cpu_time_used','mem_used','mem_req','status','exec_id','queue_id','partition_id','previous_job_id','think_time'])
-X=append_fields(X,['day_of_week','day_of_month','tsafir_mean'],[dow(data['submit_time']),dom(X['submit_time']),tsafir(extracted_data['last_runtime'],extracted_data['last_runtime2'],data['time_req'])],dtypes=[np.int_,np.int_,np.float32])
+#TODO: just modified line below
+X=append_fields(X,['day_of_week','day_of_month','tsafir_mean','mean3','mean4'],[dow(data['submit_time']),dom(X['submit_time']),tsafir(extracted_data['last_runtime'],extracted_data['last_runtime2'],data['time_req'])],dtypes=[np.int_,np.int_,np.float32])
 
 #removing job id and user id, merging
 print(X.dtype)
