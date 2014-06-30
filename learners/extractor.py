@@ -79,13 +79,13 @@ submitted_jobs={}
 running_jobs={}
 user_info={}
 
-UserInfo= namedtuple('UserInfo', 'last_runtime last_runtime2 last_status last_status2 last_jobend')
+UserInfo= namedtuple('UserInfo', 'last_runtime last_runtime2 last_runtime3 last_runtime4 last_status last_status2 last_jobend')
 
 for uid in users:
     submitted_jobs[uid]=[]
     running_jobs[uid]=[]
     #user_info[uid]['UserInfo'](-1,-1,-1,-1,-1)
-    user_info[uid]={'last_runtime':-1, 'last_runtime2':-1, 'last_status':-1, 'last_status2':-1, 'last_jobend':-1}
+    user_info[uid]={'last_runtime':-1, 'last_runtime2':-1, 'last_runtime3':-1, 'last_runtime4':-1, 'last_status':-1, 'last_status2':-1, 'last_jobend':-1,'last_submit':data[0].submit_time}
 
 def job_submit(j):
     log=lambda x: global_log("JOB SUBMIT: "+x)
@@ -93,8 +93,8 @@ def job_submit(j):
     submitted_jobs[j.user_id].append(j)
     log("dbg1")
     #dataoutput for job j, including thinktime computation
-    #job_id user_id last_runtime last_runtime2 last_status last_status2 thinktime running_maxlength running_sumlength amount_running running_average_runtime running_allocatedcores
-    printlist=[j.job_id,j.user_id,user_info[j.user_id]['last_runtime'],user_info[j.user_id]['last_runtime2'],user_info[j.user_id]['last_status'],user_info[j.user_id]['last_status2']]
+    #job_id user_id last_runtime last_runtime2 last_runtime3 last_runtime4 last_status last_status2 thinktime running_maxlength running_sumlength amount_running running_average_runtime running_allocatedcores
+    printlist=[j.job_id,j.user_id,user_info[j.user_id]['last_runtime'],user_info[j.user_id]['last_runtime2'],user_info[j.user_id]['last_runtime4'],user_info[j.user_id]['last_status'],user_info[j.user_id]['last_status2']]
     log("dbg2")
 
     if user_info[j.user_id]['last_jobend']>=0:
@@ -119,12 +119,18 @@ def job_submit(j):
         running_average_runtime=0
         running_allocatedcores=0
 
+    running_totalcores=sum([sum([abs(j2.proc_alloc) for j2 in running_jobs[uidvar]]) for uidvar in users])
+
     log("dbg4")
     printlist.append(running_maxlength)
     printlist.append(running_sumlength)
     printlist.append(amount_running)
     printlist.append(running_average_runtime)
     printlist.append(running_allocatedcores)
+    printlist.append(env.now-user_info[j.user_id]['last_submit'])
+    printlist.append(running_totalcores)
+    printlist.append(user_info[j.user_id]['last_runtime3'])
+    printlist.append(user_info[j.user_id]['last_runtime4'])
 
     s=""
     for e in printlist:
@@ -145,6 +151,8 @@ def job_end(j):
     running_jobs[j.user_id].remove(j)
     submitted_jobs[j.user_id].append(j)
     #modify data for this user
+    user_info[j.user_id]['last_runtime4']=user_info[j.user_id]['last_runtime3']
+    user_info[j.user_id]['last_runtime3']=user_info[j.user_id]['last_runtime2']
     user_info[j.user_id]['last_runtime2']=user_info[j.user_id]['last_runtime']
     user_info[j.user_id]['last_runtime']=j.run_time
     user_info[j.user_id]['last_status2']=user_info[j.user_id]['last_status']
