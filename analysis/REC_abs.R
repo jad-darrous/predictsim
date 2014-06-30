@@ -34,7 +34,7 @@ epilog=''
 
 #External parser function: for usual options.
 #e.g. parser=parser_swf(description,epilog)
-parser=parser_rf(description,epilog)
+parser=parser_pred(description,epilog)
 
 
 #additional argparse entries for this particular script.
@@ -85,95 +85,53 @@ setwd(execution_wd)
 #pause_output(pause=TRUE) for x11
 #use it to pause for output.
 #args for retrieving your arguments.
-
-df <- read.table(args$filename)
-names(df) <- c('true_run','tsafir','random_forest')
-#df$true_run=as.numeric(as.character(df$true_run))
-#df$col1=as.numeric(as.character(df$col1))
-#df$col2=as.numeric(as.character(df$col2))
-#summary(df)
-#print(df$col1[1])
-#print(df$true_run[1])
-
-#print(sum(df$true_run**2))
-N=length(df$true_run)
-print((1/N)*sum((df$true_run-df$tsafir)^2))
-print((1/N)*sum((df$true_run-df$random_forest)^2))
+library('plyr')
+library('ggplot2')
 
 
-t=df$true_run-df$tsafir
-r=df$true_run-df$random_forest
+#type stuff here.
+plot_rec_curves <- function(preds,true_values,labelnames){
+  true_runtime=ldply(true_values,data.frame)
+  colnames(true_runtime)<-c("value")
+  preds_dfs=data.frame()
 
+  for (i in 1:length(preds)){
+    d=ldply(preds[i],data.frame)
 
-t_abs=abs(t)
-r_abs=abs(r)
-print("mean tsaf")
-print(mean(t_abs))
-print("mean rf")
-print(mean(r_abs))
-print("var tsaf")
-print(sqrt(var(t_abs)/length(r_abs)))
-print("var rf")
-print(sqrt(var(r_abs)/length(r_abs)))
+    d$value=labelnames[i]
+    colnames(d)<-c("value","type")
+    d$value=abs(true_runtime$value-d$value)
+    #print(typeof(d))
+    #print(class(d))
 
-t_sq=t^2
-r_sq=r^2
-t_ssq=sign(t)*t_sq
-r_ssq=sign(r)*r_sq
-l=length(t)
-values=c(t_abs,r_abs)
-belongs=c(rep("baseline",l),rep("randomforest",l))
-df <-data.frame(values,belongs)
-colnames(df) <- c("value", "type")
-summary(df)
+    #print(summary(d))
+    preds_dfs=rbind(preds_dfs,d)
+  }
 
-plot_rec_curves <- function(...,labelnames=FALSE){
+  print(summary(preds_dfs))
+  p0 = ggplot(preds_dfs, aes(x = value)) +
+   stat_ecdf(aes(group = type, colour = type))
+  print(p0)
 
-  print(data)
-    dc <- c(...)
-
-    for (i in 1:length(dc)){
-
-      #TODO!
-        dc[[i]]$Logname=labelnames[i]
-        colnames(dc[i])<-c("value","type")
-    }
-  print(dc)
-    d=do.call(rbind,dc)
-  print(d)
-
-m <- ggplot(d, aes(x=value))
-m +
-geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
-coord_trans(y = "sqrt")+
-scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
-xlab("Absolute error (hours)")+
-ylab("Density")+
-ggtitle("Kernel density estimation of the absolute error.")+
-annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
-annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
-theme_bw()
+  #m <- ggplot(d, aes(x=value))
+  #m +
+  #geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
+  #coord_trans(y = "sqrt")+
+  #scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
+  #xlab("Absolute error (hours)")+
+  #ylab("Density")+
+  #ggtitle("Kernel density estimation of the absolute error.")+
+  #annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
+  #annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
+  #theme_bw()
 }
 
-data=apply(args$swf_filenames,1,read.table)
-plot_rec_curves(data,args$swf_filenames)
-
-
-#m + geom_histogram(aes(y=..density..,fill=type),binwidth=1800) + geom_density(aes(fill=type, y = ..scaled..), colour="black",alpha=0.2)
-#ggplot(df, aes(x=value)) +geom_histogram(aes(fill=type,y=..density..),alpha=0.2,position="dodge") +geom_density(aes(fill=type),kernel="rectangular",alpha=0.2)
-#ggplot(df, aes(x=value,y=..density..)) +geom_histogram(aes(fill=type),alpha=0.2,position="dodge") +geom_density(aes(fill=type),kernel="rectangular",alpha=0.2)
-
-#ggplot(df, aes(value)) +geom_density(aes(fill=type),kernel="rectangular")
-
-
-#ggplot(df, aes(x=type,y=value)) +geom_boxplot()
-
-
-
-
+print(args$pred_filenames)
+data=lapply(args$pred_filenames,read.table)
+plot_rec_curves(preds=data[-1],true_values=data[1],labelnames=args$pred_filenames[-1])
+print(args$pred_filenames)
 
 ###################END BLOCK#####################
-
 
 #############X11 OUTPUT MANAGEMENT###############
 #################MODIFY IF NEEDED################

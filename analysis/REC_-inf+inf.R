@@ -86,41 +86,44 @@ setwd(execution_wd)
 #use it to pause for output.
 #args for retrieving your arguments.
 library('plyr')
+library('ggplot2')
 
 
 #type stuff here.
 plot_rec_curves <- function(preds,true_values,labelnames){
-
   true_runtime=ldply(true_values,data.frame)
-  true_runtime=data.frame()
-  print(summary(true_runtime))
   colnames(true_runtime)<-c("value")
+  preds_dfs=data.frame()
+
   for (i in 1:length(preds)){
     d=ldply(preds[i],data.frame)
-    print(typeof(d))
-    print(summary(d))
 
     d$value=labelnames[i]
-    print(summary(d))
     colnames(d)<-c("value","type")
-    print("oeu")
-    d$value=abs(true_runtime$value-d$value)
-    print("oeu")
+    d$value=true_runtime$value-d$value
+    #print(typeof(d))
+    #print(class(d))
+
+    #print(summary(d))
+    preds_dfs=rbind(preds_dfs,d)
   }
 
-  d=do.call(rbind,dc)
+  print(summary(preds_dfs))
+  p0 = ggplot(preds_dfs, aes(x = value)) +
+   stat_ecdf(aes(group = type, colour = type))
+  print(p0)
 
-  m <- ggplot(d, aes(x=value))
-  m +
-  geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
-  coord_trans(y = "sqrt")+
-  scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
-  xlab("Absolute error (hours)")+
-  ylab("Density")+
-  ggtitle("Kernel density estimation of the absolute error.")+
-  annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
-  annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
-  theme_bw()
+  #m <- ggplot(d, aes(x=value))
+  #m +
+  #geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
+  #coord_trans(y = "sqrt")+
+  #scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
+  #xlab("Absolute error (hours)")+
+  #ylab("Density")+
+  #ggtitle("Kernel density estimation of the absolute error.")+
+  #annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
+  #annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
+  #theme_bw()
 }
 
 print(args$pred_filenames)
