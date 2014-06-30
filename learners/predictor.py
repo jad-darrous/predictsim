@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # encoding: utf-8
 '''
-runtime predictor.
-DWTFPL v2.0
+Runtime predictor.
 
 Usage:
     meanpredict.py <filename> <extracted_data> randomforest <encoding> [-i] [-v]
@@ -29,6 +28,11 @@ Options:
 '''
 from docopt import docopt
 arguments = docopt(__doc__, version='1.0.0rc2')
+
+__author__ = 'Valentin Reis  <valentin.reis@gmail.com>'
+__version__ = '0.10'
+__website__ = 'https://github.com/freuk/internship'
+__license__ = 'WTFPL2.0'
 
 #____ARGUMENT_MANAGEMENT____
 if arguments['--verbose']==True:
@@ -179,6 +183,7 @@ else:
 #___LEARNING___
 if tool=="random_forest":
     #____OFFLINE RANDOM FORESTS____
+
     start=int(len(Xf)*.7)
     i=int(len(Xf)*.8)
     Xlearn=Xf[start:i:1,:]
@@ -193,14 +198,20 @@ if tool=="random_forest":
     pred=forest.predict(Xtest)
     np_array_to_file(pred,"prediction_rf")
 elif tool=="tsafrir":
+    #___TSAFRIR MEAN___
+
     np_array_to_file(tsafir,"prediction_tsafrir")
 elif tool=="svr":
+    #___OFFLINE SVR___
+
     print("creating SVR")
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
     svr.fit(Xlearn,ylearn)
     pred=svr.predict(Xtest)
     np_array_to_file(pred,"prediction_rf")
 elif tool in ["sgd","passive-aggressive"]:
+    #___ONLINE LEARNING___
+
     from simpy import Environment,simulate,Monitor
     from swfpy import io
     import logging
@@ -223,8 +234,12 @@ elif tool in ["sgd","passive-aggressive"]:
         global_logger.info(prefix+': '+msg)
 
     if tool=="sgd":
+        #___SGD___
+
         model=SGDRegressor(loss='squared_loss', penalty='l2', alpha=0.0001, l1_ratio=0.15, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, epsilon=0.1, random_state=None, learning_rate='invscaling', eta0=0.01, power_t=0.25, warm_start=False)
     if tool=="passive-aggressive":
+        #___PASSIVE_AGGRESSIVE___
+
         model=PassiveAggressiveRegressor(C=1.0, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, loss='epsilon_insensitive', epsilon=0.1, random_state=None, class_weight=None, warm_start=False)
 
     pred=[]
@@ -239,7 +254,7 @@ elif tool in ["sgd","passive-aggressive"]:
         yield env.timeout(submit_time)
         if flag_bootstrapped:
             #print("predicting")
-            pred.append(model.predict(j))
+            pred.append(min(abs(model.predict(j)),max_runtime))
         else:
             pred.append(0)
 

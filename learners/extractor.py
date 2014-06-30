@@ -24,6 +24,13 @@ Options:
     -h --help                                      show this help message and exit.
     -v --verbose                                   print extra information and log info level data to extractor.log.
 '''
+
+__author__ = 'Valentin Reis  <valentin.reis@gmail.com>'
+__version__ = '0.10'
+__website__ = 'https://github.com/freuk/internship'
+__license__ = 'WTFPL2.0'
+
+
 import re
 import logging
 from collections import deque
