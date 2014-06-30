@@ -1,0 +1,14 @@
+# should backfill the last two jobs
+# the input variables: 
+# arrival time; job id; user estimated duration; number of required nodes; actual duration  
+0 600.1197 600 90 600 0 0 uid_1
+0 10.11197 10 10 10 0 0 uid_1
+1 610.1197 10 100 10 0 0 uid_1
+#all these should be backfilled in "reverse" order of arrival 
+2 30.11197 10 10 10 0 0 uid_1
+3 20.11197 11 10 10 0 0 uid_1
+
+28 50.1197 11 10 10 0 0 uid_1
+29 40.1197 10 10 10 0 0 uid_1
+
+60 70.1197 10 10 10 0 0 uid_1

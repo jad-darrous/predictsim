@@ -1,0 +1,7 @@
+# simple jobs scenario for conservative and easy backfill
+0 600 700 50 600 0 0 uid_1
+10 800 400 100 200 0 0 uid_1
+# the job below cannot be backfilled: 
+# the first available time window is "long" enough, however    
+# there are not enough free processors
+20 810 10 60 10 0 0 uid_1

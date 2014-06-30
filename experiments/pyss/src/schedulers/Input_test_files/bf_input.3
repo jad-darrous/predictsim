@@ -1,0 +1,17 @@
+### the instance below is applicable to the schedulers: easy and conservative (but not fifo) 
+### in each of these policies we expect a similar scheduling decision.  
+#
+# The Instance: jobs should be backfilled in parallel 
+0 100.0 100 15 100 0 0 uid_1
+0 100.1 100 15 100 0 0 uid_1
+0 100.2 100 15 100 0 0 uid_1
+0 100.3 100 15 100 0 0 uid_1
+0 100.4 100 15 100 0 0 uid_1
+0 100.5 100 15 100 0 0 uid_1
+5 200.0 100 60 100 0 0 uid_1
+6 16.1 11 1 10 0 0 uid_1
+6 16.2 12 1 10 0 0 uid_1
+6 300 1000 99 100 0 0 uid_1
+7 301 1 100 1 0 0 uid_1
+8 10.1 20 1 2 0 0 uid_1
+8 10.2 21 1 2 0 0 uid_1

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Time the simulator (receives input on stdin)
+
+# python: optimize bytecode, unbuffered output
+# timeit: best measurement out of 3 (default), run code once each time
+python2.4 -O -u -m timeit -n 1 -s 'import sys, run_simulator' 'sys.stdin.seek(0); run_simulator.main()' 2>&1

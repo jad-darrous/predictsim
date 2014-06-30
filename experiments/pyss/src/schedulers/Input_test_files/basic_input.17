@@ -1,0 +1,12 @@
+#basic_input.17
+### the instance below is applicable to the schedulers: fcfs, easy, conservative. 
+### in each of these policies we expect a similar scheduling decision.  
+# Bunch of jobs arriving at various times 
+# _not_ all can be scheduled at arrival time 
+# None can be backfilled (assuming 100 nodes) 
+0 10 100 50 10        0 0 uid_1
+1 20 100 60 10        0 0 uid_1
+1000 1010 1000 50 10  0 0 uid_1
+1001 1020 10 60 10    0 0 uid_1
+1002 1030 100 60 10   0 0 uid_1
+1003 1040 100 60 10   0 0 uid_1

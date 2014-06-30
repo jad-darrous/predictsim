@@ -1,0 +1,17 @@
+### the instance below is applicable to the schedulers: fcfs, easy, conservative. 
+### in each of these policies we expect a similar scheduling decision.  
+# Bunch of jobs arriving at various times 
+# We check here that scheduling is done in order of arrival  
+
+10 130.1 120 1 120 0 0 uid_1
+10 130.2 120 1 120 0 0 uid_1
+10 130.3 120 1 120 0 0 uid_1
+10 130.4 120 1 120 0 0 uid_1
+10 130.5 120 1 120 0 0 uid_1
+
+10 130.11 200 1 120 0 0 uid_1
+10 130.12 200 1 120 0 0 uid_1
+10 130.13 200 1 120 0 0 uid_1
+10 130.14 200 1 120 0 0 uid_1
+10 130.15 200 1 120 0 0 uid_1
+70 180    200 100 50 0 0 uid_1

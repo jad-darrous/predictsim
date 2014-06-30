@@ -1,0 +1,13 @@
+#basic_input.20
+### the instance below is applicable to the schedulers: fcfs, easy, conservative
+### in each of these policies we expect a similar scheduling decision
+# The instance: bunch of jobs arriving at various times
+# and should be finishing exactly on the same time (1000)
+# the last job should is wide (100 nodes) and should start on time 1000 finishing at time 1001
+0 1000 2000 10 1000 0 0 uid_1
+0 1000.1 2000 10 1000 0 0 uid_1
+10 1000.2 3000 10 990 0 0 uid_1
+10 1000.3 3000 10 990 0 0 uid_1
+20 1000.4 1980 10 980 0 0 uid_1
+20 1000.5 1980 10 980 0 0 uid_1
+30 1001 2 100 1 0 0 uid_1

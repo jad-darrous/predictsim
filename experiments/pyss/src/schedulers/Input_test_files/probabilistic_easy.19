@@ -1,0 +1,8 @@
+# the input variables: 
+# arrival time; job id; user estimated duration; number of required nodes; actual duration  # 
+
+0 10.1 10 80 10 0 0 uid_1
+0 10.2 10 10 10 0 0 uid_2
+1 20.4 10 99 10 0 0 uid_3
+2 9.03 7 2 7 0 0 uid_4
+3 30.5 10 100 10 0 0 uid_5

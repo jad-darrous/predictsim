@@ -1,0 +1,18 @@
+#basic_input.16
+### the instance below is applicable to the schedulers: fcfs, easy, conservative,
+### in each of these policies we expect a similar scheduling decision
+# The instance: a more complex bunch of jobs arriving 
+# at various times, all can be scheduled at time of arrival 
+0 10 1000 1 10 0 0 uid_1
+20 21 100 1 1 0 0 uid_1
+20 21.1 100 1 1 0 0 uid_1
+30 35 500 1 5 0 0 uid_1
+30 36.1 600 1 6 0 0 uid_1
+32 36.2 50 1 4 0 0 uid_1
+50 60 100 1 10 0 0 uid_1
+60 90 100 1 30 0 0 uid_1
+70 80 500 1 10 0 0 uid_1
+70 100 1000 1 30 0 0 uid_1
+75 77 1000 1 2 0 0 uid_1
+73 173 200 1 100 0 0 uid_1
+3000 3100 5000 1 100 0 0 uid_1

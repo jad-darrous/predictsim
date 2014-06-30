@@ -1,0 +1,16 @@
+### the instance below is applicable to the schedulers: easy and conservative (but not fifo) 
+### in each of these policies we expect a similar scheduling decision.  
+# This test is based on Dan Tsafrir's test code2
+# The Instance: many jobs should be backfilled but not the last  
+0 100 100 50 100 0 0 uid_1
+1 200 1000 95 100 0 0 uid_1
+2 300 1000 95 100 0 0 uid_1
+5 15 11 1 10 0 0 uid_1
+6 17 12 1 11 0 0 uid_1
+6 18 12 1 12 0 0 uid_1
+6 16 12 2 10 0 0 uid_1
+6 400 1000 95 100 0 0 uid_1
+7 500 100 100 100 0 0 uid_1
+8 10.1 20 1 2 0 0 uid_1
+8 10.2 21 1 2 0 0 uid_1
+10 1500 1200 6 1000 0 0 uid_1

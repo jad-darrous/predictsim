@@ -1,0 +1,7 @@
+# should not backfill ...
+# the input variables: 
+# arrival time; job id; user estimated duration; number of required nodes; actual duration  # 
+0 20.1 20 80 20 0 0 uid_1
+0 20.2 20 10 20 0 0 uid_2
+1 22.3 2 100 2 0 0 uid_3
+17 52 400 10 30 0 0 uid_4

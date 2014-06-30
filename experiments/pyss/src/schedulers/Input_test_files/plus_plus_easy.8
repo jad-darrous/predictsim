@@ -1,0 +1,13 @@
+# in this test we have 3 jobs asking each for 6 processors and 2 time units of duration 
+# and 2 jobs asking each for 10 processors and 1 unit of time
+# it should first backfill the bunch of the last 2 jobs. 
+# the input variables: 
+# arrival time; job id; user estimated duration; number of required nodes; actual duration  # 
+0 100 100 80 100 0 0 uid_1
+0 50 50 20 50 0 0 uid_2
+1 2100 2000 100 2000 0 0 uid_3 
+2 53.0 2 6 2 0 0 uid_7
+3 53.1 2 6 2 0 0 uid_7
+4 53.2 2 6 2 0 0 uid_7
+5 51.0 1 10 1 0 0 uid_7
+6 51.1 1 10 1 0 0 uid_7

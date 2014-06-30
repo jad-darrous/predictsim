@@ -1,0 +1,13 @@
+How to test pyss?
+Right now it's a bit of a mess.
+
+# base unit tests
+cd base
+python2.4 test_prototype.py
+
+# schedulers system tests
+cd schedulers
+./tests.py > /dev/null
+
+# "new" run_simulator, now with fcfs scheduler
+./go.sh (or ./run_simulator.py < input)
