@@ -9,6 +9,7 @@ from easy_plus_plus_scheduler import EasyPlusPlusScheduler
 from shrinking_easy_scheduler import ShrinkingEasyScheduler
 
 import sys
+import os
 
 class Simulator(object):
     """
@@ -17,18 +18,28 @@ class Simulator(object):
     Assumption 2: self.jobs holds every job that was introduced to the simulation.
     """
 
-    def __init__(self, jobs, num_processors, scheduler):
+    def __init__(self, jobs, num_processors, scheduler, output_swf):
         self.num_processors = num_processors
         self.jobs = jobs
         self.terminated_jobs=[]
         self.scheduler = scheduler
         self.time_of_last_job_submission = 0
         self.event_queue = EventQueue()
+        self.output_swf = None
 
         self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
 
         self.event_queue.add_handler(JobSubmissionEvent, self.handle_submission_event)
         self.event_queue.add_handler(JobTerminationEvent, self.handle_termination_event)
+        if(output_swf != None):
+		self.output_swf = open(output_swf, 'w+')
+		version = os.popen("git show -s --format=\"%h %ci\" HEAD").read()[:-1]
+		self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
+		self.output_swf.write("; Preemption: No\n")
+		self.output_swf.write("; MaxNodes: -1\n")
+		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
+		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
+		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
         if isinstance(scheduler, EasyPlusPlusScheduler) or isinstance(scheduler, ShrinkingEasyScheduler):
             self.event_queue.add_handler(JobPredictionIsOverEvent, self.handle_prediction_event)
@@ -51,6 +62,63 @@ class Simulator(object):
         for event in newEvents:
             self.event_queue.add_event(event)
 
+    def store_terminated_job(self, event):
+        assert isinstance(event, JobTerminationEvent)
+        #1. Job Number
+        self.output_swf.write(str(event.job.id))
+        self.output_swf.write(" ")
+        #2. Submit Time 
+        self.output_swf.write(str(event.job.submit_time))
+        self.output_swf.write(" ")
+        #3. Wait Time
+        self.output_swf.write(str(event.job.start_to_run_at_time - event.job.submit_time))
+        self.output_swf.write(" ")
+        #4. Run Time
+        self.output_swf.write(str(event.job.actual_run_time))
+        self.output_swf.write(" ")
+        #5. Number of Allocated Processors
+        self.output_swf.write(str(event.job.num_required_processors))
+        self.output_swf.write(" ")
+        #6. Average CPU Time Used
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #7. Used Memory
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #8. Requested Number of Processors.
+        self.output_swf.write(str(event.job.num_required_processors))
+        self.output_swf.write(" ")
+        #9. Requested Time
+        self.output_swf.write(str(event.job.user_estimated_run_time))
+        self.output_swf.write(" ")
+        #10. Requested Memory
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #11. Status. This field is meaningless for models, so would be -1.
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #12. User ID
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #13. Group ID
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #14. Executable (Application) Number
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #15. Queue Number
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #16. Partition Number
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #17. Preceding Job Number
+        self.output_swf.write("-1")
+        self.output_swf.write(" ")
+        #18. Think Time
+        self.output_swf.write("-1")
+        self.output_swf.write("\n")
+
     def handle_prediction_event(self, event):
         assert isinstance(event, JobPredictionIsOverEvent)
         newEvents = self.scheduler.new_events_on_job_under_prediction(event.job, event.timestamp)
@@ -62,8 +130,8 @@ class Simulator(object):
         while not self.event_queue.is_empty:
             self.event_queue.advance()
 
-def run_simulator(num_processors, jobs, scheduler):
-    simulator = Simulator(jobs, num_processors, scheduler)
+def run_simulator(num_processors, jobs, scheduler, output_swf):
+    simulator = Simulator(jobs, num_processors, scheduler, output_swf)
     simulator.run()
     print_simulator_stats(simulator)
     return simulator
