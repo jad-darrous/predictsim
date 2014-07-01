@@ -40,5 +40,7 @@ rec_abs:all_extract
 	../../analysis/REC_abs.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/REC_ABS.pdf -r 2
 
 clean:
-	rm prediction_results/true_run_time prediction_results/prediction_req_time $(predictedswf)
+	rm prediction_results/true_run_time prediction_results/prediction_req_time $(predswf)
 
+cleanall:
+	rm analysis_results/*
