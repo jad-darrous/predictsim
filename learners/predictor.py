@@ -7,7 +7,8 @@ Usage:
     meanpredict.py <filename> <extracted_data> randomforest <encoding> [-i] [-v]
     meanpredict.py <filename> <extracted_data> tsafrir [-i] [-v]
     meanpredict.py <filename> <extracted_data> svr <encoding> [-i] [-v]
-    meanpredict.py <filename> <extracted_data> sgd <encoding> <max_runtime> <max_cores> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> sgd <loss> <penalty> <encoding> <max_runtime> <max_cores> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> passive-aggressive <loss> <encoding> <max_runtime> <max_cores> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -15,6 +16,9 @@ Options:
     -i --interactive                               Interactive mode after script.
     tool                                           the machine learning technique to use. available: svm, random_forest,sgd(incremental learning on whole log),passive-aggressive(incremental learning on whole log).
     encoding                                       how to encode discret attributes (s.t. user ID). available: continuous, onehot.
+    loss                                           for sgd: in  'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'
+                                                   for passive-aggressive: in 'epsilon_insensitive', 'squared_epsilon_insensitive'
+    penalty                                        in 'l2' , 'l1' , 'elasticnet'
 
     Please format the csv file correctly before using: remove comments.
 
@@ -46,6 +50,8 @@ elif arguments["randomforest"]:
     tool="randomforest"
 elif arguments["svr"]:
     tool="svr"
+elif arguments["passive-aggressive"]:
+    tool="passive-aggressive"
 else:
     print "please use a valid tool."
     raise ValueError("tool")
@@ -121,7 +127,7 @@ tsaf4=tsafir4(extracted_data['last_runtime'],extracted_data['last_runtime2'],ext
 X=append_fields(X,['hour_of_day','day_of_week','day_of_month','tsafir_mean','tsafir_mean3','tsafir_mean4'],[hod(data['submit_time']),dow(data['submit_time']),dom(X['submit_time']),tsaf,tsaf3,tsaf4],dtypes=[np.int_,np.int_,np.int_,np.float32,np.float32,np.float32])
 
 #removing job id and user id, merging
-print(X.dtype)
+#print(X.dtype)
 print("merging all data into one")
 X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),usemask=False,asrecarray=True,flatten=True)
 #X=merge_arrays((X,drop_fields(extracted_data,['job_id','user_id'])),asrecarray=True,flatten=True)
@@ -178,14 +184,14 @@ if encoding=="onehot":
     Xf_running_average_runtime = np.reshape(X['running_average_runtime'].astype('<f4'),(-1,1))
     Xf_running_allocatedcores  = np.reshape(X['running_allocatedcores'].astype('<f4'),(-1,1))
     Xf_t_since_last_sub        = np.reshape(X['t_since_last_sub'].astype('<f4'),(-1,1))
-    print("DEBUG")
-    print(max(X['running_totalcores']))
+    #print("DEBUG")
+    #print(max(X['running_totalcores']))
     Xf_running_totalcores      = np.reshape(X['running_totalcores'].astype('<f4'),(-1,1))
     Xf_last_runtime3           = np.reshape(X['last_runtime3'].astype('<f4'),(-1,1))
     Xf_last_runtime4           = np.reshape(X['last_runtime4'].astype('<f4'),(-1,1))
     Xf_usermean                = np.reshape(X['usermean'].astype('<f4'),(-1,1))
 
-    if tool=="sgd":
+    if tool in ["sgd","passive-aggressive"]:
         #Scale the values to  [0,1]
         max_runtime                = float(arguments["<max_runtime>"])
         max_cores                  = float(arguments["<max_cores>"])
@@ -225,10 +231,10 @@ if encoding=="onehot":
 
     Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean,onehot_features))
 
-    for i in range(0,len(Xf[0,:])):
-        print "row %s" %(i+1)
-        print np.mean(Xf[:,i])
-        print max(Xf[:,i])
+    #for i in range(0,len(Xf[0,:])):
+        #print "row %s" %(i+1)
+        #print np.mean(Xf[:,i])
+        #print max(Xf[:,i])
 else:
     Xf=X.view(np.float32).reshape(X.shape + (-1,))
 
@@ -253,7 +259,13 @@ if tool=="random_forest":
 elif tool=="tsafrir":
     #___TSAFRIR MEAN___
 
-    np_array_to_file(tsafir,"prediction_tsafrir")
+    def bound_req(pred,req):
+        if pred<req:
+            return pred
+        else:
+            return req
+    bound_with_reqtime=np.vectorize(bound_req)
+    np_array_to_file(bound_with_reqtime(tsafir,data['time_req']),"prediction_tsafrir")
 elif tool=="svr":
     #___OFFLINE SVR___
 
@@ -289,11 +301,22 @@ elif tool in ["sgd","passive-aggressive"]:
     if tool=="sgd":
         #___SGD___
 
-        model=SGDRegressor(loss='squared_loss', penalty='l2', alpha=0.0001, l1_ratio=0.15, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, epsilon=0.1, random_state=None, learning_rate='invscaling', eta0=0.01, power_t=0.25, warm_start=False)
+        loss=arguments["<loss>"]
+        if loss not in [ 'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive']:
+            raise ValueError("invalid loss function")
+
+        penalty=arguments["<penalty>"]
+        if penalty not in ['l2' , 'l1' , 'elasticnet']:
+            raise ValueError("invalid penalty function")
+
+        model=SGDRegressor(loss=loss, penalty=penalty, alpha=0.0001, l1_ratio=0.15, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, epsilon=0.1, random_state=None, learning_rate='invscaling', eta0=0.01, power_t=0.25, warm_start=False)
     if tool=="passive-aggressive":
         #___PASSIVE_AGGRESSIVE___
 
-        model=PassiveAggressiveRegressor(C=1.0, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, loss='epsilon_insensitive', epsilon=0.1, random_state=None, class_weight=None, warm_start=False)
+        loss=arguments["<loss>"]
+        if loss not in [ 'epsilon_insensitive', 'squared_epsilon_insensitive']:
+            raise ValueError("invalid loss function")
+        model=PassiveAggressiveRegressor(C=1.0, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, loss=loss, epsilon=0.1, random_state=None, class_weight=None, warm_start=False)
 
     pred=[]
     flag_bootstrapped=False
@@ -307,7 +330,7 @@ elif tool in ["sgd","passive-aggressive"]:
         yield env.timeout(submit_time)
         if flag_bootstrapped:
             #print("predicting")
-            pred.append(min(abs(model.predict(j)),max_runtime))
+            pred.append(min(abs(model.predict(j)),max_runtime,data['time_req'][i]))
         else:
             pred.append(0)
 
@@ -333,7 +356,10 @@ elif tool in ["sgd","passive-aggressive"]:
         from IPython import embed
         embed()
 
-    array_to_file(pred,"prediction_sgd")
+    if tool=="sgd":
+        array_to_file(pred,"prediction_%s_%s_%s" %(tool,loss,penalty))
+    elif tool=="passive-aggressive":
+        array_to_file(pred,"prediction_%s_%s" %(tool,loss))
 
 #interactive?
 if arguments['--interactive']==True:
