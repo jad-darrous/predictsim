@@ -1,0 +1,4 @@
+# arrival time; job id == finish time; user estimated duration; number of required nodes; actual duration 
+0 100 100 80 100 0 0 uid_1
+1 200 100 80 100 0 0 uid_1
+

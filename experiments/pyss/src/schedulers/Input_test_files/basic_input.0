@@ -1,0 +1,23 @@
+#basic_input.0
+
+### the instance below is applicable to the schedulers: fcfs, easy, and conservative.
+### in each of these policies we expect a similar scheduling decision
+# The instance: bursts of tiny tiny jobs that can be scheduled at arrival time.
+#
+1 2.1 1 1 1 0 0 uid_1
+1 2.2 1 1 1 0 0 uid_1
+1 2.3 1 1 1 0 0 uid_1
+1 2.4 1 1 1 0 0 uid_1
+1 2.10 1 1 1 0 0 uid_1
+1 2.20 1 1 1 0 0 uid_1
+1 2.30 1 1 1 0 0 uid_1
+1 2.40 1 1 1 0 0 uid_1
+#
+2 3.11 1 1 1 0 0 uid_1
+2 3.21 1 1 1 0 0 uid_1
+2 3.31 1 1 1 0 0 uid_1
+2 3.41 1 1 1 0 0 uid_1
+2 3.1 1 1 1 0 0 uid_1
+2 3.2 1 1 1 0 0 uid_1
+2 3.3 1 1 1 0 0 uid_1
+2 3.4 1 1 1 0 0 uid_1

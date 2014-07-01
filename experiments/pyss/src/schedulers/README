@@ -1,0 +1,247 @@
+
+# define this from the shell 
+setenv PYTHONOPTIMIZE 1
+
+
+killing all running simulations on mosix:  
+ps aux| grep ahumu| grep bla_bla | awk '{print "kill -9 " $2}' > ! /tmp/junk; chmod +x /tmp/junk; /tmp/junk
+
+
+------------------------------------
+
+gnuplot:  
+
+set grid
+set terminal postscript
+set output "plot.ps" 
+set xlabel "Percentile ***"    
+set ylabel "Wait Time ***"
+set title "CTC SP2 ***"
+set key 2.25, 8.5
+set xtics 1, 1.0 ,10  
+set ytics 1, 1.0 ,10
+plot [0:10] "tiny2col.dat" title "***EASY" with lines, "tiny1col.dat" title "***PROB-EASY" with linespoints
+
+
+
+set style line 1 lt 7 lw 1
+set style line 2 lt 9 lw 4
+
+plot [0:10] "tiny2col.dat" ls 1, "tiny1col.dat" ls 2
+plot [0:10] "tiny2col.dat" with linespoints lw 3, "tiny1col.dat" with linespoints lw 3
+
+
+------------------------------------
+
+Test Files Dants: 
+
+/cs/par/users/ouaknine/simus/sim_orig
+-------------------------------------------
+
+
+Avi Nissimov files: 
+/cs/par/users/abradina/lab/thesis/java/iml_em
+/cs/par/users/abradina/lab/thesis/java/backfilling
+
+------------------------------------
+
+an early version of the main loop of probability_of_running_job_to_end_upto(self, time, current_time, job): 
+
+  for key in sorted(job_distribution.bins.keys()):
+            #print "+ key, num: ", key, job_distribution.bins[key] 
+            if key <= run_time:
+                #print "case 1 key, num: ", key, job_distribution.bins[key] 
+                num_of_jobs_in_first_bins += job_distribution.bins[key]
+
+            elif key > job.user_estimated_run_time:
+                #print "case 4 key, num: ", key, job_distribution.bins[key] 
+                num_of_jobs_in_last_bins  += job_distribution.bins[key]  
+
+            elif key <= (2 * time)  + run_time: # recall that the user original estimates was "rounded up" 
+                #print "case 2 key, num: ", key, job_distribution.bins[key] 
+                num_of_jobs_in_middle_bins += job_distribution.bins[key] 
+                #print "num of mid bins:", num_of_jobs_in_middle_bins
+
+            # elif key >= time + run_time > key / 2 :
+                #print "case 3 key, num: ", key, job_distribution.bins[key] 
+                # num_of_jobs_in_middle_bins += float(job_distribution.bins[key] * (time + run_time - (key / 2))) / (key / 2) 
+                #print "num of mid bins:", num_of_jobs_in_middle_bins
+          
+
+-------------------------------------
+
+
+        tmp_bottle_neck = M[n, first_job.num_required_processors] - M[n, C]
+        tmp_prob_first_job = M[n, first_job.num_required_processors]
+        # IMPORTANT: NOTE THE DIFFERNCE IN THE RETURNED RESULT
+        # sometimes: M[n, first_job.num_required_processors] - M[n, C] is tiny,
+        # however,  M[n, first_job.num_required_processors] is non-negligble,
+        # and so there's a reason to "give up" the backfilling of the second job.
+        if tmp_bottle_neck >= tmp_prob_first_job:
+            result = M[n, first_job.num_required_processors] - M[n, C] 
+	else: 
+	    result = max (M[n, first_job.num_required_processors] / 2, M[n, first_job.num_required_processors] - M[n, C])
+ 
+
+
+---------------------------------------
+
+ Python 2.3.5 (#2, Aug 30 2005, 15:50:26) 
+[GCC 4.0.2 20050821 (prerelease) (Debian 4.0.1-6)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sim
+>>> dir(sim)
+['ConservativeScheduler', 'CpuSnapshot', 'CpuTimeSlice', 'Job',
+'__builtins__', '__doc__', '__file__', '__name__']
+>>> reload(sim)
+<module 'sim' from 'sim.pyc'>
+>>> execfile('sim.py')
+>>> dir()
+['ConservativeScheduler', 'CpuSnapshot', 'CpuTimeSlice', 'Job',
+'__builtins__', '__doc__', '__name__', 'sim']
+>>> 
+
+------------------------------------
+svn useful commands: 
+
+% svn stat
+% svn diff
+% svn commit
+% svn up
+
+% svn revert
+% svn add
+
+% svn help <command>
+% svn checkout https://pyss.googlecode.com/svn/trunk/ pyss --username <username>
+% svn checkout http://pyss.googlecode.com/svn/trunk/ pyss
+
+./tests.py
+
+------------------------------------
+
+# Debugging an exception in python:
+
+% python2.4 -m pdb ./event.py
+# then do a 'continue' ('c' + <enter>) to reach the exception
+
+# to debug at a specific line, add this:
+import pdb; pdb.set_trace()
+
+
+
+------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+Integrated code: 
+python2.4 -O ./run_simulator.py < ../l_ctc_sp2_cln.swf
+
+
+            
+testoob.testing.skip("not ready yet")
+
+./runtests.sh --regex='test_.*easy'
+---------------------------------------------------------------------------------
+5000 line of input file, the integrated code before profiling on pentium 4: 
+
+time run_simulator.sh --num-processors=128 --input-file=5K_sample
+32.106u 0.140s 1:01.98 52.0%    0+0k 0+0io 0pf+0w
+
+
+20000 line of input file, the integrated code before profiling on pentium 4: 
+time run_simulator.sh --num-processors=128 --input-file=20K_sample
+417.242u 0.896s 8:24.15 82.9%   0+0k 0+0io 0pf+0w
+
+
+-------------------------------------------------------------
+_cleaned_ swf files used by Etzman, dants, and feit:  
+
+CTC 1.1 Cornell Theory Center 512 77,222 Jun 96 May 97 56% 123
+KTH 1.0 Swedish Royal Instit. of Tech. 100 28,490 Sep 96 Aug 97 69% 188
+SDSC 2.1 San-Diego Supercomputer Center 128 59,725 Apr 98 Apr 00 84% 148
+BLUE 2.1 San-Diego Supercomputer Center 1,152 243,314 Apr 00 Jun 03 76% 73
+-------------------------------------------------------------
+
+
+run_simulator.sh --num-processors=100 --input-file=10_sample --scheduler=1
+run_simulator.sh --num-processors=100 --input-file=5K_sample --scheduler=1 
+
+go_prob.sh --num-processors=100 --input-file=5K_sample --scheduler=c 
+
+
+
+mosrun -q -G -b run_simulator.sh --num-processors=100 --input-file=schedulers/swf_input/KTH-SP2-1996-2.swf --scheduler=13 >! res_100_kth_13 &
+mosrun -q -G -b run_simulator.sh --num-processors=128 --input-file=schedulers/swf_input/SDSC-SP2-1998-3.1-cln.swf --scheduler=13 >! res_128_sdsc_13 &
+mosrun -q -G -b run_simulator.sh --num-processors=430 --input-file=schedulers/swf_input/CTC-SP2-1996-2.1-cln.swf --scheduler=13 >! res_430_CTC_13 &
+mosrun -q -G -b run_simulator.sh --num-processors=1152 --input-file=schedulers/swf_input/SDSC-BLUE-2000-3.1-cln.swf --scheduler=13 >! res_1152_BLU_13&
+mosrun -q -G -b run_simulator.sh --num-processors=1664 --input-file=schedulers/swf_input/SDSC-DS-2004-1.swf --scheduler=13 >! res_1664_DS_13 &
+
+
+mosrun -q -G -b go_prob.sh --num-processors=100 --input-file=schedulers/swf_input/KTH-SP2-1996-2.swf --scheduler=0 >! res_100_kth_0 &; 
+mosrun -q -G -b go_prob.sh --num-processors=128 --input-file=schedulers/swf_input/SDSC-SP2-1998-3.1-cln.swf --scheduler=0 >! res_128_sdsc_0 &;
+mosrun -q -G -b go_prob.sh --num-processors=430 --input-file=schedulers/swf_input/CTC-SP2-1996-2.1-cln.swf --scheduler=0 >! res_430_CTC_0 &;
+
+mosrun -q -G -b go_prob.sh --num-processors=1152 --input-file=schedulers/swf_input/BLUE-Part1.swf --scheduler=0 >! res_1152_BLU-1_0 &;
+mosrun -q -G -b go_prob.sh --num-processors=1152 --input-file=schedulers/swf_input/BLUE-Part2.swf --scheduler=0 >! res_1152_BLU-2_0 &;
+mosrun -q -G -b go_prob.sh --num-processors=1152 --input-file=schedulers/swf_input/BLUE-Part3.swf --scheduler=0 >! res_1152_BLU-3_0 &;
+
+mosrun -q -G -b go_prob.sh --num-processors=1664 --input-file=schedulers/swf_input/DS-Part1.swf --scheduler=0 >! res_1664_DS-1_0 &; 
+mosrun -q -G -b go_prob.sh --num-processors=1664 --input-file=schedulers/swf_input/DS-Part2.swf --scheduler=0 >! res_1664_DS-2_0 &; 
+
+
+
+mosrun -q -G -b go_prob.sh --processors=100 --input=KTH-SP2-1996-2.swf --scheduler=0 --threshold=0.4 --window_size=1000 >! res_kth_0_0.4_1000 &; 
+
+mosrun -q -G -b go_prob.sh --processors=128 --input=SDSC-SP2-1998-3.1-cln.swf --scheduler=0  --threshold=0.4 --window_size=1000 >! res_sdsc_0_0.4_1000 &; 
+
+mosrun -q -G -b go_prob.sh --processors=430 --input=CTC-SP2-1996-2.1-cln.swf --scheduler=0 --threshold=0.4 --window_size=1000 >! res_CTC_0_0.4_1000 &; 
+
+mosrun -q -G -b go_prob.sh --processors=1152 --input=SDSC-BLUE-2000-3.1-cln.swf --scheduler=0 --threshold=0.4 --window_size=1000 >! res_BLU_0_0.4_1000 &; 
+
+mosrun -q -G -b go_prob.sh --processors=1664 --input=SDSC-DS-2004-1.swf --scheduler=0 --threshold=0.4 --window_size=1000 >! res_DS_0_0.4_1000 &; 
+
+
+run_alpha_simulator.sh --processors=100 --input=10_sample --scheduler=1
+
+
+
+
+-------------------------------------------------------------
+man mosrun
+man mosix
+man mosps
+mosps -A # shows the status of all jobs in the system 
+mmon # shows the status graphically over time 
+moskillall 
+mmon -h bmos
+-------------------------------------------------------------
+
+
+# running the simulator _without_ profiler 
+env PYTHONOPTIMIZE=1 ./run_profile.sh 13 1000
+
+
+# running the simulator _with_ profiler  
+env PYTHONOPTIMIZE=1 PYPROFILE="-o prof.13_1000_run00" ./run_profile.sh 13 1000
+
+
+# manual run of profiler: 
+env PYTHONOPTIMIZE=1 python -m profile -o prof.13_1000_run00 ./run_simulator.py 13 1000
+
+
+# getting the profiling report 
+./print_prof.py prof.13_1000_run00 time | head -40
+./print_prof.py prof.13_1000_run00 cumulative | head -40
+./print_prof.py prof.13_1000_run00 calls | head -40
+
+Installing python packages:
+easy_install --install-dir=$HOME/pythonpath numpy
+
+
+

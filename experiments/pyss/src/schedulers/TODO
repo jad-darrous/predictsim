@@ -1,0 +1,107 @@
+in all the shrinking/alpha etc schedulers: 
+the alarm event should increase the job prediction value to the estimated value
+
+
+fix the run_simulator.py to run all schedulers  (including alpha type and the variants of probabilistic) 
+
+
+
+run_simulator.py: extract total number of processors from the log file itself "MaxProcs"
+
+
+continue testing the prob_alpha (merge() and prepare a specific tests files)
+don't forget to delete the print command after that (also from the termination event handler ...)  
+
+
+
+change this ugly line: self.cpu_snapshot.free_processors_available_at(current_time) >= self.unscheduled_jobs[0].num_required_processors
+
+
+Change the LookAhead scheduler to give better statistics .........
+	in look ahead easy:  assert if  job.backfill_flag == 1
+check what's going on with the lookahead: the test fails for some reason ...... 
+
+
+commenting the code .....
+
+add maui to the tests (take the system quality of service from somewhere ....) 
+
+statistics: add mor harchol slowdowns criteria http://www.cs.cmu.edu/~harchol
+
+
+
+----------------------------------------------- 
+
+UnitTesters
+example of unitesthttp://www.python.org/doc/2.3.2/lib/minimal-example.html
+assertEqual() checks for an expected result. 
+assert_() verifies a condition.
+assertRaises() to verify that an expected exception gets raised.
+/cs/par/users/ouaknine/simus/sim_orig
+
+----------------------------------------------- 
+
+Maui scheduler 
+
+Dror's code: ~feit/src/sim/maui.c
+
+
+/*
+ * MAUI priorities depend on several factors with different weights.
+ * we just consider a subset.
+ */
+static double   w_qtime;        /* weight of time spent in queue    */
+static double   w_sld;          /* weight of slowdown (Xfactor)     */
+static double   w_qos;          /* weight of desired QoS (user pri) */
+static double   w_bypass;       /* weight of being skipped over     */
+static double   w_dir;          /* weight of direct pri (admin pri) */
+static double   w_size;         /* weight of job size (= nodes)     */
+
+
+
+
+ 
+/*
+ * calculate a job's priority MAUI style
+ */
+
+static double
+pri( int job )
+{
+    double      wait;
+
+    wait = glob_time - jobs_shaddow[job].t0;
+
+    return( w_qtime  * wait
+          + w_sld    * ((wait + jobs[job].estimate) / jobs[job].estimate)
+          + w_qos    * jobs_shaddow[job].qos
+          + w_dir    * jobs_shaddow[job].dir
+          + w_bypass * jobs_shaddow[job].bypass
+          + w_size   * jobs[job].size );
+}
+
+----------------------------------------------- 
+
+
+Checking running time on real data: 
+
+% time runfcfs -s ~/par/logs/l_lanl_cm5_cln.swf
+1.028u 0.048s 0:01.19 89.0%     0+0k 0+0io 0pf+0w
+
+% time runeasy -s ~/par/logs/l_lanl_cm5_cln.swf
+0.892u 0.060s 0:00.97 97.9%     0+0k 0+0io 0pf+0w
+
+delete or add to svn:
+?      schedulers/alpha_easy_plus_plus_10_scheduler.py
+?      schedulers/alpha_easy_plus_plus_20_scheduler.py
+?      schedulers/alpha_easy_plus_plus_5_scheduler.py
+?      schedulers/alpha_easy_plus_plus_scheduler.py
+?      schedulers/double_alpha_easy_scheduler.py
+?      schedulers/orig_4_probabilistic_easy_scheduler.py
+?      schedulers/orig_changing_dist_probabilistic_easy_scheduler.py
+?      schedulers/orig_window_probabilistic_easy_scheduler.py
+?      schedulers/orig_window_single_dist_probabilistic_easy_scheduler.py
+?      schedulers/probabilistic_4_nodes_easy_scheduler.py
+?      schedulers/probabilistic_linear_scale_easy_scheduler.py
+?      schedulers/shrinking_alpha_easy_scheduler.py
+

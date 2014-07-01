@@ -1,0 +1,14 @@
+#basic_input.13
+### the instance below is applicable to the schedulers: fcfs, easy, conservative.
+### in each of these policies we expect a similar scheduling decision
+# The instance: 4 jobs arriving at time 1000 > 0, 
+# _some of the jobs_ with user estimated duartion euqals actual duration  
+# all can be scheduled at arrival time (assuming at least 80 total nodes)  
+1000 1100.0 600 5 100 0 0 uid_1
+1000 1100.1 600 5 100 0 0 uid_1
+1000 1500.2 500 10 500 0 0 uid_1
+1000 1400.3 400 10 400 0 0 uid_1
+1000 1200.4 300 10 200 0 0 uid_1
+1000 1500.5 500 10 500 0 0 uid_1
+1000 1400.6 400 10 400 0 0 uid_1
+1000 1200.7 300 10 200 0 0 uid_1

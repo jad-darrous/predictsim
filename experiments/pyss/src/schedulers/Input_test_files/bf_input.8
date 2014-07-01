@@ -1,0 +1,9 @@
+# simple jobs scenario for conservative and easy backfilling
+# no job is backfilled 
+# conservative: after each reschedule the jobs should stay in the same ordering 
+# easy: we check that the jobs are served in the order of arrival  
+100 200 600 60 100 0 0 uid_1
+101 210 600 60 10 0 0 uid_1
+102 220 700 60 10 0 0 uid_1
+103 230 600 60 10 0 0 uid_1
+104 240 900 60 10 0 0 uid_1

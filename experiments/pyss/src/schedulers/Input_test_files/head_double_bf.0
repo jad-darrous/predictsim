@@ -1,0 +1,6 @@
+# the first job here is part of the head, the third and the forth(!) jobs can be backfilled   
+# arrival time; job id == finish time; user estimated duration; number of required nodes; actual duration 
+0 10.0 10 50 10 0 0 uid_1
+1 24.0 4 60 4 0 0 uid_2
+2 4.0 10 50 2 0 0 uid_3
+4 20.0 16 50 16 0 0 uid_4

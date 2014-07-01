@@ -1,0 +1,11 @@
+# this test basically tests that the look_ahead choses to backfill a bunch of jobs with more processors 
+# using the tie break rule that prefers jobs in the tail of the queue (that is "submitted later")
+# the input variables: 
+# arrival time; job id; user estimated duration; number of required nodes; actual duration  
+0 600 600 90 600 0 0 uid_1
+0 8 8 10 8 0 0 uid_1
+1 610 10 100 10 0 0 uid_1
+3 20.2 10 3 10 0 0 uid_1
+4 20.3 10 3 10 0 0 uid_1
+5 20.4 10 4 10 0 0 uid_1
+7 10.0 2 10 2 0 0 uid_1

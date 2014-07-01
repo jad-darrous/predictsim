@@ -1,0 +1,18 @@
+# arrival time; job id == finishing time; user estimated duration; number of required nodes; actual duration  
+0 10.1 10 1 10 0 0 uid_1
+0 10.2 10 1 10 0 0 uid_1
+0 10.3 10 1 10 0 0 uid_1
+
+0 10.31 10 1 10 0 0 uid_2
+0 10.32 10 1 10 0 0 uid_2
+0 10.33 10 1 10 0 0 uid_2
+
+
+100 110.1 16 50 10 0 0 uid_4
+100 110.2 16 49 10 0 0 uid_5
+
+101 114 20 2 4 0 0 uid_6
+
+#should be backfilled according to our beliefs about these users
+102 103 30 1 1 0 0 uid_1
+103 104 30 1 1 0 0 uid_2

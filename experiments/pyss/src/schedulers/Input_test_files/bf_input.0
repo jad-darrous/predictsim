@@ -1,0 +1,8 @@
+### the instance below is applicable to the schedulers: easy and conservative (but not fifo) 
+### in each of these policies we expect a similar scheduling decision.  
+#
+# The instance: We expect the last job to be backfilled and scheduled at arrival.
+0 100 100 50 100 0 0 uid_1
+1 200 200 100 100 0 0 uid_1
+2 300 100 60 100 0 0 uid_1
+20 30 10 10 10 0 0 uid_1
