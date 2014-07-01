@@ -79,13 +79,14 @@ with open (arguments["<filename>"], "r") as f:
     data=np.loadtxt(f, dtype=swf_dtype)
 
 print("opening the extracted data csv file")
-extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_),('t_since_last_sub',np.int_),('running_totalcores',np.int_),('last_runtime3',np.int_),('last_runtime4',np.int_)])
+extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_),('t_since_last_sub',np.float32),('running_totalcores',np.int_),('last_runtime3',np.float32),('last_runtime4',np.float32),('usermean',np.float32)])
 with open (arguments["<extracted_data>"], "r") as f:
     extracted_data=np.loadtxt(f, dtype=extracted_data_dtype)
 
 #____DATA MANIPULATION____
 #day of month
 print("vectorizing functions for added info")
+hod=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).strftime('%H'))
 dom=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).strftime('%d'))
 #day of week
 dow=np.vectorize(lambda x:datetime.datetime.fromtimestamp(int(x)).weekday())
@@ -95,13 +96,29 @@ def mean2last(a,b,reqtime):
         return reqtime
     else:
         return (a+b)/2
+def mean3last(a,b,c,reqtime):
+    if a==-1 or b==-1 or c==-1:
+        return reqtime
+    else:
+        return (a+b+c)/3
+def mean4last(a,b,c,d,reqtime):
+    if a==-1 or b==-1 or c==-1 or d==-1:
+        return reqtime
+    else:
+        return (a+b+c+d)/4
 #tsafir mean2last
 tsafir=np.vectorize(mean2last)
+tsafir3=np.vectorize(mean3last)
+tsafir4=np.vectorize(mean4last)
 
-print("calculating added info: tsafir mean, day of week, day of month")
+print("calculating added info: tsafir mean2-3-4, hour of day, day of week, day of month")
 X=drop_fields(data,['job_id','wait_time','run_time','proc_alloc','cpu_time_used','mem_used','mem_req','status','exec_id','queue_id','partition_id','previous_job_id','think_time'])
-#TODO: just modified line below
-X=append_fields(X,['day_of_week','day_of_month','tsafir_mean','mean3','mean4'],[dow(data['submit_time']),dom(X['submit_time']),tsafir(extracted_data['last_runtime'],extracted_data['last_runtime2'],data['time_req'])],dtypes=[np.int_,np.int_,np.float32])
+
+tsaf=tsafir(extracted_data['last_runtime'],extracted_data['last_runtime2'],data['time_req'])
+tsaf3=tsafir3(extracted_data['last_runtime'],extracted_data['last_runtime2'],extracted_data['last_runtime3'],data['time_req'])
+tsaf4=tsafir4(extracted_data['last_runtime'],extracted_data['last_runtime2'],extracted_data['last_runtime3'],extracted_data['last_runtime4'],data['time_req'])
+
+X=append_fields(X,['hour_of_day','day_of_week','day_of_month','tsafir_mean','tsafir_mean3','tsafir_mean4'],[hod(data['submit_time']),dow(data['submit_time']),dom(X['submit_time']),tsaf,tsaf3,tsaf4],dtypes=[np.int_,np.int_,np.int_,np.float32,np.float32,np.float32])
 
 #removing job id and user id, merging
 print(X.dtype)
@@ -148,6 +165,10 @@ if encoding=="onehot":
     Xf_proc_req                = np.reshape(X['proc_req'].astype('<f4'),(-1,1))
     Xf_time_req                = np.reshape(X['time_req'].astype('<f4'),(-1,1))
     Xf_tsafir_mean             = np.reshape(X['tsafir_mean'].astype('<f4'),(-1,1))
+    Xf_tsafir_mean3            = np.reshape(X['tsafir_mean3'].astype('<f4'),(-1,1))
+    Xf_tsafir_mean4            = np.reshape(X['tsafir_mean4'].astype('<f4'),(-1,1))
+    Xf_hour_of_day                     = np.reshape(X['hour_of_day'].astype('<f4'),(-1,1))
+
     Xf_last_runtime            = np.reshape(X['last_runtime'].astype('<f4'),(-1,1))
     Xf_last_runtime2           = np.reshape(X['last_runtime2'].astype('<f4'),(-1,1))
     Xf_thinktime               = np.reshape(X['thinktime'].astype('<f4'),(-1,1))
@@ -156,6 +177,13 @@ if encoding=="onehot":
     Xf_amount_running          = np.reshape(X['amount_running'].astype('<f4'),(-1,1))
     Xf_running_average_runtime = np.reshape(X['running_average_runtime'].astype('<f4'),(-1,1))
     Xf_running_allocatedcores  = np.reshape(X['running_allocatedcores'].astype('<f4'),(-1,1))
+    Xf_t_since_last_sub        = np.reshape(X['t_since_last_sub'].astype('<f4'),(-1,1))
+    print("DEBUG")
+    print(max(X['running_totalcores']))
+    Xf_running_totalcores      = np.reshape(X['running_totalcores'].astype('<f4'),(-1,1))
+    Xf_last_runtime3           = np.reshape(X['last_runtime3'].astype('<f4'),(-1,1))
+    Xf_last_runtime4           = np.reshape(X['last_runtime4'].astype('<f4'),(-1,1))
+    Xf_usermean                = np.reshape(X['usermean'].astype('<f4'),(-1,1))
 
     if tool=="sgd":
         #Scale the values to  [0,1]
@@ -164,18 +192,43 @@ if encoding=="onehot":
         Xf_proc_req                = Xf_proc_req/max_cores
         Xf_time_req                = Xf_proc_req/max_runtime
         Xf_tsafir_mean             = Xf_tsafir_mean/max_runtime
+        Xf_tsafir_mean3            = Xf_tsafir_mean3/max_runtime
+        Xf_tsafir_mean4            = Xf_tsafir_mean4/max_runtime
+        Xf_hour_of_day             = Xf_hour_of_day/24.0
         Xf_last_runtime            = Xf_last_runtime/max_runtime
         Xf_last_runtime2           = Xf_last_runtime2/max_runtime
 
-        scale_thinktime=np.vectorize(lambda x:min(x,60*60*24)/(60*60*24))
+        max_thinktime=60*60*24
+        scale_thinktime            = np.vectorize(lambda x:min(x/max_thinktime,1))
         Xf_thinktime               = scale_thinktime(Xf_thinktime)
-        Xf_running_maxlength       = Xf_running_maxlength/max_runtime
-        Xf_running_sumlength       = Xf_running_sumlength/max_runtime
-        Xf_amount_running          = Xf_amount_running/max_cores
+
+        scale_maxlength            = np.vectorize(lambda x:min(x/max_runtime,1))
+        Xf_running_maxlength       = scale_maxlength(Xf_running_maxlength)
+
+        max_sumlength=max_runtime*10
+        scale_sumlength            = np.vectorize(lambda x:min(x/max_sumlength,1))
+        Xf_running_sumlength       = scale_sumlength(Xf_running_sumlength)
+
+        scale_amount_running            = np.vectorize(lambda x:min(x/max_cores,1))
+        Xf_amount_running          = scale_amount_running(Xf_amount_running)
+
         Xf_running_average_runtime = Xf_running_average_runtime/max_runtime
         Xf_running_allocatedcores  = Xf_running_allocatedcores/max_cores
+        Xf_t_since_last_sub        = scale_thinktime(Xf_t_since_last_sub)
 
-    Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,onehot_features))
+        scale_totalcores           = np.vectorize(lambda x:min(x/max_cores,1))
+        Xf_running_totalcores      = scale_totalcores(Xf_running_totalcores)
+        Xf_last_runtime3           = Xf_last_runtime3/max_runtime
+        Xf_last_runtime4           = Xf_last_runtime4/max_runtime
+        Xf_usermean                = Xf_usermean/max_runtime
+
+
+    Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean,onehot_features))
+
+    for i in range(0,len(Xf[0,:])):
+        print "row %s" %(i+1)
+        print np.mean(Xf[:,i])
+        print max(Xf[:,i])
 else:
     Xf=X.view(np.float32).reshape(X.shape + (-1,))
 

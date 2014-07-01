@@ -79,13 +79,11 @@ submitted_jobs={}
 running_jobs={}
 user_info={}
 
-UserInfo= namedtuple('UserInfo', 'last_runtime last_runtime2 last_runtime3 last_runtime4 last_status last_status2 last_jobend')
 
 for uid in users:
     submitted_jobs[uid]=[]
     running_jobs[uid]=[]
-    #user_info[uid]['UserInfo'](-1,-1,-1,-1,-1)
-    user_info[uid]={'last_runtime':-1, 'last_runtime2':-1, 'last_runtime3':-1, 'last_runtime4':-1, 'last_status':-1, 'last_status2':-1, 'last_jobend':-1,'last_submit':data[0].submit_time}
+    user_info[uid]={'last_runtime':-1, 'last_runtime2':-1, 'last_runtime3':-1, 'last_runtime4':-1, 'last_status':-1, 'last_status2':-1, 'last_jobend':-1,'last_submit':data[0].submit_time,'usermean':0,'usercount':0}
 
 def job_submit(j):
     log=lambda x: global_log("JOB SUBMIT: "+x)
@@ -111,7 +109,7 @@ def job_submit(j):
     if amount_running>0:
         running_maxlength=max([env.now-j2.submit_time-j2.wait_time for j2 in running_jobs[j.user_id]])
         running_sumlength=sum([env.now-j2.submit_time-j2.wait_time for j in running_jobs[j.user_id]])
-        running_average_runtime=np.average([env.now-j2.submit_time-j2.wait_time for j in running_jobs[j.user_id]])
+        running_average_runtime=int(np.average([env.now-j2.submit_time-j2.wait_time for j in running_jobs[j.user_id]]))
         running_allocatedcores=sum([abs(j2.proc_alloc) for j2 in running_jobs[j.user_id]])
     else:
         running_maxlength=0
@@ -131,6 +129,7 @@ def job_submit(j):
     printlist.append(running_totalcores)
     printlist.append(user_info[j.user_id]['last_runtime3'])
     printlist.append(user_info[j.user_id]['last_runtime4'])
+    printlist.append(user_info[j.user_id]['usermean'])
 
     s=""
     for e in printlist:
@@ -157,6 +156,8 @@ def job_end(j):
     user_info[j.user_id]['last_runtime']=j.run_time
     user_info[j.user_id]['last_status2']=user_info[j.user_id]['last_status']
     user_info[j.user_id]['last_status']=j.status
+    N=user_info[j.user_id]['usercount']
+    user_info[j.user_id]['usermean']=user_info[j.user_id]['usermean']*N/(N+1) + j.run_time /(N+1)
     #including : think about the last_jobend
     if len(running_jobs[j.user_id])==0:
         user_info[j.user_id]['last_jobend']=env.now

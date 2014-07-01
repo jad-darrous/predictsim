@@ -1,13 +1,17 @@
 logname=curie
-predictions=prediction_results/prediction_sgd prediction_results/prediction_tsafrir
-predictedswf=predicted_swf/$(logname)_tsafrir.swf predicted_swf/$(logname)_sgd.swf
+predictions=prediction_results/prediction_sgd prediction_results/prediction_tsafrir prediction_results/prediction_sgd2
+predictedswf=predicted_swf/$(logname)_tsafrir.swf predicted_swf/$(logname)_sgd.swf predicted_swf/$(logname)_sgd2.swf
+justlist=prediction_sgd prediction_tsafrir prediction_sgd2
 
 all: all_extract all_swf
 all_extract:extract_req_time extract_run_time
-all_swf:true prediction_sgd prediction_tsafrir
+all_swf:true $(justlist)
 
 prediction_sgd:
 	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd > predicted_swf/$(logname)_sgd.swf
+
+prediction_sgd2:
+	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd2 > predicted_swf/$(logname)_sgd2.swf
 
 prediction_tsafrir:
 	../make_swf original_swf/$(logname).swf prediction_results/prediction_tsafrir > predicted_swf/$(logname)_tsafrir.swf
@@ -36,4 +40,7 @@ rec_abs:all_extract
 	../../analysis/REC_abs.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/REC_ABS.pdf -r 2
 
 clean:
-	rm analysis_results/* prediction_results/true_run_time prediction_results/prediction_run_time $(predswf)
+	rm prediction_results/true_run_time prediction_results/prediction_req_time $(predswf)
+
+cleanall:
+	rm analysis_results/*
