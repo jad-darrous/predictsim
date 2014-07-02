@@ -142,7 +142,8 @@ def main():
                 num_processors = options.num_processors, 
                 jobs = _job_inputs_to_jobs(parse_lines(input_file), options.num_processors),
                 scheduler = scheduler,
-                output_swf = options.output_swf
+                output_swf = options.output_swf,
+                input_file = options.input_file
             )
         
         print "Num of Processors: ", options.num_processors

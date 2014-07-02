@@ -18,7 +18,7 @@ class Simulator(object):
     Assumption 2: self.jobs holds every job that was introduced to the simulation.
     """
 
-    def __init__(self, jobs, num_processors, scheduler, output_swf):
+    def __init__(self, jobs, num_processors, scheduler, output_swf, input_file):
         self.num_processors = num_processors
         self.jobs = jobs
         self.terminated_jobs=[]
@@ -38,6 +38,7 @@ class Simulator(object):
 		self.output_swf.write("; Preemption: No\n")
 		self.output_swf.write("; MaxNodes: -1\n")
 		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
+		self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
 		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
@@ -130,8 +131,8 @@ class Simulator(object):
         while not self.event_queue.is_empty:
             self.event_queue.advance()
 
-def run_simulator(num_processors, jobs, scheduler, output_swf):
-    simulator = Simulator(jobs, num_processors, scheduler, output_swf)
+def run_simulator(num_processors, jobs, scheduler, output_swf, input_file):
+    simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file)
     simulator.run()
     print_simulator_stats(simulator)
     return simulator
