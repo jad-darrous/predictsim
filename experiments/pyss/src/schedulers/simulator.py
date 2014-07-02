@@ -98,7 +98,7 @@ class Simulator(object):
         self.output_swf.write("-1")
         self.output_swf.write(" ")
         #12. User ID
-        self.output_swf.write("-1")
+        self.output_swf.write(str(event.job.user_id))
         self.output_swf.write(" ")
         #13. Group ID
         self.output_swf.write("-1")
