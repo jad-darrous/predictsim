@@ -154,10 +154,4 @@ def main():
             input_file.close()
 
 
-if __name__ == "__main__" and not "time" in sys.modules:
-    try:
-        import psyco
-        psyco.full()
-    except ImportError:
-        print "Psyco not available, will run slower (http://psyco.sourceforge.net)"
-    main()
+main()
