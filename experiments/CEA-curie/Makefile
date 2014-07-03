@@ -6,22 +6,24 @@ justlist=prediction_sgd prediction_tsafrir prediction_sgd2
 predictions_monster=prediction_results/true_run_time prediction_results/prediction_req_time prediction_results/prediction_tsafrir prediction_results/prediction_passive-aggressive_epsilon_insensitive prediction_results/prediction_passive-aggressive_squared_epsilon_insensitive prediction_results/prediction_sgd_epsilon_insensitive_elasticnet prediction_results/prediction_sgd_epsilon_insensitive_l1 prediction_results/prediction_sgd_huber_l1 prediction_results/prediction_sgd_huber_l2 
 #predictions_monster=prediction_results/true_run_time prediction_results/prediction_req_time prediction_results/prediction_tsafrir prediction_results/prediction_passive-aggressive_epsilon_insensitive prediction_results/prediction_passive-aggressive_squared_epsilon_insensitive prediction_results/prediction_sgd_epsilon_insensitive_elasticnet prediction_results/prediction_sgd_epsilon_insensitive_l1 prediction_results/prediction_sgd_huber_l1 prediction_results/prediction_sgd_huber_l2 prediction_results/prediction_sgd_squared_epsilon_insensitive_elasticnet prediction_results/prediction_sgd_squared_epsilon_insensitive_l1 prediction_results/prediction_sgd_squared_epsilon_insensitive_l2 prediction_results/prediction_sgd_squared_loss_elasticnet prediction_results/prediction_sgd_squared_loss_l1 prediction_results/prediction_sgd_squared_loss_l2
 
+header="; MaxProcs: 93312"
+
 all: all_extract all_swf
 all_extract:extract_req_time extract_run_time
 all_swf:true $(justlist)
 
 
 prediction_sgd:
-	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd > predicted_swf/$(logname)_sgd.swf
+	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd $(header) > predicted_swf/$(logname)_sgd.swf
 
 prediction_sgd2:
-	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd2 > predicted_swf/$(logname)_sgd2.swf
+	../make_swf original_swf/$(logname).swf prediction_results/prediction_sgd2 $(header)  > predicted_swf/$(logname)_sgd2.swf
 
 prediction_tsafrir:
-	../make_swf original_swf/$(logname).swf prediction_results/prediction_tsafrir > predicted_swf/$(logname)_tsafrir.swf
+	../make_swf original_swf/$(logname).swf prediction_results/prediction_tsafrir $(header)  > predicted_swf/$(logname)_tsafrir.swf
 
 true:extract_run_time
-	../make_swf original_swf/$(logname).swf prediction_results/true_run_time > predicted_swf/$(logname)_clairvoyant.swf
+	../make_swf original_swf/$(logname).swf prediction_results/true_run_time $(header)  > predicted_swf/$(logname)_clairvoyant.swf
 
 extract_req_time:
 	../extract_req_time original_swf/$(logname).swf > prediction_results/prediction_req_time
