@@ -33,7 +33,7 @@ class Simulator(object):
         self.event_queue.add_handler(JobTerminationEvent, self.handle_termination_event)
         if(output_swf != None):
 		self.output_swf = open(output_swf, 'w+')
-		version = os.popen("git show -s --format=\"%h %ci\" HEAD").read()[:-1]
+		version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
 		self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
 		self.output_swf.write("; Preemption: No\n")
 		self.output_swf.write("; MaxNodes: -1\n")
