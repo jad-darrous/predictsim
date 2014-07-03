@@ -54,11 +54,22 @@ def parse_options():
     
     options, args = parser.parse_args()
 
-    if options.num_processors is None:
-        parser.error("missing num processors")
-
     if options.input_file is None:
         parser.error("missing input file")
+
+    if options.num_processors is None:
+	input_file = open(options.input_file)
+        for line in input_file:
+		if(line.lstrip().startswith(';')):
+			if(line.lstrip().startswith('; MaxProcs:')):
+				options.num_processors = int(line.strip()[11:])
+				break
+			else:
+				continue
+		else:
+			break
+	if options.num_processors is None:
+		parser.error("missing num processors")
 
     if options.scheduler is None:
          parser.error("missing scheduler")
