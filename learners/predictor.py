@@ -16,7 +16,7 @@ Options:
     -i --interactive                               Interactive mode after script.
     tool                                           the machine learning technique to use. available: svm, random_forest,sgd(incremental learning on whole log),passive-aggressive(incremental learning on whole log).
     encoding                                       how to encode discret attributes (s.t. user ID). available: continuous, onehot.
-    loss                                           for sgd: in  'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'
+    loss                                           for sgd: in  'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive', 'maeloss'.
                                                    for passive-aggressive: in 'epsilon_insensitive', 'squared_epsilon_insensitive'
     penalty                                        in 'l2' , 'l1' , 'elasticnet'
 
@@ -302,7 +302,7 @@ elif tool in ["sgd","passive-aggressive"]:
         #___SGD___
 
         loss=arguments["<loss>"]
-        if loss not in [ 'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive']:
+        if loss not in [ 'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive','maeloss']:
             raise ValueError("invalid loss function")
 
         penalty=arguments["<penalty>"]
