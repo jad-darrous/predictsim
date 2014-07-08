@@ -1,0 +1,23 @@
+#!/bin/sh
+#use like make_all_swfs  prediction_folder output_folder logfile header
+prediction_folder="$1"
+output_folder="$2"
+logfile="$3"
+header="$4"
+
+
+echo prediction_folder
+echo $prediction_folder
+echo output_folder
+echo $output_folder
+echo logfile
+echo $logfile
+echo header
+echo $header
+
+for file in $prediction_folder/*
+do
+  f=`basename $file`
+  ../../data_manipulation/make_swf $logfile $prediction_folder/$f $header > $output_folder/$f\.swf
+done
+
