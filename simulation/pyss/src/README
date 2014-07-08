@@ -8,7 +8,7 @@ the Python Scheduler Simulator
 *** Run exemples:
 
 ** normal run:
-time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py --input-file=../../../data/CEA-curie_cut2/original_swf/curie.swf --scheduler=EasyBackfillScheduler --num-processors=80640
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py --no-stats --input-file=../../../data/CEA-curie_cut2/original_swf/curie.swf --scheduler=EasyBackfillScheduler --num-processors=80640
 
 
 ** debug:
@@ -16,7 +16,7 @@ pypy ./run_simulator.py --input-file=../../../data/CEA-curie_cut2/original_swf/c
 
 
 ** profiling/optimizing:
-time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py --input-file=../../../data/CEA-curie_cut2/original_swf/curie.swf --scheduler=EasyBackfillScheduler --num-processors=80640
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py --no-stats --input-file=../../../data/CEA-curie_cut2/original_swf/curie.swf --scheduler=EasyBackfillScheduler --num-processors=80640
 
 runsnake simul.cprof
 

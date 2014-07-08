@@ -131,10 +131,11 @@ class Simulator(object):
         while not self.event_queue.is_empty:
             self.event_queue.advance()
 
-def run_simulator(num_processors, jobs, scheduler, output_swf, input_file):
+def run_simulator(num_processors, jobs, scheduler, output_swf=None, input_file=None, no_stats=False):
     simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file)
     simulator.run()
-    print_simulator_stats(simulator)
+    if(not no_stats):
+	print_simulator_stats(simulator)
     return simulator
 
 def print_simulator_stats(simulator):
