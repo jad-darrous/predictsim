@@ -19,7 +19,7 @@ simulated_files_dir=simulated_swf
 # final_csv_file=../experiments/CEA-curie/results.csv
 final_csv_file=results.csv
 
-algos="FcfsScheduler ConservativeScheduler EasyBackfillScheduler"
+algos="EasySJBFScheduler EasyBackfillScheduler"
 
 
 
