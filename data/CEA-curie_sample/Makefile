@@ -1,4 +1,4 @@
-logname=curie
+logname=curie_sample
 header="; MaxProcs: 11520"
 
 all: make_swfs

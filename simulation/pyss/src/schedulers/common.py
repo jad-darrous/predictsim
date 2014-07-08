@@ -275,6 +275,14 @@ class CpuSnapshot(object):
 
 	    
 
+    def unAssignJob(self, job):
+        """
+        unAssigns a job previously assigned.
+        """
+        for s in self._slices_time_range(job.start_to_run_at_time, job.predicted_finish_time):
+            s.delJob(job)
+            
+            
     def assignJob(self, job, job_start):
         """
         assigns the job to start at the given job_start time.

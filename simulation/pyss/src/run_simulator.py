@@ -51,6 +51,8 @@ def parse_options():
                       help="1) FcfsScheduler, 2) ConservativeScheduler, 3) DoubleConservativeScheduler, 4) EasyBackfillScheduler, 5) DoubleEasyBackfillScheduler, 6) GreedyEasyBackfillScheduler, 7) EasyPlusPlusScheduler, 8) ShrinkingEasyScheduler, 9) LookAheadEasyBackFillScheduler,  10) EasySJBFScheduler, 11) HeadDoubleEasyScheduler, 12) TailDoubleEasyScheduler, 13) OrigProbabilisticEasyScheduler, 14) ReverseEasyScheduler,  15) PerfectEasyBackfillScheduler, 16)DoublePerfectEasyBackfillScheduler, 17) ProbabilisticNodesEasyScheduler, 18) AlphaEasyScheduler, 19)DoubleAlphaEasyScheduler 20)ProbabilisticAlphaEasyScheduler")
     parser.add_option("--output-swf", type="string", \
                       help="if set, create a swf file of the run")
+    parser.add_option("--no-stats", action="store_true", dest="no_stats", \
+                      help="if set, no stats will be computed")
     
     options, args = parser.parse_args()
 
@@ -73,6 +75,9 @@ def parse_options():
 
     if options.scheduler is None:
          parser.error("missing scheduler")
+         
+    if options.no_stats is None:
+	    options.no_stats = False
 
     if args:
         parser.error("unknown extra arguments: %s" % args)
@@ -154,7 +159,8 @@ def main():
                 jobs = _job_inputs_to_jobs(parse_lines(input_file), options.num_processors),
                 scheduler = scheduler,
                 output_swf = options.output_swf,
-                input_file = options.input_file
+                input_file = options.input_file,
+                no_stats = options.no_stats
             )
         
         print "Num of Processors: ", options.num_processors

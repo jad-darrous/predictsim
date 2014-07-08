@@ -16,10 +16,14 @@ class EasyBackfillScheduler(Scheduler):
         # scheduling here.
         self.cpu_snapshot.archive_old_slices(current_time)
         self.unscheduled_jobs.append(just_submitted_job)
-        return [
-            JobStartEvent(current_time, job)
-            for job in self._schedule_jobs(current_time)
-        ]
+        
+        retl = []
+        
+        if (self.cpu_snapshot.free_processors_available_at(current_time) >= just_submitted_job.num_required_processors):
+		for job in self._schedule_jobs(current_time):
+			retl.append(JobStartEvent(current_time, job))
+        
+        return retl
 
     def new_events_on_job_termination(self, job, current_time):
         """ Here we first delete the tail of the just terminated job (in case it's
@@ -82,11 +86,15 @@ class EasyBackfillScheduler(Scheduler):
 
         first_job = self.unscheduled_jobs[0]
 
-        temp_cpu_snapshot = self.cpu_snapshot.copy()
-        temp_cpu_snapshot.assignJobEarliest(first_job, current_time)
-
+        self.cpu_snapshot.assignJobEarliest(first_job, current_time)
+        
         # if true, this means that the 2nd job is "independent" of the 1st, and thus can be backfilled
-        return temp_cpu_snapshot.canJobStartNow(second_job, current_time)
+        ret = self.cpu_snapshot.canJobStartNow(second_job, current_time)
+
+	#undo things
+	self.cpu_snapshot.unAssignJob(first_job)
+        
+        return ret
 
 
    
