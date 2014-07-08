@@ -1,2 +1,0 @@
-#!/bin/bash
-paste <(awk '{print $5}' $1)
