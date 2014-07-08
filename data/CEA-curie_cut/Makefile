@@ -1,4 +1,4 @@
-logname=curie
+logname=curie_cut
 predictions=prediction_results/prediction_sgd prediction_results/prediction_tsafrir prediction_results/prediction_sgd2
 predictedswf=predicted_swf/$(logname)_tsafrir.swf predicted_swf/$(logname)_sgd.swf predicted_swf/$(logname)_sgd2.swf
 justlist=prediction_sgd prediction_tsafrir prediction_sgd2

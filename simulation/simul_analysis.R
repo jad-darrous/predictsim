@@ -29,7 +29,12 @@ swf2df <- function(f, trace_start=0, with_energy=FALSE)
     ##This function read a swf trace from a file 
     # INPUT: swf trace file
     # OUTPUT: swf dataframe
-    df <- read.table(f,comment.char=';')
+    df <- try(read.table(f,comment.char=';'))
+    #if read fails:
+    if(is.character(df))
+    {
+	return(df)
+    }
     if(with_energy)
 	names(df) <- c('job_id','submit_time','wait_time','run_time','proc_alloc','cpu_time_used','mem_used','proc_req','time_req','mem_req','status','user_id','group_id','exec_id','queue_id','partition_id','previous_job_id','think_time','energy_consumed')
     else
@@ -136,6 +141,12 @@ for(f in files)
 	result = c(f)
 	
 	swf_wait = swf2df(f)
+	
+    #if read fails:
+    if(is.character(swf_wait))
+    {
+	next
+    }
 	
 	swf_wait$submit_time[which(swf_wait$submit_time == -1)] = Inf
 	swf_wait$wait_time[which(swf_wait$wait_time == -1)] = Inf
