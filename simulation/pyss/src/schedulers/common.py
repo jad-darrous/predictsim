@@ -232,8 +232,13 @@ class CpuSnapshot(object):
     def _slices_time_range(self, start, end):
         assert self._slice_starts_at(start), "start time is: " + str(start) 
         assert self._slice_starts_at(end), "end time is: " + str(end)
-
-        return (s for s in self.slices if start <= s.start_time < end)
+        
+	for s in self.slices:
+		st = s.start_time
+		if st >= end:
+			break
+		if start <= st:
+			yield s
 
 
     def delJobFromCpuSlices(self, job):
