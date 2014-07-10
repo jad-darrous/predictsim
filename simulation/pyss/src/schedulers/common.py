@@ -171,8 +171,11 @@ class CpuSnapshot(object):
 
     def _slice_starts_at(self, time):
         for slice in self.slices:
-            if slice.start_time == time:
+            st = slice.start_time
+            if st == time:
                 return True
+            if st > time:
+                return False
         return False # no slice found
 
     def _slice_index_to_split(self, split_time):
