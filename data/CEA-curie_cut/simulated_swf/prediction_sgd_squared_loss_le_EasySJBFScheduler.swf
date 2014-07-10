@@ -1,0 +1,6 @@
+; Computer: Pyss Simulator (d90abb3 2014-07-10 08:48:51 +0200)
+; Preemption: No
+; MaxNodes: -1
+; MaxProcs: 11520
+; Note: input_file:../data/CEA-curie_cut/predicted_swf/prediction_sgd_squared_loss_le.swf
+; Note: scheduler:EasySJBFScheduler
