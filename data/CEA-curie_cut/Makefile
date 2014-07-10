@@ -1,5 +1,5 @@
 logname=curie_cut
-header=";MaxProcs:11520"
+header="; MaxProcs:80640"
 
 all: make_swfs
 
