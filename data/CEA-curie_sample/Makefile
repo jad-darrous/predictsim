@@ -1,10 +1,10 @@
 logname=curie_sample
-header="; MaxProcs: 11520"
+header=";MaxProcs:80640"
 
 all: make_swfs
 
 make_swfs:extract_run_time extract_req_time
-	../../data_manipulation/make_all_swfs prediction_results predicted_swf original_swf/curie.swf $(header)
+	../../data_manipulation/make_all_swfs prediction_results predicted_swf original_swf/curie_sample.swf $(header)
 
 extract_req_time:
 	../../data_manipulation/extract_req_time original_swf/$(logname).swf > prediction_results/prediction_req_time
