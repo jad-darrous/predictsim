@@ -1,0 +1,34 @@
+#these functions are metrics for campaign scheduling.
+source('utilization.R')
+source('verbose.R')
+
+
+
+add_stretch_column<-function(C,cores){
+	verb('entered add_stretch_column')
+	
+
+
+	stretches=(C$end-C$submit)/pmax(C$longest_job_length,C$weight/pmin(rep(cores,nrow(C)),C$job_count))
+	C$stretch=stretches
+	return(C)
+
+}
+
+max_stretches<-function(C){
+	#C should be a dataframe with many campaigns and the  "user" and "stretch" columns.
+	verb('entered max_stretches')
+
+	U=as.data.frame(cbind(unique(C$user),NA))
+	colnames(U)=c("user","max_stretch")
+	for (u in U$user){
+
+		U[U$user==u,]$max_stretch=max(C[C$user==u,]$stretch)
+	}
+	return(U)
+
+
+
+}
+
+verb('sourced campaign_scheduling_metrics.R')
