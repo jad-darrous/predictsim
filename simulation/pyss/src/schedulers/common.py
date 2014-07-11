@@ -43,14 +43,24 @@ class CpuTimeSlice(object):
 
         self.total_processors = total_processors
         self.free_processors = free_processors
+        self.job_ids = set()
+        #DO NOT MODIFY these 2 attributes
         self.start_time = start_time
         self.duration = duration
+        #OR this variable will be out of date:
+        self.end_time = self.start_time + self.duration
+        #INSTEAD you can use some methods declared later
 
-        self.job_ids = set()
 
-    @property
-    def end_time(self):
-        return self.start_time + self.duration
+    def updateStartTimeAndDuration(self, st, dur):
+	self.start_time = st
+        self.duration = dur
+        self.end_time = self.start_time + self.duration
+        
+    def updateDuration(self,dur):
+        self.duration = dur
+        self.end_time = self.start_time + self.duration
+
 
     @property
     def busy_processors(self):
@@ -95,11 +105,10 @@ class CpuTimeSlice(object):
 
     def split(self, split_time):
         first = self.copy()
-        first.duration = split_time - self.start_time
+        first.updateDuration(split_time - self.start_time)
 
         second = self.copy()
-        second.start_time = split_time
-        second.duration = self.end_time - split_time
+        second.updateStartTimeAndDuration(split_time, self.end_time - split_time)
 
         return first, second
 
@@ -162,8 +171,11 @@ class CpuSnapshot(object):
 
     def _slice_starts_at(self, time):
         for slice in self.slices:
-            if slice.start_time == time:
+            st = slice.start_time
+            if st == time:
                 return True
+            if st > time:
+                return False
         return False # no slice found
 
     def _slice_index_to_split(self, split_time):
@@ -223,7 +235,7 @@ class CpuSnapshot(object):
                 accumulated_duration += s.duration
 
             if accumulated_duration >= job.predicted_run_time:
-                self.slices[-1].duration = 1000 # making sure that the last "empty" slice we've just added will not be huge
+                self.slices[-1].updateDuration(1000) # making sure that the last "empty" slice we've just added will not be huge
                 return tentative_start_time
 
         assert False # should never reach here
@@ -232,8 +244,13 @@ class CpuSnapshot(object):
     def _slices_time_range(self, start, end):
         assert self._slice_starts_at(start), "start time is: " + str(start) 
         assert self._slice_starts_at(end), "end time is: " + str(end)
-
-        return (s for s in self.slices if start <= s.start_time < end)
+        
+	for s in self.slices:
+		st = s.start_time
+		if st >= end:
+			break
+		if start <= st:
+			yield s
 
 
     def delJobFromCpuSlices(self, job):
@@ -327,7 +344,7 @@ class CpuSnapshot(object):
         for s in list_copy(self.slices[1: ]):
 	    assert s.start_time == prev.start_time + prev.duration
             if s.free_processors == prev.free_processors and s.job_ids == prev.job_ids:
-                prev.duration += s.duration
+                prev.updateDuration( prev.duration + s.duration)
                 self.slices.remove(s)
             else:
                 prev = s

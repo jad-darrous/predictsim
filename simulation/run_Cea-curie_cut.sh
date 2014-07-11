@@ -28,7 +28,7 @@ algos="EasySJBFScheduler EasyBackfillScheduler"
 PROCS=$(($(grep -c ^processor /proc/cpuinfo) - 1))
 
 # initialize the job pool to allow $PROCS parallel jobs and echo commands
-job_pool_init $PROCS 3
+job_pool_init $PROCS 1
 
 
 mkdir -p $simulated_files_dir
@@ -42,7 +42,7 @@ do
 		#./run_simulator.py --num-processors=42 --input-file=sample_input --scheduler=EasyBackfillScheduler --output-swf=dada.swf
 		fshort=$(basename -s .swf "$f")
 # 		echoinblue ./pyss/src/run_simulator.py --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf"
-		job_pool_run pypy ./pyss/src/run_simulator.py --no-stats --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf" --num-processors=11520
+		job_pool_run pypy ./pyss/src/run_simulator.py --no-stats --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf" --num-processors=80640
 	done
 done
 

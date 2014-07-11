@@ -65,60 +65,46 @@ class Simulator(object):
 
     def store_terminated_job(self, event):
         assert isinstance(event, JobTerminationEvent)
+        outl = []
+        
         #1. Job Number
-        self.output_swf.write(str(event.job.id))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.id))
         #2. Submit Time 
-        self.output_swf.write(str(event.job.submit_time))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.submit_time))
         #3. Wait Time
-        self.output_swf.write(str(event.job.start_to_run_at_time - event.job.submit_time))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.start_to_run_at_time - event.job.submit_time))
         #4. Run Time
-        self.output_swf.write(str(event.job.actual_run_time))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.actual_run_time))
         #5. Number of Allocated Processors
-        self.output_swf.write(str(event.job.num_required_processors))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.num_required_processors))
         #6. Average CPU Time Used
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #7. Used Memory
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #8. Requested Number of Processors.
-        self.output_swf.write(str(event.job.num_required_processors))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.num_required_processors))
         #9. Requested Time
-        self.output_swf.write(str(event.job.user_estimated_run_time))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.user_estimated_run_time))
         #10. Requested Memory
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #11. Status. This field is meaningless for models, so would be -1.
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #12. User ID
-        self.output_swf.write(str(event.job.user_id))
-        self.output_swf.write(" ")
+        outl.append(str(event.job.user_id))
         #13. Group ID
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #14. Executable (Application) Number
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #15. Queue Number
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #16. Partition Number
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #17. Preceding Job Number
-        self.output_swf.write("-1")
-        self.output_swf.write(" ")
+        outl.append("-1")
         #18. Think Time
-        self.output_swf.write("-1")
-        self.output_swf.write("\n")
+        outl.append("-1")
+        
+        self.output_swf.write(' '.join(outl)+"\n")
 
     def handle_prediction_event(self, event):
         assert isinstance(event, JobPredictionIsOverEvent)
