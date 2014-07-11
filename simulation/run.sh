@@ -13,11 +13,10 @@ echoinblue() {
 	tput sgr0
 }
 
-
-input_files="../data/CEA-curie_sample/predicted_swf/*.swf ../data/CEA-curie_sample/original_swf/*.swf"
+input_files="../data/CEA-curie_cut/predicted_swf/prediction_tsafrir.swf ../data/CEA-curie_cut/predicted_swf/prediction_sgd_squared_loss_le.swf ../data/CEA-curie_cut/original_swf/CEA-Curie-Cut.swf"
 # input_files="./pyss/src/sample_input ./pyss/src/5K_sample"
 
-simulated_files_dir=../data/CEA-curie_sample/simulated_swf
+simulated_files_dir=../data/CEA-curie_cut/simulated_swf
 # simulated_files_dir=simulated_swf
 
 # final_csv_file=../data/CEA-curie/results.csv
@@ -29,7 +28,7 @@ algos="EasySJBFScheduler EasyBackfillScheduler"
 PROCS=$(($(grep -c ^processor /proc/cpuinfo) - 1))
 
 # initialize the job pool to allow $PROCS parallel jobs and echo commands
-job_pool_init $PROCS 1
+job_pool_init $PROCS 3
 
 
 mkdir -p $simulated_files_dir
@@ -43,7 +42,7 @@ do
 		#./run_simulator.py --num-processors=42 --input-file=sample_input --scheduler=EasyBackfillScheduler --output-swf=dada.swf
 		fshort=$(basename -s .swf "$f")
 # 		echoinblue ./pyss/src/run_simulator.py --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf"
-		job_pool_run pypy ./pyss/src/run_simulator.py --no-stats --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf" --num-processors=80640
+		job_pool_run pypy ./pyss/src/run_simulator.py --no-stats --input-file="$f" --scheduler="$sched" --output-swf="$simulated_files_dir/${fshort}_${sched}.swf" --num-processors=11520
 	done
 done
 

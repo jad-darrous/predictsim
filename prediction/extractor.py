@@ -202,4 +202,3 @@ for j in data:
 #sys.setrecursionlimit(20000)
 simulate(env)
 
-print('-------------SUCCESS----------------')
