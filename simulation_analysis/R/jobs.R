@@ -207,17 +207,7 @@ graph_job_arrivals <- function(swf){
         arrivals = job_arrivals(swf)
         plot_arrivals <- ggplot(data=arrivals,mapping=aes(x=date,y=cores_requested, ymin=0)) +
         #plot_arrivals <- qplot(date, cores_requested, data=arrivals, size=length(cores_requested)) +
-        geom_point(alpha=0.2, size=1) +
-        #scale_size("count") +
-        theme_bw() +
-        opts(
-        panel.background = theme_rect(fill = "white", colour = NA),
-        axis.title.x = theme_text(face="bold", size=12),
-        axis.title.y = theme_text(face="bold", size=12, angle=90),
-        panel.grid.major = theme_blank(),
-        panel.grid.minor = theme_blank(),
-        title="Job Arrivals")
-
+        geom_point(alpha=0.2, size=1)
         # return the graph
         plot_arrivals
 }
@@ -226,17 +216,7 @@ graph_running_jobs <- function(swf){
 	verb('entering graph_running_jobs')
         runnings = running_jobs(swf)
         plot_runnings <- ggplot(data=runnings,mapping=aes(x=date,y=jobs)) +
-        geom_line() +
-        theme_bw() +
-        opts(
-        panel.background = theme_rect(fill = "white", colour = NA),
-        axis.title.x = theme_text(face="bold", size=12),
-        axis.title.y = theme_text(face="bold", size=12, angle=90),
-        panel.grid.major = theme_blank(),
-        panel.grid.minor = theme_blank(),
-        title="Number of Running Jobs")
-
-        # return the graph
+        geom_line()       # return the graph
         plot_runnings
 }
 

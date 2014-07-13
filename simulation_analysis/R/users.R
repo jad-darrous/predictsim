@@ -65,16 +65,7 @@ graph_users_submissions <- function(swf){
 
         plot_users <- ggplot(data=user_sub,mapping=aes(x=date,y=uid)) +
         #geom_line() +
-        geom_point() +
-        theme_bw() +
-        opts(
-        panel.background = theme_rect(fill = "white", colour = NA),
-        axis.title.x = theme_text(face="bold", size=12),
-        axis.title.y = theme_text(face="bold", size=12, angle=90),
-        panel.grid.major = theme_blank(),
-        panel.grid.minor = theme_blank(),
-        title="Users Submissions")
-        # return the graph
+        geom_point()         # return the graph
         plot_users
 }
 
@@ -86,16 +77,7 @@ graph_nb_users <- function(swf){
 
         plot_nb_users <- ggplot(data=nb_users,mapping=aes(x=date,y=users)) +
         #geom_line() +
-        geom_line() +
-        theme_bw() +
-        opts(
-        panel.background = theme_rect(fill = "white", colour = NA),
-        axis.title.x = theme_text(face="bold", size=12),
-        axis.title.y = theme_text(face="bold", size=12, angle=90),
-        panel.grid.major = theme_blank(),
-        panel.grid.minor = theme_blank(),
-        title="Users Having Running Jobs")
-        # return the graph
+        geom_line()        # return the graph
         plot_nb_users
 }
 

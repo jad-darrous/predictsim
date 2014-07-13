@@ -139,16 +139,7 @@ graph_queue_size <- function(swf){
 	queue = queue_size(swf)
 	plot_queue <- ggplot(data=queue,mapping=aes(x=date,y=cores_queued, ymin=0)) +
 	#geom_line() +
-	geom_step() +
-	theme_bw() +
-	opts(
-	     panel.background = theme_rect(fill = "white", colour = NA),
-	     axis.title.x = theme_text(face="bold", size=12),
-	     axis.title.y = theme_text(face="bold", size=12, angle=90),
-	     panel.grid.major = theme_blank(),
-	     panel.grid.minor = theme_blank(),
-	     title="System Queue Size")
-
+	geom_step() 
 	# return the graph
 	plot_queue
 }
@@ -157,15 +148,7 @@ graph_queue_jobs_length <- function(swf){
 	queue = queue_jobs_length(swf)
 	plot_queue <- ggplot(data=queue,mapping=aes(x=date,y=nb_jobs, ymin=0)) +
 	#geom_line() +
-	geom_step() +
-	theme_bw() +
-	opts(
-	     panel.background = theme_rect(fill = "white", colour = NA),
-	     axis.title.x = theme_text(face="bold", size=12),
-	     axis.title.y = theme_text(face="bold", size=12, angle=90),
-	     panel.grid.major = theme_blank(),
-	     panel.grid.minor = theme_blank(),
-	     title="System Queue Length")
+	geom_step() 
 
 	# return the graph
 	plot_queue

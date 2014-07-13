@@ -50,8 +50,7 @@ graph_utilization <- function(swf, utilization_start=0){
 	table <- as.data.frame(table)
 	print(table)
 	pp <- ggplot() +
-	geom_step(data=table, aes(x=timestamp, y = cores_used)) +
-	theme_bw()
+	geom_step(data=table, aes(x=timestamp, y = cores_used)) 
 
 	return(pp)
 }

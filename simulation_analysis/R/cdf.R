@@ -24,16 +24,7 @@ graph_cdf_wait_time <- function(swf){
         y= ecdf(swf$wait_time)(unique(swf$wait_time))
         cdf_wt = qplot(x,y)+
         scale_x_continuous('Wait Time') + scale_y_continuous('CDF')+
-        geom_line() +
-        #geom_step() +
-        theme_bw() +
-        opts(
-        panel.background = theme_rect(fill = "white", colour = NA),
-        axis.title.x = theme_text(face="bold", size=12),
-        axis.title.y = theme_text(face="bold", size=12, angle=90),
-        panel.grid.major = theme_blank(),
-        panel.grid.minor = theme_blank(),
-        title="CDF Wait Time")
+        geom_line() 
 
         # return the graph
         cdf_wt
