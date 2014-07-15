@@ -4,11 +4,11 @@
 Runtime predictor.
 
 Usage:
-    meanpredict.py <filename> <extracted_data> randomforest <encoding> [-i] [-v]
-    meanpredict.py <filename> <extracted_data> tsafrir [-i] [-v]
-    meanpredict.py <filename> <extracted_data> svr <encoding> [-i] [-v]
-    meanpredict.py <filename> <extracted_data> sgd <loss> <penalty> <encoding> <max_runtime> <max_cores> [-i] [-v]
-    meanpredict.py <filename> <extracted_data> passive-aggressive <loss> <encoding> <max_runtime> <max_cores> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <output_folder> randomforest <encoding> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <output_folder> tsafrir [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <output_folder> svr <encoding> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <output_folder> sgd <loss> <penalty> <encoding> <max_runtime> <max_cores> [-i] [-v]
+    meanpredict.py <filename> <extracted_data> <output_folder> passive-aggressive <loss> <encoding> <max_runtime> <max_cores> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -61,6 +61,9 @@ if arguments["<encoding>"]:
 else:
     encoding=None
 
+output_folder=arguments["<output_folder>"]
+
+
 #____IMPORTS____
 import numpy as np
 from swfpy import io
@@ -82,7 +85,7 @@ from np_printutils import np_array_to_file
 print("opening the swf csv file")
 swf_dtype=np.dtype([('job_id',np.int_), ('submit_time',np.float32) ,('wait_time',np.float32) ,('run_time',np.float32) ,('proc_alloc',np.int_) ,('cpu_time_used',np.float32) ,('mem_used',np.float32) ,('proc_req',np.int_) ,('time_req',np.float32) ,('mem_req',np.float32) ,('status',np.int_) ,('user_id',np.int_) ,('group_id',np.int_) ,('exec_id',np.int_) ,('queue_id',np.int_) ,('partition_id',np.int_) ,('previous_job_id',np.int_) ,('think_time',np.float32)])
 with open (arguments["<filename>"], "r") as f:
-    data=np.loadtxt(f, dtype=swf_dtype)
+    data=np.loadtxt(f, dtype=swf_dtype,comments=";")
 
 print("opening the extracted data csv file")
 extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_),('t_since_last_sub',np.float32),('running_totalcores',np.int_),('last_runtime3',np.float32),('last_runtime4',np.float32),('usermean',np.float32)])
@@ -255,7 +258,7 @@ if tool=="random_forest":
     forest.fit(Xlearn,ylearn)
     print("prediction")
     pred=forest.predict(Xtest)
-    np_array_to_file(pred,"prediction_rf")
+    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_rf")
 elif tool=="tsafrir":
     #___TSAFRIR MEAN___
 
@@ -265,7 +268,7 @@ elif tool=="tsafrir":
         else:
             return req
     bound_with_reqtime=np.vectorize(bound_req)
-    np_array_to_file(bound_with_reqtime(tsafir,data['time_req']),"prediction_tsafrir")
+    np_array_to_file(bound_with_reqtime(tsafir,data['time_req']),arguments["<output_folder>"]+"/prediction_tsafrir")
 elif tool=="svr":
     #___OFFLINE SVR___
 
@@ -273,30 +276,32 @@ elif tool=="svr":
     svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
     svr.fit(Xlearn,ylearn)
     pred=svr.predict(Xtest)
-    np_array_to_file(pred,"prediction_rf")
+    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_rf")
 elif tool in ["sgd","passive-aggressive"]:
     #___ONLINE LEARNING___
 
     from simpy import Environment,simulate,Monitor
     from swfpy import io
-    import logging
-    from simpy.util import start_delayed
-    global_logger = logging.getLogger('global')
-    hdlr = logging.FileHandler('extractor.log')
-    formatter = logging.Formatter('%(levelname)s %(message)s')
-    hdlr.setFormatter(formatter)
-    global_logger.addHandler(hdlr)
-    #logging level
     if arguments['--verbose']==True:
-        global_logger.setLevel(logging.INFO)
-    else:
-        global_logger.setLevel(logging.ERROR)
+        import logging
+    from simpy.util import start_delayed
+
+    if arguments['--verbose']==True:
+        global_logger = logging.getLogger('global')
+        hdlr = logging.FileHandler('predictor.log')
+        formatter = logging.Formatter('%(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        global_logger.addHandler(hdlr)
     #Getting a simulation environment
     env = Environment()
     #logging function
-    def global_log(msg):
-        prefix='%.1f'%env.now
-        global_logger.info(prefix+': '+msg)
+    if arguments['--verbose']==True:
+        def global_log(msg):
+            prefix='%.1f'%env.now
+            global_logger.info(prefix+': '+msg)
+    else:
+        def global_log(msg):
+            pass
 
     if tool=="sgd":
         #___SGD___
@@ -357,9 +362,9 @@ elif tool in ["sgd","passive-aggressive"]:
         embed()
 
     if tool=="sgd":
-        array_to_file(pred,"prediction_%s_%s_%s" %(tool,loss,penalty))
+        array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s_%s" %(tool,loss,penalty))
     elif tool=="passive-aggressive":
-        array_to_file(pred,"prediction_%s_%s" %(tool,loss))
+        array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s" %(tool,loss))
 
 #interactive?
 if arguments['--interactive']==True:

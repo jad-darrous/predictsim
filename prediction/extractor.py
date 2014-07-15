@@ -46,27 +46,25 @@ arguments = docopt(__doc__, version='1.0.0rc2')
 if arguments['--verbose']==True:
     print(arguments)
 
-#logging
-global_logger = logging.getLogger('global')
-hdlr = logging.FileHandler('extractor.log')
-formatter = logging.Formatter('%(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-global_logger.addHandler(hdlr)
-
-
 #logging level
 if arguments['--verbose']==True:
-    global_logger.setLevel(logging.INFO)
-else:
-    global_logger.setLevel(logging.ERROR)
+    global_logger = logging.getLogger('global')
+    hdlr = logging.FileHandler('extractor.log')
+    formatter = logging.Formatter('%(levelname)s %(message)s')
+    hdlr.setFormatter(formatter)
+    global_logger.addHandler(hdlr)
 
 #Getting a simulation environment
 env = Environment()
 
 #logging function
-def global_log(msg):
-    prefix='%.1f'%env.now
-    global_logger.info(prefix+': '+msg)
+if arguments['--verbose']==True:
+    def global_log(msg):
+        prefix='%.1f'%env.now
+        global_logger.info(prefix+': '+msg)
+else:
+    def global_log(msg):
+        pass
 
 #input
 data=io.swfopen(arguments['<filename>'])

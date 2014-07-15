@@ -9,6 +9,11 @@ The tree for a log file workflow should be this one at inception:
 ├── prediction_results
 └── simulated_swf
 
+the name of the log (log_unfiltered.swf) is mandatory.
+/!\ the Makefile should be modified to contain variables:
+ - max_runtime
+ - mak_procs
+
 then,when running make filter:
 
 .
@@ -49,6 +54,8 @@ then, with make predict:
 │   ├── prediction_method1
 │   └── prediction_method2
 └── simulated_swf
+
+the names of the prediction results can be anything.
 
 then, with make swfs:
 

@@ -1,7 +1,4 @@
-use like this:
-cd CEA-curie
-make
-and you get files in predicted_swf/
+read workflow in ../data_manipulation/README.md
 
 details:
 CEA-curie: full log
