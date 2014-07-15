@@ -1,7 +1,7 @@
 max_runtime=86400
 max_procs=80640
 
-all:filter extract predict swfs simulate
+all:filter extract predict swfs simulate simulation_analysis
 
 analysis:rec_abs rec mse
 
@@ -41,6 +41,9 @@ extract_req_time:
 #extraction of specific information for data analysis:
 extract_run_time:
 	../../data_manipulation/extract_run_time original_swf/log.swf > prediction_results/clairvoyant
+
+simulation_analysis:
+	../../simulation_analysis/swf2vis_metrics.R simulated_swf/* -o truc > analysis_results/metrics
 
 analysis:mae mse rec_abs rec
 

@@ -89,14 +89,17 @@ setwd(execution_wd)
 
 #type stuff here.
 do_one_file <- function( swf_filename ) {
-	data=swf_read(swf_filename)
   print(swf_filename)
-  print("sum Cpl. times")
-	print(sum(data$wait_time+data$run_time))
-  print("max Cpl. times")
-	print(max(data$wait_time+data$run_time))
-  #print("sum Job stretch ")
-	#print(max(data$wait_time+data$run_time))
+	data=swf_read(swf_filename)
+  print("Average flow time")
+	print(sum(data$wait_time+data$run_time)/nrow(data))
+  print("Max flow time")
+	print(max(data$wait_time+data$run_time)/nrow(data))
+  print("Average job stretch : (Wi+Pi)/Pi")
+  print(sum((data$wait_time+data$run_time)/data$run_time)/nrow(data))
+  print("Max job stretch : (Wi+Pi)/Pi")
+  print(max((data$wait_time+data$run_time)/data$run_time))
+  print("-------------------------------------------------")
 }
 
 lapply(args$swf_filenames,do_one_file)
