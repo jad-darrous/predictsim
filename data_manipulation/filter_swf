@@ -1,0 +1,16 @@
+#!/bin/bash
+#usage: filter_swf file.swf
+
+#print header
+awk '($1==";"){print}' $1
+
+#remove header
+awk '!($1==";"){print}' $1 |
+#no cores at -1
+awk '!($5=="-1"){print}' |
+#no cores at 0
+awk '!($5=="0"){print}' |
+#no runtime at -1
+awk '!($4=="-1"){print}' |
+#no time_req at -1
+awk '!($9=="-1"){print}'

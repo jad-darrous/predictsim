@@ -1,23 +1,24 @@
 #!/bin/sh
-#use like make_all_swfs  prediction_folder output_folder logfile header
+#use like make_all_swfs  prediction_folder output_folder
+#makes one swf file based on the logfile.swf per prediction.
 prediction_folder="$1"
 output_folder="$2"
-logfile="$3"
-header="$4"
+logfile=original_swf/log.swf
 
 echo generating logs with:
 echo prediction_folder:
 echo $prediction_folder
 echo output_folder:
 echo $output_folder
-echo logfile:
-echo $logfile
-echo header:
-echo $header
+
+../../data_manipulation/extract_req_time  original_swf/log.swf  > $prediction_folder/prediction_req_time
+../../data_manipulation/extract_run_time  original_swf/log.swf  > $prediction_folder/clairvoyant
 
 for file in $prediction_folder/*
 do
   f=`basename $file`
-  ../../data_manipulation/make_swf $logfile $prediction_folder/$f $header > $output_folder/$f\.swf
+  ../../data_manipulation/make_swf $logfile $prediction_folder/$f > $output_folder/$f\.swf
 done
 
+rm $prediction_folder/clairvoyant
+rm $prediction_folder/prediction_req_time

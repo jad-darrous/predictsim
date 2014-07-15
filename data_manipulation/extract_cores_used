@@ -1,2 +1,2 @@
 #!/bin/bash
-paste <(awk '{print $5}' $1)
+paste <(awk '!($1==";"){print $5}' $1)
