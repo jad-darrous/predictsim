@@ -119,6 +119,11 @@ readMaxProcs <- function(inputFile)
 			maxProcs = oneLine;
 			break;
 		}
+		if(substr(oneLine, 0, 11) == ";MaxProcs:")
+		{
+			maxProcs = oneLine;
+			break;
+		}
 	} 
 	close(con)
 
@@ -142,11 +147,11 @@ for(f in files)
 	
 	swf_wait = swf2df(f)
 	
-    #if read fails:
-    if(is.character(swf_wait))
-    {
-	next
-    }
+	#if read fails:
+	if(is.character(swf_wait))
+	{
+		next
+	}
 	
 	swf_wait$submit_time[which(swf_wait$submit_time == -1)] = Inf
 	swf_wait$wait_time[which(swf_wait$wait_time == -1)] = Inf
@@ -180,11 +185,30 @@ for(f in files)
 	col_names = c(col_names, "Work")
 	result = c(result, work)
 	
+	swf_wait$wowo = swf_wait$proc_alloc * swf_wait$run_time
+	work2 = sum(swf_wait$wowo)
+	col_names = c(col_names, "Work2")
+	result = c(result, work2)
+	
+	col_names = c(col_names, "sumPROC")
+	result = c(result, sum(swf_wait$proc_alloc))
+	col_names = c(col_names, "sumRUN")
+	result = c(result, sum(swf_wait$run_time))
+	mmii = min(swf_wait$job_id)
+	col_names = c(col_names, "sumJOBID")
+	result = c(result, sum(swf_wait$job_id - mmii))
+	col_names = c(col_names, "sumSUBMIT")
+	result = c(result, sum(swf_wait$submit_time))
+	col_names = c(col_names, "sumWAIT")
+	result = c(result, sum(swf_wait$wait_time))
+	
 	completion_time = max(swf_wait$stop) - min(swf_wait$submit_time)
 	col_names = c(col_names, "completion_time")
 	result = c(result, completion_time)
 	
 	maxProcs = readMaxProcs(f)
+	if(is.na(sum(maxProcs)))
+		maxProcs = 80640 # TODO: do something better
 	col_names = c(col_names, "utilization (%)")
 	result = c(result, work/completion_time/maxProcs)
 	
