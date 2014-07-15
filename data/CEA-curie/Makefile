@@ -1,7 +1,9 @@
 max_runtime=86400
 max_procs=80640
 
-all:filter extract predict swfs simulate
+all:filter extract predict swfs simulate simulation_analysis
+
+analysis:rec_abs rec mse
 
 #logfile filtering
 filter:
@@ -40,6 +42,9 @@ extract_req_time:
 extract_run_time:
 	../../data_manipulation/extract_run_time original_swf/log.swf > prediction_results/clairvoyant
 
+simulation_analysis:
+	../../simulation_analysis/swf2vis_metrics.R simulated_swf/* -o truc > analysis_results/metrics
+
 analysis:mae mse rec_abs rec
 
 analysis_monster:mae_monster mse_monster rec_abs_monster rec_monster
@@ -68,5 +73,9 @@ rec:all_extract
 rec_abs:all_extract
 	../../analysis/REC_abs.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/REC_ABS.pdf -r 2
 
-clean:
-	rm predicted_swf/* prediction_results/prediction_req_time prediction_results/clairvoyant
+clean_swf:
+	rm -f predicted_swf/* simulated_swf/*
+
+cleanall:clean_swf
+	rm -f prediction_results/* analysis_results/* original_swf/log.swf original_swf/extracted_features
+
