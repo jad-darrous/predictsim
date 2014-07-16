@@ -90,7 +90,12 @@ def job_submit(j):
     log("dbg1")
     #dataoutput for job j, including thinktime computation
     #job_id user_id last_runtime last_runtime2 last_runtime3 last_runtime4 last_status last_status2 thinktime running_maxlength running_sumlength amount_running running_average_runtime running_allocatedcores
-    printlist=[j.job_id,j.user_id,user_info[j.user_id]['last_runtime'],user_info[j.user_id]['last_runtime2'],user_info[j.user_id]['last_runtime4'],user_info[j.user_id]['last_status'],user_info[j.user_id]['last_status2']]
+    printlist=[j.job_id,
+            j.user_id,
+            user_info[j.user_id]['last_runtime'],
+            user_info[j.user_id]['last_runtime2'],
+            user_info[j.user_id]['last_status'],
+            user_info[j.user_id]['last_status2']]
     log("dbg2")
 
     if user_info[j.user_id]['last_jobend']>=0:

@@ -1,9 +1,11 @@
 max_runtime=86400
 max_procs=80640
 
-all:filter extract predict swfs simulate simulation_analysis
+all:work analysis
 
-analysis:rec_abs rec mse
+work:filter extract predict swfs simulate
+
+analysis:prediction_analysis simulation_analysis
 
 #logfile filtering
 filter:
@@ -45,37 +47,23 @@ extract_run_time:
 simulation_analysis:
 	../../simulation_analysis/swf2vis_metrics.R simulated_swf/* -o truc > analysis_results/metrics
 
-analysis:mae mse rec_abs rec
+prediction_analysis:mae mse rec_abs rec
 
-analysis_monster:mae_monster mse_monster rec_abs_monster rec_monster
+mse:extract_run_time extract_req_time
+	../../prediction_analysis/MSE_vs_t_smoothed.R prediction_results/* -o analysis_results/MSE.pdf -r 2
 
-mse_monster:all_extract
-	../../analysis/MSE_vs_t_smoothed.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions_monster) -o analysis_results/MSE.pdf -r 2
+mae:extract_run_time extract_req_time
+	../../prediction_analysis/MAE_vs_t_smoothed.R prediction_results/*  -o analysis_results/MAE.pdf -r 2
 
-mae_monster:all_extract
-	../../analysis/MAE_vs_t_smoothed.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions_monster) -o analysis_results/MAE.pdf -r 2
+rec:extract_run_time extract_req_time
+	../../prediction_analysis/REC_-inf+inf.R prediction_results/* -o analysis_results/REC.pdf -r 2
 
-rec_monster:all_extract
-	../../analysis/REC_-inf+inf.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions_monster) -o analysis_results/REC.pdf -r 2
+rec_abs:extract_run_time extract_req_time
+	../../prediction_analysis/REC_abs.R prediction_results/*  -o analysis_results/REC_ABS.pdf -r 2
 
-rec_abs_monster:all_extract
-	../../analysis/REC_abs.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions_monster) -o analysis_results/REC_ABS.pdf -r 2
+clean_safe:
+	rm -f predicted_swf/* prediction_results/predictions_req_time prediction_results/clairvoyant
 
-mse:all_extract
-	../../analysis/MSE_vs_t_smoothed.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/MSE.pdf -r 2
-
-mae:all_extract
-	../../analysis/MAE_vs_t_smoothed.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/MAE.pdf -r 2
-
-rec:all_extract
-	../../analysis/REC_-inf+inf.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/REC.pdf -r 2
-
-rec_abs:all_extract
-	../../analysis/REC_abs.R prediction_results/true_run_time prediction_results/prediction_req_time $(predictions) -o analysis_results/REC_ABS.pdf -r 2
-
-clean_swf:
-	rm -f predicted_swf/* simulated_swf/*
-
-cleanall:clean_swf
-	rm -f prediction_results/* analysis_results/* original_swf/log.swf original_swf/extracted_features
+cleanall:clean_safe
+	rm -f simulated_swf/* prediction_results/* analysis_results/* original_swf/log.swf original_swf/extracted_features
 

@@ -84,12 +84,45 @@ from np_printutils import np_array_to_file_floating
 
 #____FILE I/O____
 print("opening the swf csv file")
-swf_dtype=np.dtype([('job_id',np.int_), ('submit_time',np.float32) ,('wait_time',np.float32) ,('run_time',np.float32) ,('proc_alloc',np.int_) ,('cpu_time_used',np.float32) ,('mem_used',np.float32) ,('proc_req',np.int_) ,('time_req',np.float32) ,('mem_req',np.float32) ,('status',np.int_) ,('user_id',np.int_) ,('group_id',np.int_) ,('exec_id',np.int_) ,('queue_id',np.int_) ,('partition_id',np.int_) ,('previous_job_id',np.int_) ,('think_time',np.float32)])
+swf_dtype=np.dtype([('job_id',np.int_),
+    ('submit_time',np.float32),
+    ('wait_time',np.float32),
+    ('run_time',np.float32),
+    ('proc_alloc',np.int_),
+    ('cpu_time_used',np.float32),
+    ('mem_used',np.float32),
+    ('proc_req',np.int_),
+    ('time_req',np.float32),
+    ('mem_req',np.float32),
+    ('status',np.int_),
+    ('user_id',np.int_),
+    ('group_id',np.int_),
+    ('exec_id',np.int_),
+    ('queue_id',np.int_),
+    ('partition_id',np.int_),
+    ('previous_job_id',np.int_),
+    ('think_time',np.float32)])
 with open (arguments["<filename>"], "r") as f:
     data=np.loadtxt(f, dtype=swf_dtype,comments=";")
 
 print("opening the extracted data csv file")
-extracted_data_dtype=np.dtype([('job_id',np.int_),('user_id',np.int_),('last_runtime',np.int_),('last_runtime2',np.float32),('last_status',np.int_),('last_status2',np.int_),('thinktime',np.float32),('running_maxlength',np.float32),('running_sumlength',np.float32),('amount_running',np.int_),('running_average_runtime',np.float32),('running_allocatedcores',np.int_),('t_since_last_sub',np.float32),('running_totalcores',np.int_),('last_runtime3',np.float32),('last_runtime4',np.float32),('usermean',np.float32)])
+extracted_data_dtype=np.dtype([('job_id',np.int_),
+    ('user_id',np.int_),
+    ('last_runtime',np.int_),
+    ('last_runtime2',np.float32),
+    ('last_status',np.int_),
+    ('last_status2',np.int_),
+    ('thinktime',np.float32),
+    ('running_maxlength',np.float32),
+    ('running_sumlength',np.float32),
+    ('amount_running',np.int_),
+    ('running_average_runtime',np.float32),
+    ('running_allocatedcores',np.int_),
+    ('t_since_last_sub',np.float32),
+    ('running_totalcores',np.int_),
+    ('last_runtime3',np.float32),
+    ('last_runtime4',np.float32),
+    ('usermean',np.float32)])
 with open (arguments["<extracted_data>"], "r") as f:
     extracted_data=np.loadtxt(f, dtype=extracted_data_dtype)
 
@@ -238,31 +271,30 @@ if encoding=="onehot":
     print("joining all vectors")
     Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean,onehot_features))
 else:
-    Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean))
-    #Xf=X.view(np.float32).reshape(X.shape + (-1,))
-
-np_array_to_file_floating(Xf,"dump")
+    Xf=np.hstack((Xf_proc_req,
+        Xf_time_req,
+        Xf_tsafir_mean,
+        Xf_tsafir_mean3,
+        Xf_tsafir_mean4,
+        Xf_hour_of_day,
+        Xf_last_runtime,
+        Xf_last_runtime2,
+        Xf_thinktime,
+        Xf_running_maxlength,
+        Xf_running_sumlength,
+        Xf_amount_running,
+        Xf_running_average_runtime,
+        Xf_running_allocatedcores,
+        Xf_t_since_last_sub,
+        Xf_running_totalcores,
+        Xf_last_runtime3,
+        Xf_last_runtime4,
+        Xf_usermean))
 
 #At this point we have: Xf, yf, tsafir
 #___LEARNING___
 print("encoding finished. predicting..")
-if tool=="random_forest":
-    #____OFFLINE RANDOM FORESTS____
-
-    start=int(len(Xf)*.7)
-    i=int(len(Xf)*.8)
-    Xlearn=Xf[start:i:1,:]
-    Xtest=Xf[i:len(Xf),:]
-    ylearn=yf[start:i:1]
-    ytest=yf[i:len(yf)]
-    tsafirtest=tsafir[i:len(yf)]
-    forest=RandomForestRegressor(n_estimators=40, criterion='mse', max_depth=None, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=3, random_state=None, verbose=0, min_density=None, compute_importances=None)
-    print("learning random forests")
-    forest.fit(Xlearn,ylearn)
-    print("prediction")
-    pred=forest.predict(Xtest)
-    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_rf")
-elif tool=="tsafrir":
+if tool=="tsafrir":
     #___TSAFRIR MEAN___
 
     def bound_req(pred,req):
@@ -272,14 +304,6 @@ elif tool=="tsafrir":
             return req
     bound_with_reqtime=np.vectorize(bound_req)
     np_array_to_file(bound_with_reqtime(tsafir,data['time_req']),arguments["<output_folder>"]+"/prediction_tsafrir")
-elif tool=="svr":
-    #___OFFLINE SVR___
-
-    print("creating SVR")
-    svr=SVR(kernel='linear', degree=3, gamma=0.0, coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, probability=False, cache_size=200, verbose=False, max_iter=-1, random_state=None)
-    svr.fit(Xlearn,ylearn)
-    pred=svr.predict(Xtest)
-    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_rf")
 elif tool in ["sgd","passive-aggressive"]:
     #___ONLINE LEARNING___
 
@@ -345,10 +369,12 @@ elif tool in ["sgd","passive-aggressive"]:
 
         yield env.timeout(wait_time+run_time)
         #print('4: time is %s,i= %s' % (env.now, i))
-        print(np.array([j]))
-        for k in range(0,len(np.array([j]))):
-                if np.array([j])[k] <-1 or np.array([j])[k]>1:
-                    print("k %s vector %s"%(k,np.array([j])))
+        #print(j)
+        #print(Xf[i][4])
+        #print(Xf_tsafir_mean3[i])
+        #for k in range(0,len(np.array([j]))):
+                #if np.array([j])[k] <-1 or np.array([j])[k]>1:
+                    #print("k %s vector %s"%(k,np.array([j])))
 
         model.partial_fit(np.array([j]),np.array([yf[i]]))
         #print('5: time is %s,i= %s' % (env.now, i))
