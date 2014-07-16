@@ -12,11 +12,11 @@ filter:
 	../../data_manipulation/filter_swf original_swf/log_unfiltered.swf > original_swf/log.swf
 
 #logfile feature extraction
-extract:
+extract:filter
 	../../prediction/extractor.py original_swf/log.swf > original_swf/extracted_features
 
 #logfile runtime prediction
-predict:predict_sgd_squared_loss_l1 predict_tsafrir
+predict:predict_sgd_squared_loss_l1 predict_tsafrir extract
 
 #logfile swf generation
 swfs:
