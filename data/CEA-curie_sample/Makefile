@@ -32,7 +32,7 @@ predict_tsafrir:
 
 #sgd squared loss
 predict_sgd_squared_loss_l1:
-	../../prediction/predictor.py original_swf/log.swf original_swf/extracted_features prediction_results sgd squared_loss l1  onehot $(max_runtime) $(max_procs)
+	../../prediction/predictor.py original_swf/log.swf original_swf/extracted_features prediction_results sgd squared_loss l1  notonehot $(max_runtime) $(max_procs)
 
 #extraction of specific information for data analysis:
 extract_req_time:

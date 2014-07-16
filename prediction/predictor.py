@@ -80,6 +80,7 @@ from numpy.lib.recfunctions import drop_fields
 from numpy.lib.recfunctions import merge_arrays
 from np_printutils import array_to_file
 from np_printutils import np_array_to_file
+from np_printutils import np_array_to_file_floating
 
 #____FILE I/O____
 print("opening the swf csv file")
@@ -142,105 +143,105 @@ yf=data['run_time'].astype('<f4')
 #__tsafir runtime
 tsafir=X['tsafir_mean']
 
+
+print("changing vector types")
+Xf_proc_req                = np.reshape(X['proc_req'].astype('<f4'),(-1,1))
+Xf_time_req                = np.reshape(X['time_req'].astype('<f4'),(-1,1))
+Xf_tsafir_mean             = np.reshape(X['tsafir_mean'].astype('<f4'),(-1,1))
+Xf_tsafir_mean3            = np.reshape(X['tsafir_mean3'].astype('<f4'),(-1,1))
+Xf_tsafir_mean4            = np.reshape(X['tsafir_mean4'].astype('<f4'),(-1,1))
+Xf_hour_of_day                     = np.reshape(X['hour_of_day'].astype('<f4'),(-1,1))
+
+Xf_last_runtime            = np.reshape(X['last_runtime'].astype('<f4'),(-1,1))
+Xf_last_runtime2           = np.reshape(X['last_runtime2'].astype('<f4'),(-1,1))
+Xf_thinktime               = np.reshape(X['thinktime'].astype('<f4'),(-1,1))
+Xf_running_maxlength       = np.reshape(X['running_maxlength'].astype('<f4'),(-1,1))
+Xf_running_sumlength       = np.reshape(X['running_sumlength'].astype('<f4'),(-1,1))
+Xf_amount_running          = np.reshape(X['amount_running'].astype('<f4'),(-1,1))
+Xf_running_average_runtime = np.reshape(X['running_average_runtime'].astype('<f4'),(-1,1))
+Xf_running_allocatedcores  = np.reshape(X['running_allocatedcores'].astype('<f4'),(-1,1))
+Xf_t_since_last_sub        = np.reshape(X['t_since_last_sub'].astype('<f4'),(-1,1))
+#print("DEBUG")
+#print(max(X['running_totalcores']))
+Xf_running_totalcores      = np.reshape(X['running_totalcores'].astype('<f4'),(-1,1))
+Xf_last_runtime3           = np.reshape(X['last_runtime3'].astype('<f4'),(-1,1))
+Xf_last_runtime4           = np.reshape(X['last_runtime4'].astype('<f4'),(-1,1))
+Xf_usermean                = np.reshape(X['usermean'].astype('<f4'),(-1,1))
+print("done.")
+
+if tool in ["sgd","passive-aggressive"]:
+    #Scale the values to  [0,1]
+    print("scaling values")
+    max_runtime                = float(arguments["<max_runtime>"])
+    max_cores                  = float(arguments["<max_cores>"])
+    Xf_proc_req                = Xf_proc_req/max_cores
+    Xf_time_req                = Xf_proc_req/max_runtime
+    Xf_tsafir_mean             = Xf_tsafir_mean/max_runtime
+    Xf_tsafir_mean3            = Xf_tsafir_mean3/max_runtime
+    Xf_tsafir_mean4            = Xf_tsafir_mean4/max_runtime
+    Xf_hour_of_day             = Xf_hour_of_day/24.0
+    Xf_last_runtime            = Xf_last_runtime/max_runtime
+    Xf_last_runtime2           = Xf_last_runtime2/max_runtime
+
+    max_thinktime=60*60*24
+    scale_thinktime            = np.vectorize(lambda x:min(x/max_thinktime,1))
+    Xf_thinktime               = scale_thinktime(Xf_thinktime)
+
+    scale_maxlength            = np.vectorize(lambda x:min(x/max_runtime,1))
+    Xf_running_maxlength       = scale_maxlength(Xf_running_maxlength)
+
+    max_sumlength=max_runtime*10
+    scale_sumlength            = np.vectorize(lambda x:min(x/max_sumlength,1))
+    Xf_running_sumlength       = scale_sumlength(Xf_running_sumlength)
+
+    scale_amount_running            = np.vectorize(lambda x:min(x/max_cores,1))
+    Xf_amount_running          = scale_amount_running(Xf_amount_running)
+
+    Xf_running_average_runtime = Xf_running_average_runtime/max_runtime
+    Xf_running_allocatedcores  = Xf_running_allocatedcores/max_cores
+    Xf_t_since_last_sub        = scale_thinktime(Xf_t_since_last_sub)
+
+    scale_totalcores           = np.vectorize(lambda x:min(x/max_cores,1))
+    Xf_running_totalcores      = scale_totalcores(Xf_running_totalcores)
+    Xf_last_runtime3           = Xf_last_runtime3/max_runtime
+    Xf_last_runtime4           = Xf_last_runtime4/max_runtime
+    Xf_usermean                = Xf_usermean/max_runtime
+    print("done")
+
+
+
 if encoding=="onehot":
     print("encoding in onehot")
     mms = preprocessing.MinMaxScaler()
-
+    print("dbg1")
     enc_user_id           = preprocessing.OneHotEncoder()
     X_onehot_user_id      = np.array( enc_user_id.fit_transform(np.reshape(X['user_id'],(-1,1))).toarray())
-
+    print("dbg1")
     enc_group_id          = preprocessing.OneHotEncoder()
     X_onehot_group_id     = np.array( enc_group_id.fit_transform(np.reshape(X['group_id'],(-1,1))).toarray())
-
+    print("dbg1")
     enc_day_of_week       = preprocessing.OneHotEncoder()
     X_onehot_day_of_week  = np.array( enc_day_of_week.fit_transform(np.reshape(X['day_of_week'],(-1,1))).toarray())
-
+    print("dbg1")
     enc_day_of_month      = preprocessing.OneHotEncoder()
     X_onehot_day_of_month = np.array( enc_day_of_month.fit_transform(np.reshape(X['day_of_month'],(-1,1))).toarray())
-
+    print("dbg1")
     enc_last_status       = preprocessing.OneHotEncoder()
     X_onehot_last_status  = np.array( enc_last_status.fit_transform(mms.fit_transform(np.reshape(X['last_status'],(-1,1)))).toarray())
-
+    print("dbg1")
     enc_last_status2      = preprocessing.OneHotEncoder()
     X_onehot_last_status2 = np.array( enc_last_status2.fit_transform(mms.fit_transform(np.reshape(X['last_status2'],(-1,1)))).toarray())
-
+    print("building onehot_features")
     onehot_features       = np.hstack((X_onehot_user_id,X_onehot_group_id,X_onehot_day_of_week,X_onehot_last_status,X_onehot_last_status2))
-
+    print("built.")
     X=drop_fields(X,['user_id','group_id','day_of_week','day_of_month','last_status','last_status2'])
-    #print("the format of X before going to np.array is:")
-    #print(X.dtype)
-    #print("the values are:")
-    #print(X)
-
-    Xf_proc_req                = np.reshape(X['proc_req'].astype('<f4'),(-1,1))
-    Xf_time_req                = np.reshape(X['time_req'].astype('<f4'),(-1,1))
-    Xf_tsafir_mean             = np.reshape(X['tsafir_mean'].astype('<f4'),(-1,1))
-    Xf_tsafir_mean3            = np.reshape(X['tsafir_mean3'].astype('<f4'),(-1,1))
-    Xf_tsafir_mean4            = np.reshape(X['tsafir_mean4'].astype('<f4'),(-1,1))
-    Xf_hour_of_day                     = np.reshape(X['hour_of_day'].astype('<f4'),(-1,1))
-
-    Xf_last_runtime            = np.reshape(X['last_runtime'].astype('<f4'),(-1,1))
-    Xf_last_runtime2           = np.reshape(X['last_runtime2'].astype('<f4'),(-1,1))
-    Xf_thinktime               = np.reshape(X['thinktime'].astype('<f4'),(-1,1))
-    Xf_running_maxlength       = np.reshape(X['running_maxlength'].astype('<f4'),(-1,1))
-    Xf_running_sumlength       = np.reshape(X['running_sumlength'].astype('<f4'),(-1,1))
-    Xf_amount_running          = np.reshape(X['amount_running'].astype('<f4'),(-1,1))
-    Xf_running_average_runtime = np.reshape(X['running_average_runtime'].astype('<f4'),(-1,1))
-    Xf_running_allocatedcores  = np.reshape(X['running_allocatedcores'].astype('<f4'),(-1,1))
-    Xf_t_since_last_sub        = np.reshape(X['t_since_last_sub'].astype('<f4'),(-1,1))
-    #print("DEBUG")
-    #print(max(X['running_totalcores']))
-    Xf_running_totalcores      = np.reshape(X['running_totalcores'].astype('<f4'),(-1,1))
-    Xf_last_runtime3           = np.reshape(X['last_runtime3'].astype('<f4'),(-1,1))
-    Xf_last_runtime4           = np.reshape(X['last_runtime4'].astype('<f4'),(-1,1))
-    Xf_usermean                = np.reshape(X['usermean'].astype('<f4'),(-1,1))
-
-    if tool in ["sgd","passive-aggressive"]:
-        #Scale the values to  [0,1]
-        max_runtime                = float(arguments["<max_runtime>"])
-        max_cores                  = float(arguments["<max_cores>"])
-        Xf_proc_req                = Xf_proc_req/max_cores
-        Xf_time_req                = Xf_proc_req/max_runtime
-        Xf_tsafir_mean             = Xf_tsafir_mean/max_runtime
-        Xf_tsafir_mean3            = Xf_tsafir_mean3/max_runtime
-        Xf_tsafir_mean4            = Xf_tsafir_mean4/max_runtime
-        Xf_hour_of_day             = Xf_hour_of_day/24.0
-        Xf_last_runtime            = Xf_last_runtime/max_runtime
-        Xf_last_runtime2           = Xf_last_runtime2/max_runtime
-
-        max_thinktime=60*60*24
-        scale_thinktime            = np.vectorize(lambda x:min(x/max_thinktime,1))
-        Xf_thinktime               = scale_thinktime(Xf_thinktime)
-
-        scale_maxlength            = np.vectorize(lambda x:min(x/max_runtime,1))
-        Xf_running_maxlength       = scale_maxlength(Xf_running_maxlength)
-
-        max_sumlength=max_runtime*10
-        scale_sumlength            = np.vectorize(lambda x:min(x/max_sumlength,1))
-        Xf_running_sumlength       = scale_sumlength(Xf_running_sumlength)
-
-        scale_amount_running            = np.vectorize(lambda x:min(x/max_cores,1))
-        Xf_amount_running          = scale_amount_running(Xf_amount_running)
-
-        Xf_running_average_runtime = Xf_running_average_runtime/max_runtime
-        Xf_running_allocatedcores  = Xf_running_allocatedcores/max_cores
-        Xf_t_since_last_sub        = scale_thinktime(Xf_t_since_last_sub)
-
-        scale_totalcores           = np.vectorize(lambda x:min(x/max_cores,1))
-        Xf_running_totalcores      = scale_totalcores(Xf_running_totalcores)
-        Xf_last_runtime3           = Xf_last_runtime3/max_runtime
-        Xf_last_runtime4           = Xf_last_runtime4/max_runtime
-        Xf_usermean                = Xf_usermean/max_runtime
-
-
+    print("joining all vectors")
     Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean,onehot_features))
-
-    #for i in range(0,len(Xf[0,:])):
-        #print "row %s" %(i+1)
-        #print np.mean(Xf[:,i])
-        #print max(Xf[:,i])
 else:
-    Xf=X.view(np.float32).reshape(X.shape + (-1,))
+    Xf=np.hstack((Xf_proc_req, Xf_time_req, Xf_tsafir_mean,Xf_tsafir_mean3,Xf_tsafir_mean4,Xf_hour_of_day, Xf_last_runtime, Xf_last_runtime2, Xf_thinktime, Xf_running_maxlength, Xf_running_sumlength, Xf_amount_running, Xf_running_average_runtime, Xf_running_allocatedcores,Xf_t_since_last_sub,Xf_running_totalcores,Xf_last_runtime3,Xf_last_runtime4,Xf_usermean))
+    #Xf=X.view(np.float32).reshape(X.shape + (-1,))
+
+np_array_to_file_floating(Xf,"dump")
 
 #At this point we have: Xf, yf, tsafir
 #___LEARNING___
@@ -344,6 +345,11 @@ elif tool in ["sgd","passive-aggressive"]:
 
         yield env.timeout(wait_time+run_time)
         #print('4: time is %s,i= %s' % (env.now, i))
+        print(np.array([j]))
+        for k in range(0,len(np.array([j]))):
+                if np.array([j])[k] <-1 or np.array([j])[k]>1:
+                    print("k %s vector %s"%(k,np.array([j])))
+
         model.partial_fit(np.array([j]),np.array([yf[i]]))
         #print('5: time is %s,i= %s' % (env.now, i))
 
