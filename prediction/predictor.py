@@ -115,6 +115,7 @@ def mean4last(a,b,c,d,reqtime):
         return reqtime
     else:
         return (a+b+c+d)/4
+
 #tsafir mean2last
 tsafir=np.vectorize(mean2last)
 tsafir3=np.vectorize(mean3last)
@@ -243,6 +244,7 @@ else:
 
 #At this point we have: Xf, yf, tsafir
 #___LEARNING___
+print("encoding finished. predicting..")
 if tool=="random_forest":
     #____OFFLINE RANDOM FORESTS____
 
@@ -305,6 +307,7 @@ elif tool in ["sgd","passive-aggressive"]:
 
     if tool=="sgd":
         #___SGD___
+        print("sgd")
 
         loss=arguments["<loss>"]
         if loss not in [ 'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive','maeloss']:
