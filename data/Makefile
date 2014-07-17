@@ -49,7 +49,7 @@ extract_run_time:
 	../../data_manipulation/extract_run_time original_swf/log.swf > prediction_results/clairvoyant
 
 simulation_analysis:
-	../../simulation_analysis/swf2vis_metrics.R simulated_swf/* -o truc > analysis_results/metrics
+	../../simulation_analysis/swf2vis_metrics.R simulated_swf/* -o /tmp/truc > analysis_results/metrics
 
 prediction_analysis:mae mse rec_abs rec
 
