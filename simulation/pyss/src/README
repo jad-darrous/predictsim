@@ -30,3 +30,48 @@ runsnake simul.cprof
 
 
 
+
+
+
+*** Exemples of runs:
+
+
+$ pypy ./run_simulator.py --input-file=../../../data/CEA-curie_sample/original_swf/log.swf --output-swf=res.swf --scheduler=EasyBackfillScheduler --num-processors=80640                             
+....
+
+STATISTICS: 
+Wait (Tw) [minutes]:  61.5744273643
+Response time (Tw+Tr) [minutes]:  184.194747022
+Slowdown (Tw+Tr) / Tr:  405.726611658
+Bounded slowdown max(1, (Tw+Tr) / max(10, Tr):  63.9934110302
+Estimated slowdown (Tw+Tr) / Te:  306.163205919
+Tail slowdown (if bounded_sld >= 3):  418.633984425
+   Number of jobs in the tail:  1480
+Tail Percentile (the top 10% sld):  4037.82354783
+Total Number of jobs:  9924
+Number of jobs used to calculate statistics:  9823
+
+Num of Processors:  80640
+Input file:  ../../../data/CEA-curie_sample/original_swf/log.swf
+Scheduler: <class 'schedulers.easy_scheduler.EasyBackfillScheduler'>
+
+
+
+$ pypy ./run_simulator.py --input-file=../../../data/CEA-curie_sample/original_swf/log_unfiltered.swf --output-swf=res.swf --scheduler=EasyBackfillScheduler --num-processors=80640
+....
+
+STATISTICS: 
+Wait (Tw) [minutes]:  61.5806963958
+Response time (Tw+Tr) [minutes]:  184.213498609
+Slowdown (Tw+Tr) / Tr:  405.767817788
+Bounded slowdown max(1, (Tw+Tr) / max(10, Tr):  63.9998245316
+Estimated slowdown (Tw+Tr) / Te:  306.194377085
+Tail slowdown (if bounded_sld >= 3):  418.633984425
+   Number of jobs in the tail:  1480
+Tail Percentile (the top 10% sld):  4037.82354783
+Total Number of jobs:  9924
+Number of jobs used to calculate statistics:  9822
+
+Num of Processors:  80640
+Input file:  ../../../data/CEA-curie_sample/original_swf/log_unfiltered.swf
+Scheduler: <class 'schedulers.easy_scheduler.EasyBackfillScheduler'>
