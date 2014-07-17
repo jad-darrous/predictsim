@@ -1,6 +1,7 @@
 from common import Scheduler, CpuSnapshot, list_copy
 from base.prototype import JobStartEvent
 
+from predictors.predictor_tsafrir import PredictorTsafrir
 
 # shortest job first 
 sjf_sort_key = (
@@ -16,15 +17,11 @@ class  EasyPlusPlusScheduler(Scheduler):
         super(EasyPlusPlusScheduler, self).__init__(num_processors)
         self.cpu_snapshot = CpuSnapshot(num_processors)
         self.unscheduled_jobs = []
-        self.user_run_time_prev = {}
-        self.user_run_time_last = {}
+        self.predictor = PredictorTsafrir(num_processors)
 
     
     def new_events_on_job_submission(self, job, current_time):
-        if not self.user_run_time_last.has_key(job.user_id): 
-            self.user_run_time_prev[job.user_id] = None 
-            self.user_run_time_last[job.user_id] = None
-
+        
         self.cpu_snapshot.archive_old_slices(current_time)
         self.unscheduled_jobs.append(job)
         return [
@@ -34,11 +31,8 @@ class  EasyPlusPlusScheduler(Scheduler):
 
 
     def new_events_on_job_termination(self, job, current_time):
-        assert self.user_run_time_last.has_key(job.user_id) == True
-        assert self.user_run_time_prev.has_key(job.user_id) == True
-
-        self.user_run_time_prev[job.user_id] = self.user_run_time_last[job.user_id]
-        self.user_run_time_last[job.user_id] = job.actual_run_time
+        self.predictor.fit(job, current_time)
+        
         self.cpu_snapshot.archive_old_slices(current_time)
         self.cpu_snapshot.delTailofJobFromCpuSlices(job)
         return [
@@ -59,9 +53,7 @@ class  EasyPlusPlusScheduler(Scheduler):
         "Schedules jobs that can run right now, and returns them"
    
         for job in self.unscheduled_jobs:
-            if self.user_run_time_prev[job.user_id] != None: 
-                average =  int((self.user_run_time_last[job.user_id] + self.user_run_time_prev[job.user_id])/ 2)
-                job.predicted_run_time = min (job.user_estimated_run_time, average)
+            self.predictor.predict(job, current_time)
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)
