@@ -1,5 +1,5 @@
 from common import CpuSnapshot, list_copy
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 default_sort_key_functions = (
     lambda job : -job.submit_time, # sort by reverse submission time

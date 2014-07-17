@@ -1,5 +1,5 @@
 from common import CpuSnapshot
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 
 # this scheduler used the actual run time _doubled_ as the prediction of the job and then apply the regular Easy Backfill Schedular

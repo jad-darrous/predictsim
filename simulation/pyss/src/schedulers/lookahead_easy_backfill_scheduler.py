@@ -1,5 +1,5 @@
 from common import CpuSnapshot, list_copy 
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 def default_score_function(job):
     return job.num_required_processors * job.user_estimated_run_time

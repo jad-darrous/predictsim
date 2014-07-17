@@ -1,5 +1,5 @@
 from common import Scheduler, CpuSnapshot, list_copy
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 # latest job first 
 latest_sort_key = (

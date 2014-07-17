@@ -1,5 +1,5 @@
 from common import Scheduler, CpuSnapshot
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 # This scheduler is similar to the standard easy scheduler. The only diffrence is that 
 # the _head_ of jobs is doubled before the decision of backfilling.

@@ -1,8 +1,7 @@
 from common import Scheduler, CpuSnapshot, list_copy
 from base.prototype import JobStartEvent
 
-from predictors.predictor_tsafrir import PredictorTsafrir
-from predictors.predictor_clairvoyant import PredictorClairvoyant
+from predictors import *
 
 # shortest job first 
 sjf_sort_key = (
@@ -18,7 +17,7 @@ class  EasyPlusPlusScheduler(Scheduler):
         super(EasyPlusPlusScheduler, self).__init__(num_processors)
         self.cpu_snapshot = CpuSnapshot(num_processors)
         self.unscheduled_jobs = []
-        self.predictor = PredictorTsafrir(num_processors)
+        self.predictor = predictor_tsafrir.PredictorTsafrir(num_processors)
 
     
     def new_events_on_job_submission(self, job, current_time):
