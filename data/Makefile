@@ -3,28 +3,32 @@ max_procs=80640
 
 all:work analysis
 
-work:filter extract predict swfs simulate
+work:filter extract predict swfs filter_predictions simulate
 
 analysis:prediction_analysis simulation_analysis
 
 #logfile filtering
 filter:
-	../../data_manipulation/filter_swf original_swf/log_unfiltered.swf > original_swf/log.swf
+	../../data_manipulation/weak_filter_swf original_swf/log_unfiltered.swf > original_swf/log.swf
 
 #logfile feature extraction
-extract:filter
+extract:
 	../../prediction/extractor.py original_swf/log.swf > original_swf/extracted_features
 
 #logfile runtime prediction
-predict:predict_sgd_squared_loss_l1 predict_tsafrir extract
+predict:predict_tsafrir predict_sgd_squared_loss_l1
 
 #logfile swf generation
 swfs:
 	../../data_manipulation/make_all_swfs prediction_results predicted_swf original_swf/curie_sample.swf
 
+#filtering for simulation
+filter_predictions:
+	../../data_manipulation/strong_filter_all_swf predicted_swf predicted_swf_filtered
+
 #logfile simulation
 simulate:
-	../../simulation/run_simulator.sh predicted_swf $(max_procs) simulated_swf
+	../../simulation/run_simulator.sh predicted_swf_filtered $(max_procs) simulated_swf
 
 #predictors:
 
@@ -62,7 +66,7 @@ rec_abs:extract_run_time extract_req_time
 	../../prediction_analysis/REC_abs.R prediction_results/*  -o analysis_results/REC_ABS.pdf -r 2
 
 clean_safe:
-	rm -f predicted_swf/* prediction_results/predictions_req_time prediction_results/clairvoyant
+	rm -f predicted_swf_filtered/* predicted_swf/* prediction_results/predictions_req_time prediction_results/clairvoyant
 
 cleanall:clean_safe
 	rm -f simulated_swf/* prediction_results/* analysis_results/* original_swf/log.swf original_swf/extracted_features

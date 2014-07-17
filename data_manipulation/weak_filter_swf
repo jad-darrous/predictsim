@@ -1,5 +1,6 @@
 #!/bin/bash
-#usage: filter_swf file.swf
+#usage: weak_filter_swf file.swf
+#output to stdout
 
 #print header
 awk '($1==";"){print}' $1
