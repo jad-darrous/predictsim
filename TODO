@@ -30,3 +30,5 @@ correction:
 *recuperer les logs et formater(filtrer) pour expés:
 -logs feitelson
 -4 logs papier easy++
+*preparation des donnees:
+filtrer runtime 0 -> runtime 1
