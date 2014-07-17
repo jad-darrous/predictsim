@@ -16,7 +16,7 @@ class Weights(object):
 # degree of freedom: maui may consider the jobs not necessarily by order of
 # submission, as opposed to the easy backfill.
 
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 class MauiScheduler(EasyBackfillScheduler):
     def __init__(self, num_processors, weights_list=None, weights_backfill=None):

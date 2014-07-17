@@ -1,5 +1,5 @@
 from common import CpuSnapshot
-from easy_scheduler import EasyBackfillScheduler
+from easy_backfill_scheduler import EasyBackfillScheduler
 
 class  ShrinkingEasyScheduler(EasyBackfillScheduler):
     """ This "toy" algorithm follows an the paper of Tsafrir, Etzion, Feitelson, june 2007
