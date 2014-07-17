@@ -194,24 +194,55 @@ def parse_job_lines_quick_and_dirty(lines):
 
 def _job_input_to_job(job_input, total_num_processors):
     # if job input seems to be problematic  
-    if job_input.run_time <= 0 or job_input.num_allocated_processors <= 0 or job_input.submit_time < 0 :
+    if job_input.run_time <= 0:
+        print("WARNING: Job %s is not fully valid (run_time <= 0)." % job_input.number)
+    elif job_input.num_allocated_processors <= 0:
+        print("WARNING: Job %s is not fully valid (um_allocated_processors <= 0)." % job_input.number)
+    elif job_input.submit_time < 0:
+        print("WARNING: Job %s is not fully valid (submit_time < 0)." % job_input.number)
+    else:
+        user_estimated_run_time = int(job_input.requested_time)
+        if user_estimated_run_time < job_input.run_time:
+            print("WARNING: Job %s is not fully valid (requested_time < run_time)." % job_input.number)
+            user_estimated_run_time = int(job_input.run_time)
+        if user_estimated_run_time < 1:
+            print("WARNING: Job %s is not fully valid (requested_time < 1)." % job_input.number)
+            user_estimated_run_time = 1
+         
+        actual_run_time = int(job_input.run_time)
+        if actual_run_time > job_input.requested_time:
+            print("WARNING: Job %s is not fully valid (run_time > requested_time)." % job_input.number)
+            actual_run_time = int(job_input.requested_time)
+        if actual_run_time < 1:
+            print("WARNING: Job %s is not fully valid (run_time < 1)." % job_input.number)
+            actual_run_time = 1
+        
+        num_required_processors = job_input.num_allocated_processors
+        if num_required_processors > total_num_processors:
+            print("WARNING: Job %s is not fully valid (num_allocated_processors > total_num_processors)." % job_input.number)
+            num_required_processors = total_num_processors
+        if num_required_processors < 1:
+            print("WARNING: Job %s is not fully valid (num_allocated_processors < 1)." % job_input.number)
+            num_required_processors = 1
+        
         return Job(
             id = job_input.number,
-            user_estimated_run_time = 1,
-            actual_run_time = 1, 
-            num_required_processors = max(1, job_input.num_allocated_processors),  
-            submit_time = max(job_input.submit_time, 1), 
+            user_estimated_run_time = user_estimated_run_time,
+            actual_run_time = actual_run_time, 
+            num_required_processors = num_required_processors, 
+            submit_time = job_input.submit_time, 
             user_id = job_input.user_id, 
         )
 
     return Job(
         id = job_input.number,
-        user_estimated_run_time = int(max(job_input.requested_time, job_input.run_time, 1)),
-        actual_run_time = int(max(min(job_input.requested_time, job_input.run_time), 1)), 
-        num_required_processors = max(min(job_input.num_allocated_processors, total_num_processors), 1), 
-        submit_time = job_input.submit_time, 
+        user_estimated_run_time = 1,
+        actual_run_time = 1, 
+        num_required_processors = max(1, job_input.num_allocated_processors),  
+        submit_time = max(job_input.submit_time, 1), 
         user_id = job_input.user_id, 
     )
+
 
 def _job_inputs_to_jobs(job_inputs, total_num_processors):
     for job_input in job_inputs:
