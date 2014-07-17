@@ -195,11 +195,11 @@ def parse_job_lines_quick_and_dirty(lines):
 def _job_input_to_job(job_input, total_num_processors):
     # if job input seems to be problematic  
     if job_input.run_time <= 0:
-        print("WARNING: Job %s is not fully valid (run_time <= 0)." % job_input.number)
-    elif job_input.num_allocated_processors <= 0:
-        print("WARNING: Job %s is not fully valid (um_allocated_processors <= 0)." % job_input.number)
+        print("WARNING: Job %s is not valid (run_time <= 0)." % job_input.number)
+    elif job_input.num_requested_processors <= 0:
+        print("WARNING: Job %s is not valid (num_requested_processors <= 0)." % job_input.number)
     elif job_input.submit_time < 0:
-        print("WARNING: Job %s is not fully valid (submit_time < 0)." % job_input.number)
+        print("WARNING: Job %s is not valid (submit_time < 0)." % job_input.number)
     else:
         user_estimated_run_time = int(job_input.requested_time)
         if user_estimated_run_time < job_input.run_time:
@@ -217,12 +217,12 @@ def _job_input_to_job(job_input, total_num_processors):
             print("WARNING: Job %s is not fully valid (run_time < 1)." % job_input.number)
             actual_run_time = 1
         
-        num_required_processors = job_input.num_allocated_processors
+        num_required_processors = job_input.num_requested_processors
         if num_required_processors > total_num_processors:
-            print("WARNING: Job %s is not fully valid (num_allocated_processors > total_num_processors)." % job_input.number)
+            print("WARNING: Job %s is not fully valid (num_requested_processors > total_num_processors)." % job_input.number)
             num_required_processors = total_num_processors
         if num_required_processors < 1:
-            print("WARNING: Job %s is not fully valid (num_allocated_processors < 1)." % job_input.number)
+            print("WARNING: Job %s is not fully valid (num_requested_processors < 1)." % job_input.number)
             num_required_processors = 1
         
         return Job(
