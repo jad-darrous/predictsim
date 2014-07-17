@@ -11,6 +11,13 @@ from schedulers.simulator import run_simulator
 import optparse
 
 
+def module_to_class(module):
+	"""
+	transform foo_bar to FooBar
+	"""
+	return ''.join(w.title() for w in str.split(module, "_"))
+
+
 def parse_options():
     parser = optparse.OptionParser()
     parser.add_option("--num-processors", type="int", \
@@ -18,7 +25,9 @@ def parse_options():
     parser.add_option("--input-file", \
                       help="a file in the standard workload format: http://www.cs.huji.ac.il/labs/parallel/workload/swf.html, if '-' read from stdin")
     parser.add_option("--scheduler", 
-                      help="for s in schedulers/*_scheduler.py ; do basename -s .py $s; done")
+                      help="The scheduler to use. To list them: for s in schedulers/*_scheduler.py ; do basename -s .py $s; done")
+    parser.add_option("--predictor", 
+                      help="The predictor (if needed) to use. To list them: for s in predictors/predictor_*.py ; do basename -s .py $s; done")
     parser.add_option("--output-swf", type="string", \
                       help="if set, create a swf file of the run")
     parser.add_option("--no-stats", action="store_true", dest="no_stats", \
@@ -63,8 +72,7 @@ def main():
         input_file = open(options.input_file)
 
     my_module = options.scheduler
-    # transform foo_bar to FoBar
-    my_class = ''.join(w.title() for w in str.split(my_module, "_"))
+    my_class = module_to_class(my_module)
 
     #load module(or file)
     package = __import__ ('schedulers', fromlist=[my_module])
@@ -75,9 +83,27 @@ def main():
         print "No such scheduler (class within the module file not found)."
         return
     #load the class
-    scheduler = package.__dict__[my_module].__dict__[my_class](options.num_processors)
+    scheduler_non_instancied = package.__dict__[my_module].__dict__[my_class]
 
-        
+    if hasattr(scheduler_non_instancied, 'I_NEED_A_PREDICTOR'):
+        my_module = options.predictor
+        print(my_module)
+        if my_module is None:
+            print("This scheduler need a predictor")
+            return
+        my_class = module_to_class(my_module) 
+        package = __import__ ('predictors', fromlist=[my_module])
+        if my_module not in package.__dict__:
+            print "No such predictor (module file not found)."
+            return 
+        if my_class not in package.__dict__[my_module].__dict__:
+            print "No such predictor (class within the module file not found)."
+            return
+        #load the class
+        predictor = package.__dict__[my_module].__dict__[my_class](options.num_processors)
+        scheduler = scheduler_non_instancied(options.num_processors, predictor)
+    else:
+        scheduler = scheduler_non_instancied(options.num_processors)
 
     try:
         print "...." 

@@ -1,7 +1,6 @@
 from common import Scheduler, CpuSnapshot, list_copy
 from base.prototype import JobStartEvent
 
-from predictors import *
 
 # shortest job first 
 sjf_sort_key = (
@@ -13,11 +12,13 @@ class  EasyPlusPlusScheduler(Scheduler):
     """ This algorithm implements the algorithm in the paper of Tsafrir, Etzion, Feitelson, june 2007?
     """
     
-    def __init__(self, num_processors):
+    I_NEED_A_PREDICTOR = True
+    
+    def __init__(self, num_processors, predictor):
         super(EasyPlusPlusScheduler, self).__init__(num_processors)
         self.cpu_snapshot = CpuSnapshot(num_processors)
         self.unscheduled_jobs = []
-        self.predictor = predictor_tsafrir.PredictorTsafrir(num_processors)
+        self.predictor = predictor
 
     
     def new_events_on_job_submission(self, job, current_time):
