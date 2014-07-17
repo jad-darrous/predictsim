@@ -18,7 +18,7 @@ def parse_options():
     parser.add_option("--input-file", \
                       help="a file in the standard workload format: http://www.cs.huji.ac.il/labs/parallel/workload/swf.html, if '-' read from stdin")
     parser.add_option("--scheduler", 
-                      help="1) FcfsScheduler, 2) ConservativeScheduler, 3) DoubleConservativeScheduler, 4) EasyBackfillScheduler, 5) DoubleEasyBackfillScheduler, 6) GreedyEasyBackfillScheduler, 7) EasyPlusPlusScheduler, 8) ShrinkingEasyScheduler, 9) LookAheadEasyBackFillScheduler,  10) EasySJBFScheduler, 11) HeadDoubleEasyScheduler, 12) TailDoubleEasyScheduler, 13) OrigProbabilisticEasyScheduler, 14) ReverseEasyScheduler,  15) PerfectEasyBackfillScheduler, 16)DoublePerfectEasyBackfillScheduler, 17) ProbabilisticNodesEasyScheduler, 18) AlphaEasyScheduler, 19)DoubleAlphaEasyScheduler 20)ProbabilisticAlphaEasyScheduler")
+                      help="for s in schedulers/*_scheduler.py ; do basename -s .py $s; done")
     parser.add_option("--output-swf", type="string", \
                       help="if set, create a swf file of the run")
     parser.add_option("--no-stats", action="store_true", dest="no_stats", \
@@ -66,13 +66,15 @@ def main():
     # transform foo_bar to FoBar
     my_class = ''.join(w.title() for w in str.split(my_module, "_"))
 
+    #load module(or file)
     package = __import__ ('schedulers', fromlist=[my_module])
     if my_module not in package.__dict__:
         print "No such scheduler (module file not found)."
         return 
     if my_class not in package.__dict__[my_module].__dict__:
         print "No such scheduler (class within the module file not found)."
-        return 
+        return
+    #load the class
     scheduler = package.__dict__[my_module].__dict__[my_class](options.num_processors)
 
         
