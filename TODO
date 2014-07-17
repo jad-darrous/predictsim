@@ -1,0 +1,24 @@
+estimation
+-générer les logs avec la colonne thinktime remplaçée
+-feature scaled stochastic gradient descent
+
+-format:
+4.Run Time: runtime
+9 Requested Time: time_req
+18 Think Time: prediction
+
+simulateur
+-utiliser la colonne thinktime
+-algos:
+prévoir les combinaisons:
+priority list: FCFS
+backfill: EASY EASY+SJBF
+correction:  reqtime(assume reqtime if runtime >prediction),
+             tsafrir(if runtime > prediction, then +1mn, +2mn,+5mn,+10mn.. cf papier),
+             "99% of jobs are shorter than" value,
+             "wait"(stop backfilling as soon as "shadow" reservation is delayed)
+
+workload
+*recuperer les logs et formater(filter) pour expés:
+-logs feitelson
+-4 logs papier easy++
