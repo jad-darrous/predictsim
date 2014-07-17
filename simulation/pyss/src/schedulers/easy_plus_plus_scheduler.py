@@ -2,6 +2,7 @@ from common import Scheduler, CpuSnapshot, list_copy
 from base.prototype import JobStartEvent
 
 from predictors.predictor_tsafrir import PredictorTsafrir
+from predictors.predictor_clairvoyant import PredictorClairvoyant
 
 # shortest job first 
 sjf_sort_key = (

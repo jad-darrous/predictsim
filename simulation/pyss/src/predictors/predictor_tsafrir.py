@@ -15,7 +15,7 @@ class PredictorTsafrir(Predictor):
 	
 	def predict(self, job, current_time):
 		"""
-		Return the estimate_runtime of job.
+		Modify the estimate_runtime of job.
 		Called when a job is submitted to the system.
 		"""
 		if not self.user_run_time_last.has_key(job.user_id): 
