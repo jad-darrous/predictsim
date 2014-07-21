@@ -4,7 +4,7 @@ import numpy as np
 class PredictorSGDLinear(Predictor):
     n_features=2
 
-    def __init__(self,max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0):
+    def __init__(self,max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0,verbose=True):
         self.user_run_time_prev = {}
         self.user_run_time_last = {}
         if loss=="squared_loss":
@@ -13,6 +13,12 @@ class PredictorSGDLinear(Predictor):
             raise ValueError("only squared_loss is supported")
         assert isinstance(eta,int) or isinstance(eta,float)
         self.eta=eta
+        if verbose==True:
+            def verb(s):
+                print(s)
+        else:
+            def verb(s):
+                pass
         self.w=np.zeros(self.n_features,dtype=np.float32)
 
     def d_squared_loss(self, p, y):
@@ -48,6 +54,8 @@ class PredictorSGDLinear(Predictor):
         y     = job.actual_run_time
         dloss = self.dloss(p,y)
         self.w     = self.w-self.eta*np.dot(dloss,x)
+        verb(np.mean(w))
+        verb(max(w))
 
     def fit(self, job, current_time):
         self.update_model(job)

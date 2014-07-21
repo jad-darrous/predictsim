@@ -16,7 +16,7 @@ extract:
 	../../prediction/extractor.py original_swf/log.swf > original_swf/extracted_features
 
 #logfile runtime prediction
-predict:predict_tsafrir predict_sgd_squared_loss_l1
+predict:predict_tsafrir 
 
 #logfile swf generation
 swfs:
@@ -34,11 +34,11 @@ simulate:
 
 #tsafrir
 predict_tsafrir:
-	../../prediction/predictor.py original_swf/log.swf original_swf/extracted_features prediction_results tsafrir
+	../../simulation/pyss/src/run_predictor.py  original_swf/log.swf prediction_results tsafrir max_procs
 
 #sgd squared loss
-predict_sgd_squared_loss_l1:
-	../../prediction/predictor.py original_swf/log.swf original_swf/extracted_features prediction_results sgd squared_loss l1  notonehot $(max_runtime) $(max_procs)
+#predict_sgd_squared_loss_l1:
+	#../../prediction/predictor.py original_swf/log.swf original_swf/extracted_features prediction_results sgd squared_loss l1  notonehot $(max_runtime) $(max_procs)
 
 #extraction of specific information for data analysis:
 extract_req_time:

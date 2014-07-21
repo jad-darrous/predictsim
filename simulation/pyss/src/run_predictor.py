@@ -4,18 +4,17 @@
 Runtime predictor tester.
 
 Usage:
-    predictor_tester.py <filename> <output_folder> tsafrir <max_cores> [-i] [-v]
-    predictor_tester.py <filename> <output_folder> clairvoyant <max_cores> [-i] [-v]
+    run_predictor.py <filename> <output_folder> tsafrir [-i] [-v]
+    run_predictor.py <filename> <output_folder> clairvoyant [-i] [-v]
+    run_predictor.py <filename> <output_folder> sgd_linear <max_cores> <loss> <penalty> <eta> <alpha> <beta> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
     -v --verbose                                   Be verbose.
-    -i --interactive                               Interactive mode after script.
-    tool                                           the machine learning technique to use. available: sgd,passive-aggressive,tsafrir.
-    encoding                                       how to encode discret attributes (s.t. user ID). available: continuous, onehot.
-    loss                                           for sgd: in  'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive', 'maeloss'.
+    -i --interactive                               Interactive mode at key points in script.
+    loss                                           for sgd: for now, 'squared_loss'.
                                                    for passive-aggressive: in 'epsilon_insensitive', 'squared_epsilon_insensitive'
-    penalty                                        in 'l2' , 'l1' , 'elasticnet'
+    penalty                                        regularization term: 'none', 'l2' , 'l1' , or 'elasticnet'
     max_cores                                      can be a number, or "auto".
 
 TODO:
@@ -27,8 +26,13 @@ from base.docopt import docopt
 from base.prototype import _job_input_to_job
 from base.workload_parser import parse_lines
 from base.np_printutils import array_to_file
+from base.np_printutils import np_array_to_file
 from simpy import Environment,simulate,Monitor
 from simpy.util import start_delayed
+
+#parameters for the argument retrieval:
+supported_losses=['squared_loss']
+supported_penalties=['none']
 
 #Retrieve arguments
 arguments = docopt(__doc__, version='1.0.0rc2')
@@ -65,7 +69,7 @@ if arguments['<max_cores>']=="auto":
             else:
                 break
         if num_processors is None:
-            raise ValueError("missing num processors")
+            raise ValueError("Missing MaxProcs in header or cli argument.")
 elif arguments['<max_cores>'].isdigit():
     num_processors=eval(arguments['<max_cores>'])
 else:
@@ -91,14 +95,20 @@ with open(arguments['<filename>'], 'rt') as  f:
     print("Parsed swf file.")
 
     print("Choosing predictor.")
-    predictor=None
     if arguments["tsafrir"]:
         from predictors.predictor_tsafrir import PredictorTsafrir
-        predictor=PredictorTsafrir(num_processors)
-    if arguments["clairvoyant"]:
+        predictor=PredictorTsafrir()
+    elif arguments["clairvoyant"]:
         from predictors.predictor_tsafrir import PredictorClairvoyant
-        predictor=PredictorClairvoyant(num_processors)
-    if predictor==None:
+        predictor=PredictorClairvoyant()
+    elif arguments["sgd_linear"]:
+        if arguments["<loss>"] not in ["squared_loss"]:
+            raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
+        if arguments["<penalty>"] not in ["none"]:
+            raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
+        from predictors.predictor_sgdlinear import PredictorSGDLinear
+        predictor=PredictorSGDLinear(max_runtime=None, loss=arguments["<loss>"], eta=0.01, regularization="l1",alpha=1,beta=0)
+    else:
         raise ValueError("no valid predictor specified")
     iprint("Predictor created.")
 
@@ -125,5 +135,10 @@ with open(arguments['<filename>'], 'rt') as  f:
 
 if arguments["tsafrir"]:
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_tsafrir")
-if arguments["clairvoyant"]:
+elif arguments["clairvoyant"]:
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
+elif arguments["sgd_linear"]:
+    print(pred)
+    np_array_to_file(pred[:4],arguments["<output_folder>"]+"/prediction_sgd_linear_loss:%s_penalty:%s_eta:%s_alpha:%s_beta:%s"%(arguments["<loss>"],arguments["<penalty>"],arguments["<eta>"],arguments["<alpha>"],arguments["<beta>"]))
+else:
+    raise ValueError("no valid predictor")

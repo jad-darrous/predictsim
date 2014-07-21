@@ -1,19 +1,13 @@
 **** estimation ****
-- ajouter un historique pour stocker les données
-- faire une API:
-class Predictor:
-	__init__(max_procs, max_runtime)
-	(exec on_job_submission) predict(job, current_time) => estimate_runtime
-	(exec on_job_ending) fit(job, current_time)
--feature scaled stochastic gradient descent
-
+-ajouter un historique pour stocker les données
+-feature scaled stochastic gradient descent (with regularization???)
 
 **** simulateur ****
 - faire une API pour easy_plus_plus, pouvoir changer le predictor en param:
-class Predictor:
-	__init__(max_procs, max_runtime)
-	(exec on_job_submission) predict(job, current_time) => estimate_runtime
-	(exec on_job_ending) fit(job, current_time)
+-changement de l'API á: Mon Jul 21 10:38:47 CEST 2014 cf. plus bas.
+-> donc il faut ajouter ces paramètres en ligne de commande.
+-> la vérification de leur pertinence pour un scheduler donné est la responsabilité du predictor.
+-> dans ce cas il te suffit de passer les paramètres bêtement.
 
 -algos:
 prévoir toutes les combinaisons:
@@ -32,3 +26,10 @@ correction:
 -4 logs papier easy++
 *preparation des donnees:
 filtrer runtime 0 -> runtime 1
+
+**For reference:
+API:
+class Predictor(object):
+  __init__(max_procs, max_runtime=None, loss="squared_loss", regularization="l1",alpha=1,beta=0)
+	predict(self, job, current_time)
+	fit(self, job, current_time)
