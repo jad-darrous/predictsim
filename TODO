@@ -19,7 +19,6 @@ correction:
 	if runtime>prediction, then "99% of jobs are shorter than" value,
 	"wait"(stop backfilling (and scheduling) as soon as "shadow" reservation is delayed)
 
-
 **** workload ****
 *recuperer les logs et formater(filtrer) pour expés:
 -logs feitelson
@@ -29,7 +28,4 @@ filtrer runtime 0 -> runtime 1
 
 **For reference:
 API:
-class Predictor(object):
-  __init__(max_procs, max_runtime=None, loss="squared_loss", regularization="l1",alpha=1,beta=0)
-	predict(self, job, current_time)
-	fit(self, job, current_time)
+see predictor/predictor.py :)
