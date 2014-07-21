@@ -1,10 +1,10 @@
 from predictor import Predictor
 import numpy as np
 
-class Predictor_SGD_Linear(Predictor):
+class PredictorSGDLinear(Predictor):
     n_features=2
 
-    def __init__(max_procs, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0):
+    def __init__(max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0):
         self.user_run_time_prev = {}
         self.user_run_time_last = {}
         self.w=np.zeros(n_features,dtype=np.float32)
