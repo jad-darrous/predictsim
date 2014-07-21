@@ -4,8 +4,8 @@
 Runtime predictor tester.
 
 Usage:
-    predictor_tester.py <filename> <output_folder> tsafrir [-i] [-v]
-    predictor_tester.py <filename> <output_folder> clairvoyant[-i] [-v]
+    predictor_tester.py <filename> <output_folder> tsafrir <max_cores> [-i] [-v]
+    predictor_tester.py <filename> <output_folder> clairvoyant <max_cores> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -24,11 +24,11 @@ TODO:
 
 '''
 from base.docopt import docopt
-from base.prototype import _job_inputs_to_jobs
+from base.prototype import _job_input_to_job
 from base.workload_parser import parse_lines
 from base.np_printutils import array_to_file
-from base.simpy import Environment,simulate,Monitor
-from base.simpy.util import start_delayed
+from simpy import Environment,simulate,Monitor
+from simpy.util import start_delayed
 
 #Retrieve arguments
 arguments = docopt(__doc__, version='1.0.0rc2')
@@ -52,8 +52,8 @@ else:
         pass
 
 #argement management: max_cores
-if arguments['<max_cores>']==auto:
-    with input_file as open(arguments['<filename>']):
+if arguments['<max_cores>']=="auto":
+    with open(arguments['<filename>']) as input_file:
         num_processors=None
         for line in input_file:
             if(line.lstrip().startswith(';')):
@@ -79,49 +79,51 @@ def iprint(p=None):
         from IPython import embed
         embed()
 
+def _my_job_inputs_to_jobs(job_inputs, total_num_processors):
+    for job_input in job_inputs:
+        j=_job_input_to_job(job_input, total_num_processors)
+        j.wait_time=job_input.wait_time
+        yield j
+
 iprint("Opening the swf file.")
-with f as  open(arguments['<filename>'], 'rt'):
-    jobs = _job_inputs_to_jobs(parse_lines(input_file), options.num_processors),
-print("Parsed swf file.")
+with open(arguments['<filename>'], 'rt') as  f:
+    jobs = _my_job_inputs_to_jobs(parse_lines(f), num_processors)
+    print("Parsed swf file.")
 
-print("Choosing predictor.")
-predictor=None
+    print("Choosing predictor.")
+    predictor=None
+    if arguments["tsafrir"]:
+        from predictors.predictor_tsafrir import PredictorTsafrir
+        predictor=PredictorTsafrir(num_processors)
+    if arguments["clairvoyant"]:
+        from predictors.predictor_tsafrir import PredictorClairvoyant
+        predictor=PredictorClairvoyant(num_processors)
+    if predictor==None:
+        raise ValueError("no valid predictor specified")
+    iprint("Predictor created.")
+
+    #Getting a simulation environment
+    env = Environment()
+
+    pred=[]
+    def job_process(j):
+        yield env.timeout(j.submit_time)
+        predictor.predict(j,env.now)
+        pred.append(j.predicted_run_time)
+        yield env.timeout(j.wait_time+j.actual_run_time)
+        predictor.fit(j,env.now)
+
+    #Starting the replay
+    for job in jobs:
+        env.start(job_process(job))
+    simulate(env)
+
+    if arguments['--interactive']==True:
+        print(arguments)
+        from IPython import embed
+        embed()
+
 if arguments["tsafrir"]:
-    from predictors.predictor_tsafrir import PredictorTsafrir
-    predictor=PredictorTsafrir(num_processors)
-if arguments["clairvoyant"]:
-    from predictors.predictor_tsafrir import PredictorClairvoyant
-    predictor=PredictorClairvoyant(num_processors)
-if predictor==None:
-    raise ValueError("no valid predictor specified")
-iprint("Predictor created.")
-
-#Getting a simulation environment
-env = Environment()
-
-pred=[]
-def job_process(j):
-    yield env.timeout(submit_time)
-    pred.append(predictor.predict(j))
-    yield env.timeout(wait_time+run_time)
-    predictor.fit(np.array([j]),np.array([yf[i]]))
-
-#Starting the replay
-for job in jobs:
-    env.start(job_process(job))
-simulate(env)
-
-if arguments['--interactive']==True:
-    print(arguments)
-    from IPython import embed
-    embed()
-
-if tool=="tsafrir":
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_tsafrir")
-if tool=="clairvoyant":
+if arguments["clairvoyant"]:
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
-#if tool=="sgd":
-    #array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s_%s" %(tool,loss,penalty))
-#elif tool=="passive-aggressive":
-    #array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s" %(tool,loss))
-
