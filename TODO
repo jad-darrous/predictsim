@@ -14,6 +14,8 @@
 -> la vérification de leur pertinence pour un scheduler donné est la responsabilité du predictor.
 -> dans ce cas il te suffit de passer les paramètres bêtement.
 
+-ajouter un check pour verifier que "fit " est appelé une fois par job seulement.
+
 -algos:
 prévoir toutes les combinaisons:
 priority list: FCFS
