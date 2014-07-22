@@ -53,7 +53,7 @@ JobEvent.EVENTS_ORDER = [JobPredictionIsOverEvent, JobSubmissionEvent, JobTermin
 
 class Job(object):
     def __init__(self, id, user_estimated_run_time, actual_run_time, num_required_processors, \
-            submit_time=0, admin_QoS=0, user_QoS=0, user_id=0): # TODO: are these defaults used?
+            submit_time=0, admin_QoS=0, user_QoS=0, user_id=0, think_time=0): # TODO: are these defaults used?
 
         assert num_required_processors > 0, "job_id=%s"%id
         assert actual_run_time > 0, "job_id=%s"%id
@@ -80,7 +80,10 @@ class Job(object):
         self.backfill_flag = 0
 
         # the next is for the probabilistic easy scheduler
-        self.expected_predicted_run_time = user_estimated_run_time 
+        self.expected_predicted_run_time = user_estimated_run_time
+        
+        self.think_time = think_time
+
 
         
     @property
@@ -231,7 +234,8 @@ def _job_input_to_job(job_input, total_num_processors):
             actual_run_time = actual_run_time, 
             num_required_processors = num_required_processors, 
             submit_time = job_input.submit_time, 
-            user_id = job_input.user_id, 
+            user_id = job_input.user_id,
+            think_time = job_input.think_time_from_preceding_job
         )
 
     return Job(

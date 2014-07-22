@@ -58,7 +58,7 @@ Scheduler: <class 'schedulers.easy_scheduler.EasyBackfillScheduler'>
 
 
 
-$ pypy -m cProfile -o simul.cprof ./run_simulator.py --input-file=../../../data/CEA-curie_sample/original_swf/log.swf --output-swf=res.swf --scheduler=easy_plus_plus_scheduler --num-processors=80640 
+$ pypy -m cProfile -o simul.cprof ./run_simulator.py --input-file=../../../data/CEA-curie_sample/original_swf/log.swf --output-swf=res.swf --scheduler=easy_plus_plus_scheduler --num-processors=80640  --predictor=predictor_tsafrir
 
 STATISTICS: 
 Wait (Tw) [minutes]:  55.3790542604
