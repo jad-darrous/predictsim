@@ -274,23 +274,16 @@ class CpuSnapshot(object):
         for s in self._slices_time_range(job.finish_time, job.predicted_finish_time):
             s.delJob(job)
 
-    def assignTailofJobToTheCpuSlices(self, job):
+    def assignTailofJobToTheCpuSlices(self, job, new_predicted_run_time):
 	"""
 	This function extends the duration of a job, if the predicted duration is smaller
 	than the user estimated duration, then the function adds more slices to the job accordingly.
-	
 	"""
-	if job.user_estimated_run_time <= job.predicted_run_time:
-		return
-
-	job_estimated_finish_time = job.start_to_run_at_time + job.user_estimated_run_time	
+	job_estimated_finish_time = job.start_to_run_at_time + new_predicted_run_time
         self._ensure_a_slice_starts_at(job_estimated_finish_time)
         for s in self._slices_time_range(job.predicted_finish_time, job_estimated_finish_time):
             s.addJob(job)
 
-	job.predicted_run_time = job.user_estimated_run_time
-
-	    
 
     def unAssignJob(self, job):
         """
@@ -363,6 +356,7 @@ class CpuSnapshot(object):
         print "start time | duration | #free processors | jobs"
 	for s in self.archive_of_old_slices:
 	    print s 
+	print("-----------------------------------------------")
         for s in self.slices:
             print s
         print

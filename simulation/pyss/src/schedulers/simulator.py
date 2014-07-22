@@ -111,6 +111,8 @@ class Simulator(object):
         newEvents = self.scheduler.new_events_on_job_under_prediction(event.job, event.timestamp)
         for event in newEvents:
             self.event_queue.add_event(event)
+        if event.job.predicted_run_time < event.job.actual_run_time:
+             self.event_queue.add_event(JobPredictionIsOverEvent(job=event.job, timestamp=event.job.predicted_finish_time))
 
             
     def run(self):
