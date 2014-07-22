@@ -4,139 +4,128 @@
 Runtime predictor tester.
 
 Usage:
-    predictor_tester.py <filename> <output_folder> tsafrir [-i] [-v]
-    predictor_tester.py <filename> <output_folder> sgd <loss> <penalty> <max_cores> [-i] [-v]
-    predictor_tester.py <filename>  <output_folder> passive-aggressive <loss> <max_cores> [-i] [-v]
+    run_predictor.py <filename> <output_folder> tsafrir [-i] [-v]
+    run_predictor.py <filename> <output_folder> clairvoyant [-i] [-v]
+    run_predictor.py <filename> <output_folder> sgd_linear <max_cores> <loss> <penalty> <eta> <alpha> <beta> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
     -v --verbose                                   Be verbose.
-    -i --interactive                               Interactive mode after script.
-    tool                                           the machine learning technique to use. available: sgd,passive-aggressive,tsafrir.
-    encoding                                       how to encode discret attributes (s.t. user ID). available: continuous, onehot.
-    loss                                           for sgd: in  'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive', 'maeloss'.
+    -i --interactive                               Interactive mode at key points in script.
+    loss                                           for sgd: for now, 'squared_loss'.
                                                    for passive-aggressive: in 'epsilon_insensitive', 'squared_epsilon_insensitive'
-    penalty                                        in 'l2' , 'l1' , 'elasticnet'
+    penalty                                        regularization term: 'none', 'l2' , 'l1' , or 'elasticnet'
+    max_cores                                      can be a number, or "auto".
+
+TODO:
+    predictor_tester.py <filename> <output_folder> sgd <loss> <penalty> <max_cores> [-i] [-v]
+    predictor_tester.py <filename> <output_folder> passive-aggressive <loss> <max_cores> [-i] [-v]
 
 '''
-from docopt import docopt
+from base.docopt import docopt
+from base.prototype import _job_input_to_job
+from base.workload_parser import parse_lines
+from base.np_printutils import array_to_file
+from base.np_printutils import np_array_to_file
+from simpy import Environment,simulate,Monitor
+from simpy.util import start_delayed
+
+#parameters for the argument retrieval:
+supported_losses=['squared_loss']
+supported_penalties=['none']
+
+#Retrieve arguments
 arguments = docopt(__doc__, version='1.0.0rc2')
 
-from base.prototype import _job_inputs_to_jobs
-from base.workload_parser import parse_lines
-
+#Manage Verbosity
 if arguments['--verbose']==True:
+    print("You asked for verbose output. File \"predictor.log\" will be created in this directory.")
     print(arguments)
     import warnings
+    import logging
+    global_logger = logging.getLogger('global')
+    hdlr = logging.FileHandler('predictor.log')
+    formatter = logging.Formatter('%(levelname)s %(message)s')
+    hdlr.setFormatter(formatter)
+    global_logger.addHandler(hdlr)
+    def global_log(msg):
+        prefix='%.1f'%env.now
+        global_logger.info(prefix+': '+msg)
+else:
+    def global_log(msg):
+        pass
 
-if arguments['<max_cores>']==auto:
-    with input_file as open(arguments['<filename>']):
+#argement management: max_cores
+if arguments['<max_cores>']=="auto":
+    with open(arguments['<filename>']) as input_file:
+        num_processors=None
         for line in input_file:
-                if(line.lstrip().startswith(';')):
-                        if(line.lstrip().startswith('; MaxProcs:')):
-                                numproc = int(line.strip()[11:])
-                                break
-                        else:
-                                continue
+            if(line.lstrip().startswith(';')):
+                if(line.lstrip().startswith('; MaxProcs:')):
+                    num_processors = int(line.strip()[11:])
+                    break
                 else:
-                        break
-        if options.num_processors is None:
-                parser.error("missing num processors")
-elif eval(arguments['<max_cores>']):
-    numproc=
+                    continue
+            else:
+                break
+        if num_processors is None:
+            raise ValueError("Missing MaxProcs in header or cli argument.")
+elif arguments['<max_cores>'].isdigit():
+    num_processors=eval(arguments['<max_cores>'])
+else:
+    raise ValueError("<max_cores> must be an integer or \"auto\"")
 
-with f as  open(arguments['<filename>'], 'rt'):
-    jobs = _job_inputs_to_jobs(parse_lines(input_file), options.num_processors),
+def iprint(p=None):
+    """interactive print: switch to interactive python shell if --interactive is asked."""
+    if not p==None:
+        print(p)
+    if arguments['--interactive']==True:
+        from IPython import embed
+        embed()
 
+def _my_job_inputs_to_jobs(job_inputs, total_num_processors):
+    for job_input in job_inputs:
+        j=_job_input_to_job(job_input, total_num_processors)
+        j.wait_time=job_input.wait_time
+        yield j
 
-if arguments["tsafrir"]:
+iprint("Opening the swf file.")
+with open(arguments['<filename>'], 'rt') as  f:
+    jobs = _my_job_inputs_to_jobs(parse_lines(f), num_processors)
+    print("Parsed swf file.")
 
+    print("Choosing predictor.")
+    if arguments["tsafrir"]:
+        from predictors.predictor_tsafrir import PredictorTsafrir
+        predictor=PredictorTsafrir()
+    elif arguments["clairvoyant"]:
+        from predictors.predictor_tsafrir import PredictorClairvoyant
+        predictor=PredictorClairvoyant()
+    elif arguments["sgd_linear"]:
+        if arguments["<loss>"] not in ["squared_loss"]:
+            raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
+        if arguments["<penalty>"] not in ["none"]:
+            raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
+        from predictors.predictor_sgdlinear import PredictorSGDLinear
+        predictor=PredictorSGDLinear(max_runtime=None, loss=arguments["<loss>"], eta=0.01, regularization="l1",alpha=1,beta=0)
+    else:
+        raise ValueError("no valid predictor specified")
+    iprint("Predictor created.")
 
-elif tool in ["sgd","passive-aggressive"]:
-    #___ONLINE LEARNING___
-
-    from simpy import Environment,simulate,Monitor
-    from swfpy import io
-    if arguments['--verbose']==True:
-        import logging
-    from simpy.util import start_delayed
-
-    if arguments['--verbose']==True:
-        global_logger = logging.getLogger('global')
-        hdlr = logging.FileHandler('predictor.log')
-        formatter = logging.Formatter('%(levelname)s %(message)s')
-        hdlr.setFormatter(formatter)
-        global_logger.addHandler(hdlr)
     #Getting a simulation environment
     env = Environment()
-    #logging function
-    if arguments['--verbose']==True:
-        def global_log(msg):
-            prefix='%.1f'%env.now
-            global_logger.info(prefix+': '+msg)
-    else:
-        def global_log(msg):
-            pass
-
-    if tool=="sgd":
-        #___SGD___
-        print("sgd")
-
-        loss=arguments["<loss>"]
-        if loss not in [ 'squared_loss', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive','maeloss']:
-            raise ValueError("invalid loss function")
-
-        penalty=arguments["<penalty>"]
-        if penalty not in ['l2' , 'l1' , 'elasticnet']:
-            raise ValueError("invalid penalty function")
-
-        model=SGDRegressor(loss=loss, penalty=penalty, alpha=0.0001, l1_ratio=0.15, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, epsilon=0.1, random_state=None, learning_rate='invscaling', eta0=0.01, power_t=0.25, warm_start=False)
-    if tool=="passive-aggressive":
-        #___PASSIVE_AGGRESSIVE___
-
-        loss=arguments["<loss>"]
-        if loss not in [ 'epsilon_insensitive', 'squared_epsilon_insensitive']:
-            raise ValueError("invalid loss function")
-        model=PassiveAggressiveRegressor(C=1.0, fit_intercept=True, n_iter=5, shuffle=False, verbose=0, loss=loss, epsilon=0.1, random_state=None, class_weight=None, warm_start=False)
 
     pred=[]
-    flag_bootstrapped=False
-    def job_process(i):
-        global flag_bootstrapped
-        j=Xf[i]
-        wait_time=data['wait_time'][i]
-        run_time=data['run_time'][i]
-        submit_time=data['submit_time'][i]
+    def job_process(j):
+        yield env.timeout(j.submit_time)
+        predictor.predict(j,env.now)
+        pred.append(j.predicted_run_time)
+        yield env.timeout(j.wait_time+j.actual_run_time)
+        predictor.fit(j,env.now)
 
-        yield env.timeout(submit_time)
-        if flag_bootstrapped:
-            #print("predicting")
-            pred.append(min(abs(model.predict(j)),max_runtime,data['time_req'][i]))
-        else:
-            pred.append(0)
-
-        yield env.timeout(wait_time+run_time)
-        #print('4: time is %s,i= %s' % (env.now, i))
-        #print(j)
-        #print(Xf[i][4])
-        #print(Xf_tsafir_mean3[i])
-        #for k in range(0,len(np.array([j]))):
-                #if np.array([j])[k] <-1 or np.array([j])[k]>1:
-                    #print("k %s vector %s"%(k,np.array([j])))
-
-        model.partial_fit(np.array([j]),np.array([yf[i]]))
-        #print('5: time is %s,i= %s' % (env.now, i))
-
-        if not flag_bootstrapped:
-            flag_bootstrapped=True
-        if i % 1000==0:
-            print "processed %s jobs so far" %i
-
-    i=0
-    for i in range(len(X)):
-        env.start(job_process(i))
-        i=i+1
-
+    #Starting the replay
+    for job in jobs:
+        env.start(job_process(job))
     simulate(env)
 
     if arguments['--interactive']==True:
@@ -144,13 +133,12 @@ elif tool in ["sgd","passive-aggressive"]:
         from IPython import embed
         embed()
 
-    if tool=="sgd":
-        array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s_%s" %(tool,loss,penalty))
-    elif tool=="passive-aggressive":
-        array_to_file(pred,arguments["<output_folder>"]+"/prediction_%s_%s" %(tool,loss))
-
-#interactive?
-if arguments['--interactive']==True:
-    print(arguments)
-    from IPython import embed
-    embed()
+if arguments["tsafrir"]:
+    array_to_file(pred,arguments["<output_folder>"]+"/prediction_tsafrir")
+elif arguments["clairvoyant"]:
+    array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
+elif arguments["sgd_linear"]:
+    print(pred)
+    np_array_to_file(pred[:4],arguments["<output_folder>"]+"/prediction_sgd_linear_loss:%s_penalty:%s_eta:%s_alpha:%s_beta:%s"%(arguments["<loss>"],arguments["<penalty>"],arguments["<eta>"],arguments["<alpha>"],arguments["<beta>"]))
+else:
+    raise ValueError("no valid predictor")

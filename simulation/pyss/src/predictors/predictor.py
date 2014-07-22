@@ -3,7 +3,7 @@ class Predictor(object):
 	This is an "interface" to declare a predictor
 	"""
 
-	def __init__(self, num_processors, max_runtime=None):
+        def __init__(max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0):
 		print("Do it")
 
 	def predict(self, job, current_time):
