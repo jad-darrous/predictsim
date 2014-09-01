@@ -34,3 +34,6 @@ filtrer runtime 0 -> runtime 1
 **For reference:
 API:
 see predictor/predictor.py :)
+GIT stuff:
+git submodule init
+git submodule update
