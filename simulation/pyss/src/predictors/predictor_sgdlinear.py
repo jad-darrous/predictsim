@@ -1,17 +1,25 @@
 from predictor import Predictor
 import numpy as np
 from valopt.models.linear_model import LinearModel
+from valopt.losses.squared_loss import SquaredLoss
+from valopt.algos.nag import NAG
 
 class PredictorSGDLinear(Predictor):
     #Internal info
     n_features=2
 
-    def __init__(self,max_procs=None, max_runtime=None,verbose=True):
+    def __init__(self,config_dict):
         #Data structures for storing info
         self.user_job_last3 = {}
         self.user_job_last2 = {}
         self.user_job_last1 = {}
         self.job_x= {}
+
+        #machine learning thing
+        m=LinearModel(2)
+        l=SquaredLoss(m)
+        alg=NAG(m,l,,verbose=verbose)
+
 
     def make_x(self,job,running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
