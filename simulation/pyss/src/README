@@ -77,3 +77,7 @@ Input file:  ../../../data/CEA-curie_sample/original_swf/log.swf
 Scheduler: <class 'schedulers.easy_plus_plus_scheduler.EasyPlusPlusScheduler'>
 
 
+
+
+
+df2gantt(swf_read('../../simulation/pyss/src/res.swf'))

@@ -5,6 +5,8 @@ In this file, you will find a collection of corrector.
 
 """
 
+def correctors_list():
+	return ["reqtime","tsafrir","ninetynine","wait"]
 
 #reqtime (assume reqtime if runtime >prediction)
 def reqtime(job, current_time):
@@ -31,7 +33,7 @@ def tsafrir(job, current_time):
 
 #if runtime>prediction, then "99% of jobs are shorter than" value,
 def ninetynine(job, current_time):
-	print("TODO")
+	print("TODO, need a communication with the predictor!")
 	return job.user_estimated_run_time
 
 

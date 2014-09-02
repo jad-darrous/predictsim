@@ -3,10 +3,10 @@ class Predictor(object):
 	This is an "interface" to declare a predictor
 	"""
 
-        def __init__(config_filename):
+        def __init__(config_dict):
 		print("Do it")
 
-	def predict(self, job, current_time, system_state):
+	def predict(self, job, current_time, list_running_jobs):
 		"""
 		Modify the predicted_run_time of job.
 		Called when a job is submitted to the system.
