@@ -1,5 +1,6 @@
 from predictor import Predictor
 import numpy as np
+from valopt.models.linear_model import LinearModel
 
 class PredictorSGDLinear(Predictor):
     #Internal info
@@ -45,15 +46,24 @@ class PredictorSGDLinear(Predictor):
             raise ValueError("Predictor internal x memory failed.")
         return x
 
-    def predict(self, job, current_time):
-        #make x 
+    def predict(self, job, current_time, system_state):
+        """
+        Modify the predicted_run_time of a job.
+        Called when a job is submitted to the system.
+        """
+        #make x
         x=make_x(job)
         #store x
         store_x(job,x)
-        #TODO:make the prediction
+        #make the prediction
+        job.predicted_run_time=self.model.predict(x)
 
     def fit(self, job, current_time):
-        """update the model with this job"""
+        """
+        Add a job to the learning algorithm.
+        Called when a job end.
+        """
+
         #Pop  x from internal data
         x=pop_x(job)
 
@@ -66,4 +76,5 @@ class PredictorSGDLinear(Predictor):
         self.user_job_last2[job.user_id] = self.user_job_last1[job.user_id]
         self.user_job_last1[job.user_id] = job
 
-        #TODO:Fit the model
+        #Fit the model
+        self.model.fit(x,job.actual_run_time)
