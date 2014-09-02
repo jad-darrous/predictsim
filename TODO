@@ -13,6 +13,8 @@
 -> donc il faut ajouter ces paramètres en ligne de commande.
 -> la vérification de leur pertinence pour un scheduler donné est la responsabilité du predictor.
 -> dans ce cas il te suffit de passer les paramètres bêtement.
+NOPNOPONOP : faire un dict dans un fichier python !
+
 
 -ajouter un check pour verifier que "fit" et "predict" est appelé une fois par job seulement (respct al a soumission et la fin du job)
 
