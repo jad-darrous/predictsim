@@ -1,59 +1,80 @@
 from predictor import Predictor
 import numpy as np
+from valopt.models.linear_model import LinearModel
 
 class PredictorSGDLinear(Predictor):
+    #Internal info
     n_features=2
 
-    def __init__(self,max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0,verbose=True):
-        self.user_run_time_prev = {}
-        self.user_run_time_last = {}
-        if loss=="squared_loss":
-            self.dloss=self.d_squared_loss
-        else:
-            raise ValueError("only squared_loss is supported")
-        assert isinstance(eta,int) or isinstance(eta,float)
-        self.eta=eta
-        self.w=np.zeros(self.n_features,dtype=np.float32)
+    def __init__(self,max_procs=None, max_runtime=None,verbose=True):
+        #Data structures for storing info
+        self.user_job_last3 = {}
+        self.user_job_last2 = {}
+        self.user_job_last1 = {}
+        self.job_x= {}
 
-    def d_squared_loss(self, p, y):
-        return p - y
-
-    def make_x(self,job):
+    def make_x(self,job,running_jobs):
+        """Make a vector from a job. requires job, current time and system state."""
         x=np.empty(self.n_features,dtype=np.float32)
 
-        #Tsafir SMA(2)
+        #checks on user internal memory
         if not self.user_run_time_last.has_key(job.user_id):
-            self.user_run_time_prev[job.user_id] = None
-            self.user_run_time_last[job.user_id] = None
-        if self.user_run_time_prev[job.user_id] != None:
-            average = float((self.user_run_time_last[job.user_id] + self.user_run_time_prev[job.user_id])/ 2)
-            x[0]    = min(job.user_estimated_run_time, average)
-        else:
-            x[0] = job.user_estimated_run_time
+            self.user_job_last1[job.user_id] = None
+            self.user_job_last2[job.user_id] = None
+            self.user_job_last3[job.user_id] = None
 
+        #TODO:make x    
+        #if self.user_run_time_prev[job.user_id] != None:
+            #average = float((self.user_run_time_last[job.user_id] + self.user_run_time_prev[job.user_id])/ 2)
+            #x[0]    = min(job.user_estimated_run_time, average)
+        #else:
+            #x[0] = job.user_estimated_run_time
         #Required_time (aka user estimated run time)
-        x[1]= job.user_estimated_run_time
+        #x[1]= job.user_estimated_run_time
+
         return x
 
-    def apply_model(self,x):
-        return np.dot(self.w,x)
+    def store_x(self,job,x):
+        """store x for a given job if its not already stored"""
+        if not x in self.job_x.keys():
+            self.job_x[job]=x
 
-    def predict(self, job, current_time):
-        x                      = self.make_x(job)
-        job.predicted_run_time = self.apply_model(x)
+    def pop_x(self, job):
+        """retrieve x for a given job and delete it from memory"""
+        x=self.job_x.pop(x,False)
+        if not x:
+            raise ValueError("Predictor internal x memory failed.")
+        return x
 
-    def update_model(self,job):
-        x     = self.make_x(job)
-        p     = self.apply_model(x)
-        y     = job.actual_run_time
-        dloss = self.dloss(p,y)
-        self.w     = self.w-self.eta*np.dot(dloss,x)
+    def predict(self, job, current_time, system_state):
+        """
+        Modify the predicted_run_time of a job.
+        Called when a job is submitted to the system.
+        """
+        #make x
+        x=make_x(job)
+        #store x
+        store_x(job,x)
+        #make the prediction
+        job.predicted_run_time=self.model.predict(x)
 
     def fit(self, job, current_time):
-        self.update_model(job)
+        """
+        Add a job to the learning algorithm.
+        Called when a job end.
+        """
 
-        #History for Tsafir SMA(2)
-        assert self.user_run_time_last.has_key(job.user_id) == True
-        assert self.user_run_time_prev.has_key(job.user_id) == True
-        self.user_run_time_prev[job.user_id] = self.user_run_time_last[job.user_id]
-        self.user_run_time_last[job.user_id] = job.actual_run_time
+        #Pop  x from internal data
+        x=pop_x(job)
+
+        #Updating our data
+        #store user previous run time history
+        assert self.user_job_last1.has_key(job.user_id) == True
+        assert self.user_job_last2.has_key(job.user_id) == True
+        assert self.user_job_last3.has_key(job.user_id) == True
+        self.user_job_last3[job.user_id] = self.user_job_last2[job.user_id]
+        self.user_job_last2[job.user_id] = self.user_job_last1[job.user_id]
+        self.user_job_last1[job.user_id] = job
+
+        #Fit the model
+        self.model.fit(x,job.actual_run_time)

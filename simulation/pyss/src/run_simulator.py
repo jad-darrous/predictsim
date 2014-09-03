@@ -9,6 +9,7 @@ from base.workload_parser import parse_lines
 from base.prototype import _job_inputs_to_jobs
 from schedulers.simulator import run_simulator
 import optparse
+import schedulers.common_correctors
 
 
 def module_to_class(module):
@@ -28,6 +29,8 @@ def parse_options():
                       help="The scheduler to use. To list them: for s in schedulers/*_scheduler.py ; do basename -s .py $s; done")
     parser.add_option("--predictor", 
                       help="The predictor (if needed) to use. To list them: for s in predictors/predictor_*.py ; do basename -s .py $s; done")
+    parser.add_option("--corrector", 
+                      help="The corrector (if needed) to use. Choose between: "+str(schedulers.common_correctors.correctors_list()))
     parser.add_option("--output-swf", type="string", \
                       help="if set, create a swf file of the run")
     parser.add_option("--no-stats", action="store_true", dest="no_stats", \
@@ -101,6 +104,14 @@ def main():
             return
         #load the class
         predictor = package.__dict__[my_module].__dict__[my_class](options.num_processors)
+        
+        #now the corrector
+        #if options.corrector is None:
+		#print("This scheduler need a corrector")
+		#return
+	
+	
+	
         scheduler = scheduler_non_instancied(options.num_processors, predictor)
     else:
         scheduler = scheduler_non_instancied(options.num_processors)

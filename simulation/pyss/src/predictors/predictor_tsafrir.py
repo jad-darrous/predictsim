@@ -9,11 +9,11 @@ class PredictorTsafrir(Predictor):
 		self.user_run_time_prev = {}
 		self.user_run_time_last = {}
 
-	def predict(self, job, current_time):
-		"""
-		Modify the estimate_runtime of job.
-		Called when a job is submitted to the system.
-		"""
+        def predict(self, job, current_time, system_state):
+                """
+                Modify the predicted_run_time of a job.
+                Called when a job is submitted to the system.
+                """
 		if not self.user_run_time_last.has_key(job.user_id):
 			self.user_run_time_prev[job.user_id] = None
 			self.user_run_time_last[job.user_id] = None
