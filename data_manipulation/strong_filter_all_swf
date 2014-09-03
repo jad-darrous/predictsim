@@ -22,10 +22,13 @@ awk '!($1==";"){print}' $file |
 awk '($5>0){print}' |
 
 #runtime >0
-awk '($4>=0){print}' |
+awk '($4>0){print}' |
 
 #time_req >0
 awk '($9>0){print}' |
+
+#run_time <= req_time
+awk '($9>=$4){print}' |
 
 #sub_time >0
 awk '($2>0){print}' >> $output_swf_folder/`basename $file`

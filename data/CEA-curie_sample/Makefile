@@ -9,7 +9,7 @@ analysis:prediction_analysis simulation_analysis
 
 #logfile filtering
 filter:
-	../../data_manipulation/strong_filter_all_swf swf swf_filtered
+	../../data_manipulation/strong_filter_all_swf swf_unfiltered swf
 
 #logfile runtime prediction
 predict:predict_tsafrir 
