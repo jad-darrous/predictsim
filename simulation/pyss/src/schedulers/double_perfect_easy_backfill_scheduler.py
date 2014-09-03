@@ -6,8 +6,8 @@ from easy_backfill_scheduler import EasyBackfillScheduler
 # this is of course a non realistic scheduler -- since the predication is based on the _actual_ run time. 
 
 class DoublePerfectEasyBackfillScheduler(EasyBackfillScheduler):
-    def __init__(self, num_processors):
-        super(DoublePerfectEasyBackfillScheduler, self).__init__(num_processors)
+    def __init__(self, options):
+        super(DoublePerfectEasyBackfillScheduler, self).__init__(options)
 
     def new_events_on_job_submission(self, job, current_time):
         "Overriding parent method"

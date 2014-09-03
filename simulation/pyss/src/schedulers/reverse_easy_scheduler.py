@@ -11,9 +11,9 @@ latest_sort_key = (
   
 class  ReverseEasyScheduler(EasyBackfillScheduler):
     
-    def __init__(self, num_processors):
-        super(ReverseEasyScheduler, self).__init__(num_processors)
-        self.cpu_snapshot = CpuSnapshot(num_processors)
+    def __init__(self, options):
+        super(ReverseEasyScheduler, self).__init__(options)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors)
 
     
     def _backfill_jobs(self, current_time):
