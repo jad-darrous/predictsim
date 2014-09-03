@@ -4,24 +4,14 @@
 Runtime predictor tester.
 
 Usage:
-    run_predictor.py <filename> <output_folder> tsafrir [-i] [-v]
-    run_predictor.py <filename> <output_folder> clairvoyant [-i] [-v]
-    run_predictor.py <filename> <output_folder> sgd_linear <max_cores> <loss> <penalty> <eta> <alpha> <beta> [-i] [-v]
+    run_predictor.py <swf_file> <config_file> <output_folder> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
     -v --verbose                                   Be verbose.
     -i --interactive                               Interactive mode at key points in script.
-    loss                                           for sgd: for now, 'squared_loss'.
-                                                   for passive-aggressive: in 'epsilon_insensitive', 'squared_epsilon_insensitive'
-    penalty                                        regularization term: 'none', 'l2' , 'l1' , or 'elasticnet'
-    max_cores                                      can be a number, or "auto".
-
-TODO:
-    predictor_tester.py <filename> <output_folder> sgd <loss> <penalty> <max_cores> [-i] [-v]
-    predictor_tester.py <filename> <output_folder> passive-aggressive <loss> <max_cores> [-i] [-v]
-
 '''
+
 from base.docopt import docopt
 from base.prototype import _job_input_to_job
 from base.workload_parser import parse_lines
@@ -56,8 +46,10 @@ else:
         pass
 
 #argement management: max_cores
-if arguments['<max_cores>']=="auto":
-    with open(arguments['<filename>']) as input_file:
+config = {}
+execfile(arguments["<config_file>"], config) 
+if config['max_cores']=="auto":
+    with open(arguments['<swf_file>']) as input_file:
         num_processors=None
         for line in input_file:
             if(line.lstrip().startswith(';')):
@@ -70,10 +62,10 @@ if arguments['<max_cores>']=="auto":
                 break
         if num_processors is None:
             raise ValueError("Missing MaxProcs in header or cli argument.")
-elif arguments['<max_cores>'].isdigit():
-    num_processors=eval(arguments['<max_cores>'])
+elif config['max_cores'].isdigit():
+    num_processors=eval(config['max_cores'])
 else:
-    raise ValueError("<max_cores> must be an integer or \"auto\"")
+    raise ValueError("max_cores must be an integer or \"auto\"")
 
 def iprint(p=None):
     """interactive print: switch to interactive python shell if --interactive is asked."""
@@ -90,24 +82,24 @@ def _my_job_inputs_to_jobs(job_inputs, total_num_processors):
         yield j
 
 iprint("Opening the swf file.")
-with open(arguments['<filename>'], 'rt') as  f:
+with open(arguments['<swf_file>'], 'rt') as  f:
     jobs = _my_job_inputs_to_jobs(parse_lines(f), num_processors)
     print("Parsed swf file.")
 
     print("Choosing predictor.")
-    if arguments["tsafrir"]:
+    if config["predictor"]=="tsafrir":
         from predictors.predictor_tsafrir import PredictorTsafrir
-        predictor=PredictorTsafrir()
-    elif arguments["clairvoyant"]:
-        from predictors.predictor_tsafrir import PredictorClairvoyant
-        predictor=PredictorClairvoyant()
-    elif arguments["sgd_linear"]:
-        if arguments["<loss>"] not in ["squared_loss"]:
-            raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
-        if arguments["<penalty>"] not in ["none"]:
-            raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
+        predictor=PredictorTsafrir({})
+    elif config["predictor"]=="clairvoyant":
+        from predictors.predictor_clairvoyant import PredictorClairvoyant
+        predictor=PredictorClairvoyant({})
+    elif config["predictor"]=="sgd":
+        #if arguments["<loss>"] not in ["squared_loss"]:
+            #raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
+        #if arguments["<penalty>"] not in ["none"]:
+            #raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
         from predictors.predictor_sgdlinear import PredictorSGDLinear
-        predictor=PredictorSGDLinear(max_runtime=None, loss=arguments["<loss>"], eta=0.01, regularization="l1",alpha=1,beta=0)
+        predictor=PredictorSGDLinear({})
     else:
         raise ValueError("no valid predictor specified")
     iprint("Predictor created.")
@@ -118,7 +110,7 @@ with open(arguments['<filename>'], 'rt') as  f:
     pred=[]
     def job_process(j):
         yield env.timeout(j.submit_time)
-        predictor.predict(j,env.now)
+        predictor.predict(j,env.now,[])
         pred.append(j.predicted_run_time)
         yield env.timeout(j.wait_time+j.actual_run_time)
         predictor.fit(j,env.now)
@@ -133,12 +125,12 @@ with open(arguments['<filename>'], 'rt') as  f:
         from IPython import embed
         embed()
 
-if arguments["tsafrir"]:
+if config["predictor"]=="tsafrir":
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_tsafrir")
-elif arguments["clairvoyant"]:
+elif config["predictor"]=="clairvoyant":
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
-elif arguments["sgd_linear"]:
+elif config["predictor"]=="sgd":
     print(pred)
-    np_array_to_file(pred[:4],arguments["<output_folder>"]+"/prediction_sgd_linear_loss:%s_penalty:%s_eta:%s_alpha:%s_beta:%s"%(arguments["<loss>"],arguments["<penalty>"],arguments["<eta>"],arguments["<alpha>"],arguments["<beta>"]))
+    np_array_to_file(pred[:4],arguments["<output_folder>"]+"/prediction_sgd")
 else:
     raise ValueError("no valid predictor")
