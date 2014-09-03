@@ -20,7 +20,6 @@ class PredictorSGDLinear(Predictor):
         l=SquaredLoss(m)
         self.model=NAG(m,l,10000,verbose=False)
 
-
     def make_x(self,job,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
         x=np.empty(self.n_features,dtype=np.float32)
@@ -31,15 +30,21 @@ class PredictorSGDLinear(Predictor):
             self.user_job_last2[job.user_id] = None
             self.user_job_last3[job.user_id] = None
 
-        #TODO:make x    
-        #if self.user_run_time_prev[job.user_id] != None:
-            #average = float((self.user_run_time_last[job.user_id] + self.user_run_time_prev[job.user_id])/ 2)
-            #x[0]    = min(job.user_estimated_run_time, average)
-        #else:
-            #x[0] = job.user_estimated_run_time
-        #Required_time (aka user estimated run time)
-        #x[1]= job.user_estimated_run_time
+        #TODO:make x
+        #x[0] is user estimated run time
+        #x[1] is p_i-1, p_i-2 mean
 
+        #Required_time (aka user estimated run time)
+        x[0]= job.user_estimated_run_time
+
+        #Moving averages
+        if self.user_run_time_last2[job.user_id] != None:
+            average = float((self.user_run_time_last1[job.user_id] + self.user_run_time_last2[job.user_id])/ 2)
+            x[1]    = min(job.user_estimated_run_time, average)
+        elif self.user_run_time_last1[job.user_id] != None:
+            x[1]    = min(job.user_estimated_run_time, float(self.user_run_time_last1[job.user_id]))
+        else:
+            x[1] = job.user_estimated_run_time
         return x
 
     def store_x(self,job,x):
@@ -71,11 +76,10 @@ class PredictorSGDLinear(Predictor):
         Add a job to the learning algorithm.
         Called when a job end.
         """
-
-        #Pop  x from internal data
+        #pop  x from internal data
         x=pop_x(job)
 
-        #Updating our data
+        #updating our data
         #store user previous run time history
         assert self.user_job_last1.has_key(job.user_id) == True
         assert self.user_job_last2.has_key(job.user_id) == True
@@ -84,5 +88,5 @@ class PredictorSGDLinear(Predictor):
         self.user_job_last2[job.user_id] = self.user_job_last1[job.user_id]
         self.user_job_last1[job.user_id] = job
 
-        #Fit the model
+        #fit the model
         self.model.fit(x,job.actual_run_time)
