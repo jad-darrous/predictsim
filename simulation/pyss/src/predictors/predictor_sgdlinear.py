@@ -1,19 +1,27 @@
 from predictor import Predictor
 import numpy as np
 from valopt.models.linear_model import LinearModel
+from valopt.losses.squared_loss import SquaredLoss
+from valopt.algos.nag import NAG
 
 class PredictorSGDLinear(Predictor):
     #Internal info
     n_features=2
 
-    def __init__(self,max_procs=None, max_runtime=None,verbose=True):
+    def __init__(self,config_dict):
         #Data structures for storing info
         self.user_job_last3 = {}
         self.user_job_last2 = {}
         self.user_job_last1 = {}
         self.job_x= {}
 
-    def make_x(self,job,running_jobs):
+        #machine learning thing
+        m=LinearModel(self.n_features)
+        l=SquaredLoss(m)
+        self.model=NAG(m,l,10000,verbose=False)
+
+
+    def make_x(self,job,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
         x=np.empty(self.n_features,dtype=np.float32)
 
@@ -46,7 +54,7 @@ class PredictorSGDLinear(Predictor):
             raise ValueError("Predictor internal x memory failed.")
         return x
 
-    def predict(self, job, current_time, system_state):
+    def predict(self, job, current_time, list_running_jobs):
         """
         Modify the predicted_run_time of a job.
         Called when a job is submitted to the system.

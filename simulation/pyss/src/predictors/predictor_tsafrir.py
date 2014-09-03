@@ -5,11 +5,11 @@ class PredictorTsafrir(Predictor):
 	estimate_runtime = (prev_runtime + prev_prev_runtime)/2
 	"""
 
-        def __init__(self,max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0,verbose=True):
+        def __init__(config_dict):
 		self.user_run_time_prev = {}
 		self.user_run_time_last = {}
 
-        def predict(self, job, current_time, system_state):
+	def predict(self, job, current_time, list_running_jobs):
                 """
                 Modify the predicted_run_time of a job.
                 Called when a job is submitted to the system.
