@@ -5,7 +5,7 @@ class PredictorTsafrir(Predictor):
 	estimate_runtime = (prev_runtime + prev_prev_runtime)/2
 	"""
 
-        def __init__(self,config_dict):
+        def __init__(self, options):
 		self.user_run_time_prev = {}
 		self.user_run_time_last = {}
 
