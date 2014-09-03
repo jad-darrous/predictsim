@@ -25,8 +25,8 @@ class LookAheadEasyBackFillScheduler(EasyBackfillScheduler):
     This function calls the function _mark_jobs_in_look_ahead_best_order before the preforming backfilling itself.
     """
     
-    def __init__(self, num_processors, score_function = None):
-        super(LookAheadEasyBackFillScheduler, self).__init__(num_processors)
+    def __init__(self, options, score_function = None):
+        super(LookAheadEasyBackFillScheduler, self).__init__(options)
 
         if score_function is None:
             self.score_function = default_score_function

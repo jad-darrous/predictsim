@@ -7,8 +7,8 @@ class  AlphaEasyScheduler(EasyPlusPlusScheduler):
 	 the parameter alpha that denotes how the user is precise (in "average") in his estimation 
     """
     
-    def __init__(self, num_processors):
-        super(AlphaEasyScheduler, self).__init__(num_processors)
+    def __init__(self, options):
+        super(AlphaEasyScheduler, self).__init__(options)
 	self.user_jobs = {}
     
     def new_events_on_job_submission(self, job, current_time):

@@ -8,7 +8,7 @@ class PredictorSGDLinear(Predictor):
     #Internal info
     n_features=2
 
-    def __init__(self,config_dict):
+    def __init__(self, options):
         #Data structures for storing info
         self.user_job_last3 = {}
         self.user_job_last2 = {}

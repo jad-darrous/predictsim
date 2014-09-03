@@ -7,8 +7,8 @@ from easy_backfill_scheduler import EasyBackfillScheduler
 
 
 class PerfectEasyBackfillScheduler(EasyBackfillScheduler):
-    def __init__(self, num_processors):
-        super(PerfectEasyBackfillScheduler, self).__init__(num_processors)
+    def __init__(self, options):
+        super(PerfectEasyBackfillScheduler, self).__init__(options)
 
     def new_events_on_job_submission(self, job, current_time):
         "Overriding parent method"

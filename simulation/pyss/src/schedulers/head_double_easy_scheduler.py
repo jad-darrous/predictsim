@@ -9,9 +9,9 @@ from easy_backfill_scheduler import EasyBackfillScheduler
 
 class HeadDoubleEasyScheduler(EasyBackfillScheduler):
 
-    def __init__(self, num_processors):
-        super(HeadDoubleEasyScheduler, self).__init__(num_processors)
-        self.cpu_snapshot = CpuSnapshot(num_processors)
+    def __init__(self, options):
+        super(HeadDoubleEasyScheduler, self).__init__(options)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors)
 
 
     def _schedule_head_of_list(self, current_time):

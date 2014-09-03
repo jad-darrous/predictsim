@@ -11,12 +11,40 @@ def list_print(my_list):
         print
 
 
+
+def module_to_class(module):
+	"""
+	transform foo_bar to FooBar
+	"""
+	return ''.join(w.title() for w in str.split(module, "_"))
+
+
 class Scheduler(object):
     """
     Assumption: every handler returns a (possibly empty) collection of new events
     """
-    def __init__(self, num_processors):
-        self.num_processors = num_processors
+    def __init__(self, options):
+        self.num_processors = options["num_processors"]
+    
+    def init_predictor(self, options):
+
+        if options["scheduler"]["predictor"] is None:
+             raise Exception("missing predictor")
+        if options["scheduler"]["predictor"]["name"] is None:
+             raise Exception("missing predictor name")
+        
+        my_module = options["scheduler"]["predictor"]["name"]
+        
+        my_class = module_to_class(my_module) 
+        package = __import__ ('predictors', fromlist=[my_module])
+        if my_module not in package.__dict__:
+             print "No such predictor (module file not found)."
+             return 
+        if my_class not in package.__dict__[my_module].__dict__:
+             print "No such predictor (class within the module file not found)."
+             return
+        #load the class
+        self.predictor = package.__dict__[my_module].__dict__[my_class](options)
 
     def new_events_on_job_submission(self, job, current_time):
         raise NotImplementedError()
@@ -197,6 +225,13 @@ class CpuSnapshot(object):
             if s.start_time <= time < s.end_time:
                 return s.free_processors
         return self.total_processors
+
+
+    def jobs_at(self, time):
+        for s in self.slices:
+            if s.start_time <= time < s.end_time:
+                return s.job_ids
+        return set()
 
     def canJobStartNow(self, job, current_time):
         return self.jobEarliestAssignment(job, current_time) == current_time

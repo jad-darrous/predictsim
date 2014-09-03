@@ -3,9 +3,9 @@ from base.prototype import JobStartEvent
 
 class ConservativeScheduler(Scheduler):
 
-    def __init__(self, num_processors):
-        super(ConservativeScheduler, self).__init__(num_processors)
-        self.cpu_snapshot = CpuSnapshot(num_processors)
+    def __init__(self, options):
+        super(ConservativeScheduler, self).__init__(options)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors)
         self.unfinished_jobs_by_submit_time = []
 
     def new_events_on_job_submission(self, job, current_time):

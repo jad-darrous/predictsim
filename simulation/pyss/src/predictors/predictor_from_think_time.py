@@ -5,7 +5,7 @@ class PredictorFromThinkTime(Predictor):
 	estimate_runtime = think time
 	"""
 
-        def __init__(config_dict):
+        def __init__(self, options):
 		pass
 
 	def predict(self, job, current_time, list_running_jobs):

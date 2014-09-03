@@ -5,7 +5,7 @@ class PredictorClairvoyant(Predictor):
 	estimate_runtime = real runtime
 	"""
 
-        def __init__(config_dict):
+        def __init__(self, options):
 		pass
 
 	def predict(self, job, current_time, list_running_jobs):

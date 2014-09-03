@@ -15,11 +15,12 @@ class  EasyPlusPlusScheduler(Scheduler):
     
     I_NEED_A_PREDICTOR = True
     
-    def __init__(self, num_processors, predictor):
-        super(EasyPlusPlusScheduler, self).__init__(num_processors)
-        self.cpu_snapshot = CpuSnapshot(num_processors)
+    def __init__(self, options):
+        super(EasyPlusPlusScheduler, self).__init__(options)
+        self.init_predictor(options)
+        
+        self.cpu_snapshot = CpuSnapshot(self.num_processors)
         self.unscheduled_jobs = []
-        self.predictor = predictor
 
     
     def new_events_on_job_submission(self, job, current_time):
@@ -59,7 +60,7 @@ class  EasyPlusPlusScheduler(Scheduler):
         "Schedules jobs that can run right now, and returns them"
    
         for job in self.unscheduled_jobs:
-            self.predictor.predict(job, current_time)
+            self.predictor.predict(job, current_time, self.cpu_snapshot.jobs_at(current_time))
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)

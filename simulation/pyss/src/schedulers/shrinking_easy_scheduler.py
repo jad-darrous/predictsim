@@ -5,9 +5,9 @@ class  ShrinkingEasyScheduler(EasyBackfillScheduler):
     """ This "toy" algorithm follows an the paper of Tsafrir, Etzion, Feitelson, june 2007
     """
     
-    def __init__(self, num_processors):
-        super(ShrinkingEasyScheduler, self).__init__(num_processors)
-        self.cpu_snapshot = CpuSnapshot(num_processors)
+    def __init__(self, options):
+        super(ShrinkingEasyScheduler, self).__init__(options)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors)
         self.unscheduled_jobs = []
 
     def new_events_on_job_submission(self, job, current_time):
