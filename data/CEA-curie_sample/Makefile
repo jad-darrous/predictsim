@@ -9,11 +9,7 @@ analysis:prediction_analysis simulation_analysis
 
 #logfile filtering
 filter:
-	../../data_manipulation/weak_filter_swf original_swf/log_unfiltered.swf > original_swf/log.swf
-
-#logfile feature extraction
-extract:
-	../../prediction/extractor.py original_swf/log.swf > original_swf/extracted_features
+	../../data_manipulation/strong_filter_all_swf swf swf_filtered
 
 #logfile runtime prediction
 predict:predict_tsafrir 
