@@ -16,12 +16,12 @@ class PredictorSGDLinear(Predictor):
         self.job_x= {}
 
         #machine learning thing
-        m=LinearModel(2)
+        m=LinearModel(self.n_features)
         l=SquaredLoss(m)
-        alg=NAG(m,l,,verbose=verbose)
+        self.model=NAG(m,l,10000,verbose=False)
 
 
-    def make_x(self,job,running_jobs):
+    def make_x(self,job,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
         x=np.empty(self.n_features,dtype=np.float32)
 
@@ -54,7 +54,7 @@ class PredictorSGDLinear(Predictor):
             raise ValueError("Predictor internal x memory failed.")
         return x
 
-    def predict(self, job, current_time, system_state):
+    def predict(self, job, current_time, list_running_jobs):
         """
         Modify the predicted_run_time of a job.
         Called when a job is submitted to the system.

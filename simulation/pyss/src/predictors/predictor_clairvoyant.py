@@ -5,10 +5,10 @@ class PredictorClairvoyant(Predictor):
 	estimate_runtime = real runtime
 	"""
 
-        def __init__(self,max_procs=None, max_runtime=None, loss="squared_loss", eta=0.01, regularization="l1",alpha=1,beta=0,verbose=True):
+        def __init__(config_dict):
 		pass
 
-	def predict(self, job, current_time, system_state):
+	def predict(self, job, current_time, list_running_jobs):
                 """
                 Modify the predicted_run_time of a job.
                 Called when a job is submitted to the system.
