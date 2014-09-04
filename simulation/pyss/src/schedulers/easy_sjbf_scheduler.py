@@ -9,12 +9,12 @@ sjf_sort_key = (
 # this scheduler is similar to the standard easy scheduler. The only diffrence is that 
 # the tail of jobs is reordered by shortest job first before trying to backfill jobs in the tail.
   
-class  EasySJBFScheduler(EasyBackfillScheduler):
+class  EasySjbfScheduler(EasyBackfillScheduler):
     """ This algorithm implements the algorithm in the paper of Tsafrir, Etzion, Feitelson, june 2007?
     """
     
     def __init__(self, options):
-        super(EasySJBFScheduler, self).__init__(options)
+        super(EasySjbfScheduler, self).__init__(options)
         self.cpu_snapshot = CpuSnapshot(self.num_processors)
 
     
