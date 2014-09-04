@@ -1,0 +1,48 @@
+#!/bin/bash
+#usage: strong_filter_all_swf
+#output inplace
+swf_folder="$1"
+output_swf_folder="$2"
+
+echo strong_filtering logs in with:
+echo swf_folder:
+echo $swf_folder
+
+for file in $swf_folder/*
+do
+echo  `basename $file`
+
+#print header
+awk '($1==";"){print}' $file > $output_swf_folder/`basename $file`
+
+#get maxcores
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+maxprocs=`$DIR/extract_maxprocs.py $file`
+echo maxprocs $maxprocs
+
+#remove header for treatment
+awk '!($1==";"){print}' $file |
+
+#alloc cores >0
+awk '($5>0){print}' |
+
+#alloc cores <= maxprocs
+awk -v m=$maxprocs '($5<=m){print}' |
+
+#requested_processors  <= maxprocs
+awk -v m=$maxprocs '($8<=m){print}' |
+
+#runtime >0
+awk '($4>0){print}' |
+
+#time_req >0
+awk '($9>0){print}' |
+
+#run_time <= req_time
+awk '($9>=$4){print}' |
+
+#sub_time >0
+awk '($2>0){print}' >> $output_swf_folder/`basename $file`
+
+
+done

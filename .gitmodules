@@ -1,3 +1,0 @@
-[submodule "simulation/pyss/src/valopt"]
-	path = simulation/pyss/src/valopt
-	url = git@github.com:freuk/python-online-optimization.git
