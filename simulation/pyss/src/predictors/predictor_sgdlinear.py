@@ -121,4 +121,4 @@ class PredictorSGDLinear(Predictor):
         self.user_job_last1[job.user_id] = job
 
         #fit the model
-        self.model.fit(x,job.actual_run_time,p=np.log(job.actual_run_time/job.num_required_processors))
+        self.model.fit(x,job.actual_run_time,p=np.log(1+(job.actual_run_time/min(1,job.num_required_processors))))
