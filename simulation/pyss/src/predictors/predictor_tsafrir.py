@@ -21,6 +21,8 @@ class PredictorTsafrir(Predictor):
 		if self.user_run_time_prev[job.user_id] != None:
 			average =  int((self.user_run_time_last[job.user_id] + self.user_run_time_prev[job.user_id])/ 2)
 			job.predicted_run_time = min (job.user_estimated_run_time, average)
+		else:
+			job.predicted_run_time = job.user_estimated_run_time
 
 	def fit(self, job, current_time):
 		"""

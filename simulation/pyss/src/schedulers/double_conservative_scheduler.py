@@ -2,7 +2,7 @@ from common import CpuSnapshot
 from conservative_scheduler import ConservativeScheduler
 
 
-#this scheduler only doubles the user estimation and then apply the regular Conservative Schedular
+#this scheduler only doubles the user estimation and then apply the regular Conservative Scheduler
 
 class DoubleConservativeScheduler(ConservativeScheduler):
     def __init__(self, options, weights_list=None, weights_backfill=None):

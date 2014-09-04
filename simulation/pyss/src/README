@@ -3,6 +3,79 @@
 the Python Scheduler Simulator
 
 
+*** Notes on schedulers:
+** alpha_easy_scheduler
+Useless scheduler.
+
+** common_dist_easy_plus_plus_scheduler
+It's easy_plus_plus_scheduler with a dirty patch were all users are the same.
+
+** conservative_scheduler
+Pure conservative scheduler.
+
+** double_conservative_scheduler
+this scheduler only doubles the user estimation and then apply the regular Conservative Scheduler
+TODO: add a test that compare this to conservative_prediction_scheduler (predictor = double_reqtime)
+
+** double_easy_backfill_scheduler
+this scheduler only doubles the user estimation and then apply the regular Easy Backfill Scheduler
+TODO: add a test that compare this to easy_prediction_scheduler (predictor = double_reqtime)
+
+** double_perfect_easy_backfill_scheduler
+this scheduler only doubles the REAL runtime and then apply the regular Easy Backfill Scheduler
+TODO: add a test that compare this to easy_prediction_scheduler (predictor = double_runtime)
+
+** easy_backfill_scheduler
+Pure easy backfill scheduler
+
+** easy_plus_plus_scheduler
+This algorithm implements the algorithm in the paper of Tsafrir, Etzion, Feitelson, june 2007?
+This algo need predictor/corrector.
+TODO: verify the algo
+
+** easy_sjbf_scheduler
+Pure SJBF (shortest job backfilled first) scheduler
+
+** fcfs_scheduler
+Purs FCFS
+
+** greedy_easy_backfill_scheduler
+EasyBackfillScheduler where jobs can be sorted in different orders.
+TODO: scheduler parameters should be taken from "options" (ie. the config file) not from python parameters.
+TODO: with the good parameters it should be the same as easy_sjbf_scheduler
+
+** head_double_easy_scheduler
+EasyBackfillScheduler where only the non-backfilled job have their predicted runtime = 2*reqtime
+I don't see the purpose of this scheduler.
+
+** lookahead_easy_backfill_scheduler
+This scheduler implements the LOS Scheduling Algorithm
+
+** maui_scheduler
+The maui scheduler, easy backfilling with jobs sorted by a combinaison of factors.
+
+** orig_common_dist_probabilistic_easy_scheduler
+orig_probabilistic_easy_scheduler with only one user (all users are overridden as one unique suer (yes it's a dirty hack))
+
+** orig_probabilistic_easy_scheduler
+This algorithm implements a version of Feitelson and Nissimov, June 2007.
+
+** perfect_easy_backfill_scheduler
+EasyBackfillScheduler whith prediction=runtime
+TODO: make a test to compare results
+
+** reverse_easy_scheduler
+EasyBackfillScheduler where lasts jobs are backfilled first
+
+** shrinking_easy_scheduler
+EasyBackfillScheduler(predictor=reqtime/2, corrector=reqtime)
+TODO: make a test to compare both version
+
+** tail_double_easy_scheduler
+EasyBackfillScheduler where predicted_runtime is doubled when backfilling is done
+
+
+
 
 
 *** Run exemples:
