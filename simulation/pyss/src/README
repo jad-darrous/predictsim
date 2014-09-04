@@ -37,7 +37,7 @@ TODO: verify the algo
 Pure SJBF (shortest job backfilled first) scheduler
 
 ** fcfs_scheduler
-Purs FCFS
+Pure FCFS
 
 ** greedy_easy_backfill_scheduler
 EasyBackfillScheduler where jobs can be sorted in different orders.

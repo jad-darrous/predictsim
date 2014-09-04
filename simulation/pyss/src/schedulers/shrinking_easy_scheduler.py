@@ -10,7 +10,6 @@ class  ShrinkingEasyScheduler(EasyBackfillScheduler):
     
     def __init__(self, options):
         super(ShrinkingEasyScheduler, self).__init__(options)
-        print("WARNING: this scheduler (ShrinkingEasyScheduler) should be updated to work with predictor and corrector. The actual code only mimics previous behaviour (predictor=reqtime/2, corrector=reqtime)") 
         self.cpu_snapshot = CpuSnapshot(self.num_processors)
         self.unscheduled_jobs = []
 

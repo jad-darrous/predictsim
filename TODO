@@ -8,7 +8,6 @@
 
 
 **** simulateur ****
-- vérifier toutes les algos : certaines sont justes des instances d'autres.
 
 -ajouter un check pour verifier que "fit" et "predict" est appelé une fois par job seulement (respct al a soumission et la fin du job)
 
