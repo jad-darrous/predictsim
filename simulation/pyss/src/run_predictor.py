@@ -99,7 +99,7 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         #if arguments["<penalty>"] not in ["none"]:
             #raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
         from predictors.predictor_sgdlinear import PredictorSGDLinear
-        predictor=PredictorSGDLinear({})
+        predictor=PredictorSGDLinear(config)
     else:
         raise ValueError("no valid predictor specified")
     iprint("Predictor created.")
@@ -130,7 +130,7 @@ if config["predictor"]=="tsafrir":
 elif config["predictor"]=="clairvoyant":
     array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
 elif config["predictor"]=="sgd":
-    print(pred)
-    np_array_to_file(pred[:4],arguments["<output_folder>"]+"/prediction_sgd")
+    print pred
+    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_sgd")
 else:
     raise ValueError("no valid predictor")

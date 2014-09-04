@@ -11,7 +11,7 @@ class WeightedSquaredLoss(object):
         p=self.model.predict(x)
         return 0.5*(p-y)*(p-y)*p
 
-    def d_loss_directional(self,x,y,p,i):
+    def d_loss_directional(self,x,y,i,p):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
         return self.model.d_predict_directional(x, i)*(self.model.predict(x)-y)*p
 

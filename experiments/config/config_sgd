@@ -9,3 +9,6 @@
 
 predictor="sgd"
 max_cores="auto"
+eta=10000
+#loss=weightedsquaredloss  squaredloss  maeloss
+loss="weightedsquaredloss"

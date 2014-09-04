@@ -32,6 +32,12 @@ awk -v m=$maxprocs '($5<=m){print}' |
 #requested_processors  <= maxprocs
 awk -v m=$maxprocs '($8<=m){print}' |
 
+#requested_processors  > 0 
+awk '($8>0){print}' |
+
+#alloc cores > 0 
+awk '($5>0){print}' |
+
 #runtime >0
 awk '($4>0){print}' |
 

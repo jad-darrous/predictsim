@@ -13,7 +13,7 @@ class NAG(object):
         self.model=model
         assert model.__class__.__name__=='LinearModel'
         self.loss=loss
-        self.grad_loss=lambda x,y:self.loss.grad_loss(x,y)
+        self.grad_loss=lambda x,y,p:self.loss.grad_loss(x,y,p)
         self.eta=eta
         self.verbose=verbose
         self.n=1
@@ -24,20 +24,20 @@ class NAG(object):
     def predict(self, x):
         return self.model.predict(x)
 
-    def verbose(func):
-         def wrap(self,x,y):
-             if self.verbose:
-                 print(self.model.get_param_vector())
-                 print(self.eta*self.grad_loss(x,y))
-             ret = func(self,x,y)
-             if self.verbose:
-                 print("gradient descent step with fixed eta: gradient l2 norm is %s"
-                         %(-self.eta*np.dot(self.grad_loss(x,y),self.grad_loss(x,y))))
-             return ret
-         return wrap
+    #def verbose(func):
+         #def wrap(self,x,y,p):
+             #if self.verbose:
+                 #print(self.model.get_param_vector())
+                 #print(self.eta*self.grad_loss(x,y,p))
+             #ret = func(self,x,y)
+             #if self.verbose:
+                 #print("gradient descent step with fixed eta: gradient l2 norm is %s"
+                         #%(-self.eta*np.dot(self.grad_loss(x,y,p),self.grad_loss(x,y,p))))
+             #return ret
+         #return wrap
 
-    @verbose
-    def fit(self, x,y):
+    #@verbose
+    def fit(self, x,y,p=1):
         w=self.model.get_param_vector()
         for i in range(0,self.model.dim):
             if np.abs(x[i])>self.s[i]:
@@ -47,8 +47,8 @@ class NAG(object):
         self.model.set_param_vector(w)
 
         for i in range(0,self.model.dim):
-            self.G+= (self.loss.d_loss_directional(x,y,i))**2
-            w[i]-= self.eta*self.loss.d_loss_directional(x,y,i)/(np.sqrt(self.N*self.G[i]/self.n)*self.s[i])
+            self.G+= (self.loss.d_loss_directional(x,y,i,p))**2
+            w[i]-= self.eta*self.loss.d_loss_directional(x,y,i,p)/(np.sqrt(self.N*self.G[i]/self.n)*self.s[i])
 
         self.n+=1
         self.model.set_param_vector(w)
