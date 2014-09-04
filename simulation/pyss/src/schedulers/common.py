@@ -38,13 +38,22 @@ class Scheduler(object):
         my_class = module_to_class(my_module) 
         package = __import__ ('predictors', fromlist=[my_module])
         if my_module not in package.__dict__:
-             print "No such predictor (module file not found)."
-             return 
+             raise Exception("No such predictor (module file not found).")
         if my_class not in package.__dict__[my_module].__dict__:
-             print "No such predictor (class within the module file not found)."
-             return
+             raise Exception("No such predictor (class within the module file not found).")
         #load the class
         self.predictor = package.__dict__[my_module].__dict__[my_class](options)
+    
+    def init_corrector(self, options):
+        if options["scheduler"]["corrector"] is None:
+             raise Exception("missing corrector")
+        if options["scheduler"]["corrector"]["name"] is None:
+             raise Exception("missing corrector name")
+        import common_correctors
+        if not hasattr(common_correctors, options["scheduler"]["corrector"]["name"]):
+             raise Exception("corrector doesn't exist")
+        self.corrector =  getattr(common_correctors, options["scheduler"]["corrector"]["name"])
+        
 
     def new_events_on_job_submission(self, job, current_time):
         raise NotImplementedError()

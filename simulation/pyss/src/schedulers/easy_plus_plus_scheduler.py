@@ -1,7 +1,6 @@
 from common import Scheduler, CpuSnapshot, list_copy
 from base.prototype import JobStartEvent
 
-import common_correctors
 
 # shortest job first 
 sjf_sort_key = (
@@ -18,6 +17,7 @@ class  EasyPlusPlusScheduler(Scheduler):
     def __init__(self, options):
         super(EasyPlusPlusScheduler, self).__init__(options)
         self.init_predictor(options)
+        self.init_corrector(options)
         
         self.cpu_snapshot = CpuSnapshot(self.num_processors)
         self.unscheduled_jobs = []
@@ -47,7 +47,7 @@ class  EasyPlusPlusScheduler(Scheduler):
     def new_events_on_job_under_prediction(self, job, current_time):
         assert job.predicted_run_time <= job.user_estimated_run_time
 
-        new_predicted_run_time = common_correctors.reqtime(job, current_time)
+        new_predicted_run_time = self.corrector(job, current_time)
 
         #set the new predicted runtime
         self.cpu_snapshot.assignTailofJobToTheCpuSlices(job, new_predicted_run_time)
