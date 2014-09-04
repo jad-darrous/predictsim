@@ -1,0 +1,37 @@
+#!/bin/bash
+#usage: strong_filter_all_swf
+#output inplace
+swf_folder="$1"
+output_swf_folder="$2"
+
+echo strong_filtering logs in with:
+echo swf_folder:
+echo $swf_folder
+
+for file in $swf_folder/*
+do
+#print header
+echo  `basename $file`
+
+awk '($1==";"){print}' $file > $output_swf_folder/`basename $file`
+
+#remove header for treatment
+awk '!($1==";"){print}' $file |
+
+#alloc cores >0
+awk '($5>0){print}' |
+
+#runtime >0
+awk '($4>0){print}' |
+
+#time_req >0
+awk '($9>0){print}' |
+
+#run_time <= req_time
+awk '($9>=$4){print}' |
+
+#sub_time >0
+awk '($2>0){print}' >> $output_swf_folder/`basename $file`
+
+
+done
