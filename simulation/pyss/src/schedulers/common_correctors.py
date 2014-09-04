@@ -6,7 +6,7 @@ In this file, you will find a collection of corrector.
 """
 
 def correctors_list():
-	return ["reqtime","tsafrir","ninetynine","wait"]
+	return ["reqtime","tsafrir","ninetynine","wait","recursive_doubling"]
 
 #reqtime (assume reqtime if runtime >prediction)
 def reqtime(job, current_time):
@@ -44,4 +44,10 @@ def wait(job, current_time):
 	print("TODO")
 	return job.user_estimated_run_time
 
+
+
+#recursive doubling: we double the time
+def recursive_doubling(job, current_time):
+	new_predicted_run_time = job.predicted_run_time * 2
+	return new_predicted_run_time
 

@@ -2,7 +2,7 @@ from common import CpuSnapshot
 from easy_backfill_scheduler import EasyBackfillScheduler
 
 
-#this scheduler only doubles the user estimation and then apply the regular Easy Backfill Schedular
+#this scheduler only doubles the user estimation and then apply the regular Easy Backfill Scheduler
 
 class DoubleEasyBackfillScheduler(EasyBackfillScheduler):
     def __init__(self, options):
