@@ -10,16 +10,23 @@ echo $swf_folder
 
 for file in $swf_folder/*
 do
-#print header
 echo  `basename $file`
 
+#print header
 awk '($1==";"){print}' $file > $output_swf_folder/`basename $file`
+
+#get maxcores
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+maxprocs=`$DIR/extract_maxprocs.py $file`
 
 #remove header for treatment
 awk '!($1==";"){print}' $file |
 
 #alloc cores >0
 awk '($5>0){print}' |
+
+#alloc cores < maxprocs
+awk -v m==$maxprocs '($5>m){print}' |
 
 #runtime >0
 awk '($4>0){print}' |
