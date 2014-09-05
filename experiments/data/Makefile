@@ -2,7 +2,7 @@ max_runtime=86400
 max_procs=80640
 
 all:filter
-val_task1:filter predict extract_req_time prediction_analysis
+val_task1:filter predict prediction_analysis
 
 #________________FILTERING___________________:
 #filtering for simulation
@@ -15,35 +15,30 @@ simulate:
 	../../simulation/run_simulator.sh predicted_swf_filtered $(max_procs) simulated_swf
 
 #_____________DRY_PREDICTION_________________:
-predict: predict_tsafrir predict_clairvoyant predict_sgd
-#tsafrir
-predict_tsafrir:
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf ../../config/config_tsafrir dry_predictions
+CONFIG_FILES := $(wildcard ../../config/*.cfg)
+ALL_PREDICTION_FILES = $(patsubst ../../config/%.cfg,%,$(CONFIG_FILES))
+TERMINATED_JOBS_FP := $(wildcard dry_predictions/*)
+TERMINATED_JOBS=  $(patsubst dry_predictions/%,%,$(TERMINATED_JOBS_FP))
+PREDICTION_FILES = $(filter-out $(TERMINATED_JOBS),$(ALL_PREDICTION_FILES))
 
-#clairvoyant
-predict_clairvoyant:
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf ../../config/config_clairvoyant dry_predictions
+predict: $(PREDICTION_FILES)
 
-#sgd
-predict_sgd:
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf ../../config/config_sgd dry_predictions
+%: ../../config/%.cfg
+	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@
 
-#_______________ANALYSIS____________________:
-prediction_analysis:extract_req_time mae mse rec_abs rec cdfs
+#_______________DRY PREDICTION ANALYSIS__________:
+prediction_analysis: mae mse rec_abs rec cdfs
 
-#extracting the reqtime for further analysis.
-extract_req_time:
-	../../data_manipulation/extract_req_time swf/log.swf > dry_predictions/prediction_req_time
-mse:extract_req_time
-	../../../prediction_analysis/MSE_vs_t_smoothed.R dry_predictions/* -o analysis/MSE.pdf -r 2
-mae:extract_req_time
-	../../../prediction_analysis/MAE_vs_t_smoothed.R dry_predictions/*  -o analysis/MAE.pdf -r 2
-rec:extract_req_time
-	../../../prediction_analysis/REC_-inf+inf.R dry_predictions/* -o analysis/REC.pdf -r 2
-rec_abs:extract_req_time
-	../../../prediction_analysis/REC_abs.R dry_predictions/*  -o analysis/REC_ABS.pdf -r 2
-cdfs:extract_req_time
-	../../../prediction_analysis/compare_cdfs.R dry_predictions/*  -o analysis/compare_cdfs.pdf -r 2
+mse:
+	../../../prediction_analysis/MSE_vs_t_smoothed.R dry_predictions/clairvoyant dry_predictions/* -o analysis/MSE.pdf -r 2
+mae:
+	../../../prediction_analysis/MAE_vs_t_smoothed.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/MAE.pdf -r 2
+rec:
+	../../../prediction_analysis/REC_-inf+inf.R dry_predictions/clairvoyant dry_predictions/* -o analysis/REC.pdf -r 2
+rec_abs:
+	../../../prediction_analysis/REC_abs.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/REC_ABS.pdf -r 2
+cdfs:
+	../../../prediction_analysis/compare_cdfs.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/compare_cdfs.pdf -r 2
 
 
 

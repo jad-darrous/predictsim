@@ -23,32 +23,42 @@ echo maxprocs $maxprocs
 #remove header for treatment
 awk '!($1==";"){print}' $file |
 
-#alloc cores >0
-awk '($5>0){print}' |
-
-#alloc cores <= maxprocs
+#allocated_cores <= maxprocs
 awk -v m=$maxprocs '($5<=m){print}' |
 
-#requested_processors  <= maxprocs
+#requested_cores  <= maxprocs
 awk -v m=$maxprocs '($8<=m){print}' |
 
-#requested_processors != 0
-awk '!($8==0){print}' |
-
-#alloc cores != 0
-awk '!($5==0){print}' |
+#requested_cores and allocated_cores management: if all strictly positive dont touch, if one is, take it for both, and if none are, do not print.
+awk '{
+if ($8>0 && $5>0)
+  print;
+else if ($8>0)
+  {$5 = $8;
+  print;}
+else if ($5>0)
+  {$8 = $5;
+  print;}
+else
+  p=34;
+}' |
 
 #runtime >0
 awk '($4>0){print}' |
 
-#time_req >0
-awk '($9>0){print}' |
+#time_req to runtime if time_req<=0
+awk '{
+if ($9<=0)
+  {$9=$4;
+  print;}
+else
+  print;
+}' |
 
 #run_time <= req_time
 awk '($9>=$4){print}' |
 
 #sub_time >0
 awk '($2>0){print}' >> $output_swf_folder/`basename $file`
-
 
 done
