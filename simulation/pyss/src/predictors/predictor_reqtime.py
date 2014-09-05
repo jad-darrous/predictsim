@@ -1,8 +1,8 @@
 from predictor import Predictor
 
-class PredictorClairvoyant(Predictor):
+class PredictorReqtime(Predictor):
 	"""
-	estimate_runtime = real runtime
+	estimate_runtime = user value
 	"""
 
         def __init__(self, options):

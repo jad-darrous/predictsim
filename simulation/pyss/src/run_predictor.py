@@ -4,7 +4,7 @@
 Runtime predictor tester.
 
 Usage:
-    run_predictor.py <swf_file> <config_file> <output_folder> [-i] [-v]
+    run_predictor.py <swf_file> <config_file> <output_file> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -93,6 +93,9 @@ with open(arguments['<swf_file>'], 'rt') as  f:
     elif config["predictor"]=="clairvoyant":
         from predictors.predictor_clairvoyant import PredictorClairvoyant
         predictor=PredictorClairvoyant({})
+    elif config["predictor"]=="reqtime":
+        from predictors.predictor_reqtime import PredictorReqtime
+        predictor=PredictorReqtime({})
     elif config["predictor"]=="sgd":
         #if arguments["<loss>"] not in ["squared_loss"]:
             #raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
@@ -125,12 +128,4 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         from IPython import embed
         embed()
 
-if config["predictor"]=="tsafrir":
-    array_to_file(pred,arguments["<output_folder>"]+"/prediction_tsafrir")
-elif config["predictor"]=="clairvoyant":
-    array_to_file(pred,arguments["<output_folder>"]+"/prediction_clairvoyant")
-elif config["predictor"]=="sgd":
-    print pred
-    np_array_to_file(pred,arguments["<output_folder>"]+"/prediction_sgd")
-else:
-    raise ValueError("no valid predictor")
+array_to_file(pred,arguments["<output_file>"])
