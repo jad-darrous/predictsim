@@ -29,7 +29,14 @@ class PredictorSGDLinear(Predictor):
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
+        if "max_runtime" in options.keys():
+            self.max_runtime=options["max_runtime"]
+        else:
+            self.max_runtime=False
+
+
         self.model=NAG(m,l,options["eta"],verbose=False)
+
 
     def make_x(self,job,current_time,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
@@ -102,6 +109,9 @@ class PredictorSGDLinear(Predictor):
         self.store_x(job,x)
         #make the prediction
         job.predicted_run_time=abs(self.model.predict(x))
+        if not self.max_runtime==False:
+            job.predicted_run_time=min(job.predicted_run_time,self.max_runtime)
+
 
     def fit(self, job, current_time):
         """
@@ -121,4 +131,4 @@ class PredictorSGDLinear(Predictor):
         self.user_job_last1[job.user_id] = job
 
         #fit the model
-        self.model.fit(x,job.actual_run_time,p=np.log(1+(job.actual_run_time/min(1,job.num_required_processors))))
+        self.model.fit(x,job.actual_run_time,p=10*np.log(1+(job.actual_run_time/min(1,job.num_required_processors))))
