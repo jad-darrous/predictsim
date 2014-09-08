@@ -26,6 +26,7 @@ class  EasyPlusPlusScheduler(Scheduler):
     def new_events_on_job_submission(self, job, current_time):
         
         self.cpu_snapshot.archive_old_slices(current_time)
+        self.predictor.predict(job, current_time, self.cpu_snapshot.jobs_at(current_time))
         self.unscheduled_jobs.append(job)
         return [
             JobStartEvent(current_time, job)
@@ -58,9 +59,10 @@ class  EasyPlusPlusScheduler(Scheduler):
 
     def _schedule_jobs(self, current_time):
         "Schedules jobs that can run right now, and returns them"
-   
-        for job in self.unscheduled_jobs:
-            self.predictor.predict(job, current_time, self.cpu_snapshot.jobs_at(current_time))
+
+        # If you uncomment this, the prediction is called several time, just before a possible schedule for the job.
+        #for job in self.unscheduled_jobs:
+            #self.predictor.predict(job, current_time, self.cpu_snapshot.jobs_at(current_time))
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)
