@@ -60,7 +60,7 @@ verb(args,"Parameters to the script")
 setwd(rfold)
 rfold_wd=getwd()
 for (filename in userfiles) {
-	source(filename)
+  source(filename)
 }
 
 
@@ -93,26 +93,37 @@ library('ggplot2')
 plot_rec_curves <- function(preds,true_values,labelnames){
   true_runtime=ldply(true_values,data.frame)
   colnames(true_runtime)<-c("value")
-  preds_dfs=data.frame()
+
+  mi=Inf
+  ma=-Inf
+  print(mi)
+  print(ma)
+
+  for (i in 1:length(preds)){
+    d=ldply(preds[i],data.frame)
+    d$value=labelnames[i]
+    colnames(d)<-c("value","type")
+    for (j in 1:length(d$value)){
+      mi=min(mi,d$value[j]-true_runtime$value[j])
+      ma=max(ma,d$value[j]-true_runtime$value[j])
+    }
+  }
 
   for (i in 1:length(preds)){
     d=ldply(preds[i],data.frame)
 
     d$value=labelnames[i]
     colnames(d)<-c("value","type")
-    d$value=abs(true_runtime$value-d$value)
-    #print(typeof(d))
-    #print(class(d))
+    d$value=d$value-true_runtime$value
 
-    #print(summary(d))
-    preds_dfs=rbind(preds_dfs,d)
-  }
-
-  print(summary(preds_dfs))
-  p0 = ggplot(preds_dfs, aes(x = value)) +
-   stat_ecdf(aes(group = type, colour = type))+
+    p0 = ggplot(d, aes(x = value)) +
+    geom_density()+
+    theme(legend.position="bottom")+
+    xlab(paste("Value of the error for predictor:", labelnames[i]))+
   scale_color_brewer(palette="Set3")
-  print(p0)
+    print(p0)
+
+  }
 
   #m <- ggplot(d, aes(x=value))
   #m +

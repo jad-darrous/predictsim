@@ -5,14 +5,21 @@ from valopt.algos.nag import NAG
 
 class PredictorSGDLinear(Predictor):
     #Internal info
-    n_features=2
+    n_features=7
 
     def __init__(self, options):
         #Data structures for storing info
         self.user_job_last3 = {}
         self.user_job_last2 = {}
         self.user_job_last1 = {}
+        self.user_sum_runtimes = {}
+        self.user_sum_cores = {}
+        self.user_n_jobs = {}
         self.job_x= {}
+        self.user_last_ending = {}
+
+        #Statistics oriented.
+        self.last_loss=0
 
         #machine learning thing
         m=LinearModel(self.n_features)
@@ -26,6 +33,11 @@ class PredictorSGDLinear(Predictor):
         elif options["loss"]=="weightedsquaredloss":
             from valopt.losses.weighted_squared_loss import WeightedSquaredLoss
             l=WeightedSquaredLoss(m)
+        elif options["loss"]=="asymetricweightedsquaredloss":
+            from valopt.losses.asymetric_weighted_squared_loss import AsymetricWeightedSquaredLoss
+            if not options["beta"]:
+                raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
+            l=AsymetricWeightedSquaredLoss(m,options["beta"])
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
@@ -34,9 +46,19 @@ class PredictorSGDLinear(Predictor):
         else:
             self.max_runtime=False
 
-
         self.model=NAG(m,l,options["eta"],verbose=False)
 
+        if not options["weight"]:
+            wstr="1"
+        else:
+            wstr=options["weight"]
+
+        def weight(job):
+            m=float(job.num_required_processors)
+            r=float(job.actual_run_time)
+            log=np.log
+            return eval(wstr)
+        self.weight=weight
 
     def make_x(self,job,current_time,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
@@ -50,40 +72,101 @@ class PredictorSGDLinear(Predictor):
         if not self.user_job_last3.has_key(job.user_id):
             self.user_job_last3[job.user_id] = None
 
+        if not self.user_sum_cores.has_key(job.user_id):
+            self.user_sum_cores[job.user_id] = 0
+        if not self.user_sum_runtimes.has_key(job.user_id):
+            self.user_sum_runtimes[job.user_id] = 0
+        if not self.user_n_jobs.has_key(job.user_id):
+            self.user_n_jobs[job.user_id] = 0
+        if not self.user_last_ending.has_key(job.user_id):
+            self.user_last_ending[job.user_id] = 0
+
         #TODO:make x
-        #x[0] is user estimated run time
-        #x[1] is p_i-1, p_i-2 mean
+        #x[0] is 1
+        #x[1] is last user run time
+        #x[2] is last user run time2
+        #x[3] is last user run time3
+        #x[4] is user request
+        #x[5] is moving average(3)
+        #x[6] is moving average(2)
+        #x[7] is user runtime mean
+        #x[8] is time since last time a job of the user ended.
 
-        #Required_time (aka user estimated run time)
-        x[0]= job.user_estimated_run_time
+        #Turning linear model into affine model
+        x[0]=1
 
-        #Moving averages
-        if self.user_job_last2[job.user_id] != None:
-            #TODO:check if we know already the 2 last run time, take a choice.
-            j1= self.user_job_last1[job.user_id]
-            j2= self.user_job_last2[job.user_id]
-            if j1.submit_time+j1.actual_run_time>current_time:
-                last1=j1.actual_run_time
-            else:
-                last1=current_time-j1.submit_time
-            if j2.submit_time+j2.actual_run_time>current_time:
-                last2=j2.actual_run_time
-            else:
-                last2=current_time-j2.submit_time
-
-            average = float((last1+last2)/ 2)
-            x[1]    = min(job.user_estimated_run_time, average)
-        elif self.user_job_last1[job.user_id] != None:
-            #TODO:check if we know already the last run time, take a choice.
+        #Last runtime
+        if self.user_job_last1[job.user_id] != None:
             j1= self.user_job_last1[job.user_id]
             if j1.submit_time+j1.actual_run_time>current_time:
                 last=j1.actual_run_time
             else:
                 last=current_time-j1.submit_time
-
-            x[1]    = min(job.user_estimated_run_time, last)
         else:
-            x[1] = job.user_estimated_run_time
+            last=job.user_estimated_run_time
+        x[1] = min(job.user_estimated_run_time, last)
+
+        #Last runtime2
+        if self.user_job_last2[job.user_id] != None:
+            j2= self.user_job_last2[job.user_id]
+            if j2.submit_time+j2.actual_run_time>current_time:
+                last=j2.actual_run_time
+            else:
+                last=current_time-j2.submit_time
+        else:
+            last=job.user_estimated_run_time
+        x[2] = min(job.user_estimated_run_time, last)
+
+        #Last runtime3
+        if self.user_job_last3[job.user_id] != None:
+            j3= self.user_job_last3[job.user_id]
+            if j3.submit_time+j3.actual_run_time>current_time:
+                last=j3.actual_run_time
+            else:
+                last=current_time-j3.submit_time
+        else:
+            last=job.user_estimated_run_time
+        x[3] = min(job.user_estimated_run_time, last)
+
+        #Required_time (aka user estimated run time)
+        x[4]= job.user_estimated_run_time
+
+        #Moving averages
+        if self.user_job_last3[job.user_id] != None:
+            x[6]=0.33*(x[1]+x[2]+x[3])
+            x[5]=0.5*(x[1]+x[2])
+        elif self.user_job_last2[job.user_id] != None:
+            x[5]=0.5*(x[1]+x[2])
+            x[6]=x[5]
+        elif self.user_job_last1[job.user_id] != None: 
+            x[5]=x[1]
+            x[6]=x[5]
+        else:
+            x[5]=job.user_estimated_run_time
+            x[6]=x[5]
+
+        """
+        #User run time mean
+        if not self.user_n_jobs[job.user_id] ==0:
+            x[7]=float(self.user_sum_runtimes[job.user_id])/float(self.user_n_jobs[job.user_id])
+        else:
+            x[7]=0
+
+        #T since Last job ending of this user
+        if not self.user_last_ending[job.user_id]==0:
+            x[8]=current_time-self.user_last_ending[job.user_id]
+        else:
+            x[8]=0
+
+        #Ratio of Cores from user mean to this one.
+        #User cores mean
+        if not self.user_n_jobs[job.user_id] ==0:
+            coremean=float(self.user_sum_cores[job.user_id])/float(self.user_n_jobs[job.user_id])
+            x[9]=job.num_required_processors
+        else:
+            x[9]=0
+        """
+
         return x
 
     def store_x(self,job,x):
@@ -112,6 +195,8 @@ class PredictorSGDLinear(Predictor):
         if not self.max_runtime==False:
             job.predicted_run_time=min(job.predicted_run_time,self.max_runtime)
 
+        return self.model.loss.loss(x,job.actual_run_time,self.weight(job))
+
 
     def fit(self, job, current_time):
         """
@@ -126,9 +211,17 @@ class PredictorSGDLinear(Predictor):
         assert self.user_job_last1.has_key(job.user_id) == True
         assert self.user_job_last2.has_key(job.user_id) == True
         assert self.user_job_last3.has_key(job.user_id) == True
+        assert self.user_sum_runtimes.has_key(job.user_id) == True
+        assert self.user_sum_cores.has_key(job.user_id) == True
+        assert self.user_n_jobs.has_key(job.user_id) == True
+        assert self.user_last_ending.has_key(job.user_id) == True
         self.user_job_last3[job.user_id] = self.user_job_last2[job.user_id]
         self.user_job_last2[job.user_id] = self.user_job_last1[job.user_id]
         self.user_job_last1[job.user_id] = job
+        self.user_n_jobs[job.user_id]+=1
+        self.user_sum_runtimes[job.user_id]+=job.actual_run_time
+        self.user_sum_cores[job.user_id]+=job.num_required_processors
+        self.user_last_ending[job.user_id]=current_time
 
         #fit the model
-        self.model.fit(x,job.actual_run_time,p=10*np.log(1+(job.actual_run_time/min(1,job.num_required_processors))))
+        self.model.fit(x,job.actual_run_time,w=self.weight(job))

@@ -95,6 +95,8 @@ plot_rec_curves <- function(preds,true_values,labelnames){
   colnames(true_runtime)<-c("value")
   preds_dfs=data.frame()
 
+  scores=c()
+
   for (i in 1:length(preds)){
     d=ldply(preds[i],data.frame)
 
@@ -104,14 +106,20 @@ plot_rec_curves <- function(preds,true_values,labelnames){
     d$value=(true_runtime$value-d$value)**2
     #print(typeof(d))
     #print(class(d))
+    scores=c(scores,labelnames[i])
+    scores=c(scores,sqrt(mean(d$value[d$id>80000])))
 
     #print(summary(d))
     preds_dfs=rbind(preds_dfs,d)
   }
 
+  print(scores)
+  write(scores,file="scores")
+
   print(summary(preds_dfs))
   p0 = ggplot(preds_dfs, aes(x = id,y=value)) +
-   stat_smooth(aes(group = type, colour = type))
+  stat_smooth(aes(group = type, colour = type))+
+  scale_color_brewer(palette="Set3")
   print(p0)
 
   #m <- ggplot(d, aes(x=value))

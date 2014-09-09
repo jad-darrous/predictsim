@@ -89,28 +89,29 @@ library('plyr')
 library('ggplot2')
 
 
+print(args$pred_filenames)
+
 #type stuff here.
 plot_rec_curves <- function(preds,true_values,labelnames){
   true_runtime=ldply(true_values,data.frame)
   colnames(true_runtime)<-c("value")
+
   preds_dfs=data.frame()
 
   for (i in 1:length(preds)){
     d=ldply(preds[i],data.frame)
+    colnames(d)<-c("value")
 
-    d$value=labelnames[i]
-    colnames(d)<-c("value","type")
-    d$value=abs(true_runtime$value-d$value)
-    #print(typeof(d))
-    #print(class(d))
-
-    #print(summary(d))
+    d$type=labelnames[i]
+    d$id=1:nrow(d)
+    d$value=d$value-true_runtime$value
     preds_dfs=rbind(preds_dfs,d)
   }
 
-  print(summary(preds_dfs))
+  mi=min(preds_dfs$value)
+  ma=max(preds_dfs$value)
   p0 = ggplot(preds_dfs, aes(x = value)) +
-   stat_ecdf(aes(group = type, colour = type))+
+   geom_density(aes(group = type, colour = type))+
   scale_color_brewer(palette="Set3")
   print(p0)
 

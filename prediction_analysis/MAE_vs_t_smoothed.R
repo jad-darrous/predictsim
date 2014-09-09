@@ -111,7 +111,9 @@ plot_rec_curves <- function(preds,true_values,labelnames){
 
   print(summary(preds_dfs))
   p0 = ggplot(preds_dfs, aes(x = id,y=value)) +
-   stat_smooth(aes(group = type, colour = type))
+   stat_smooth(aes(group = type, colour = type))+
+  scale_color_brewer(palette="Set3")
+  #scale_color_manual(values=cbbPalette)
   print(p0)
 
   #m <- ggplot(d, aes(x=value))

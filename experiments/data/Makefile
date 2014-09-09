@@ -24,10 +24,11 @@ PREDICTION_FILES = $(filter-out $(TERMINATED_JOBS),$(ALL_PREDICTION_FILES))
 predict: $(PREDICTION_FILES)
 
 %: ../../config/%.cfg
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@
+	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@ measurements/$@
 
 #_______________DRY PREDICTION ANALYSIS__________:
-prediction_analysis: mae mse rec_abs rec cdfs
+prediction_analysis: mae mse customloss rec_abs rec cdfs kde kde_indiv
+
 
 mse:
 	../../../prediction_analysis/MSE_vs_t_smoothed.R dry_predictions/clairvoyant dry_predictions/* -o analysis/MSE.pdf -r 2
@@ -35,11 +36,27 @@ mae:
 	../../../prediction_analysis/MAE_vs_t_smoothed.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/MAE.pdf -r 2
 rec:
 	../../../prediction_analysis/REC_-inf+inf.R dry_predictions/clairvoyant dry_predictions/* -o analysis/REC.pdf -r 2
+MEASUREMENT_FILES=$(wildcard measurements/*)
+CUSTOM_IGNORE=measurements/clairvoyant measurements/tsafrir measurements/reqtime
+CL_FILES=$(filter-out $(CUSTOM_IGNORE),$(MEASUREMENT_FILES))
+customloss:
+	../../../prediction_analysis/CustomLoss_vs_t_smoothed.R $(CL_FILES) -o analysis/custom_loss.pdf -r 2
+
 rec_abs:
 	../../../prediction_analysis/REC_abs.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/REC_ABS.pdf -r 2
 cdfs:
 	../../../prediction_analysis/compare_cdfs.R dry_predictions/clairvoyant dry_predictions/*  -o analysis/compare_cdfs.pdf -r 2
 
+KDE_FILES=$(filter-out dry_predictions/clairvoyant,$(TERMINATED_JOBS_FP))
+kde:
+	../../../prediction_analysis/KDE.R dry_predictions/clairvoyant  $(KDE_FILES) -o analysis/KDE.pdf -r 4
+
+kde_indiv:
+	../../../prediction_analysis/KDE_indiv.R dry_predictions/clairvoyant  $(KDE_FILES) -o analysis/KDE_indiv.pdf -r 4
+
+#_____________CLEANING___________:
+clean:
+	rm -rf dry_predictions/* analysis/* swf/*
 
 
 #_____________ARCHIVED___________:

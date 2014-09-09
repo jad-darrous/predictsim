@@ -87,6 +87,9 @@ setwd(execution_wd)
 #args for retrieving your arguments.
 library('plyr')
 library('ggplot2')
+cbbPalette <- c("#000001", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+scale_fill_manual(values=cbbPalette)
+scale_colour_manual(values=cbbPalette)
 
 
 #type stuff here.
@@ -107,7 +110,8 @@ plot_rec_curves <- function(preds,labelnames){
 
   print(summary(preds_dfs))
   p0 = ggplot(preds_dfs, aes(x = value)) +
-   stat_ecdf(aes(group = type, colour = type))
+  stat_ecdf(aes(group = type, colour = type))+
+  scale_color_brewer(palette="Set3")
   print(p0)
 
   #m <- ggplot(d, aes(x=value))
@@ -122,6 +126,7 @@ plot_rec_curves <- function(preds,labelnames){
   #annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
   #theme_bw()
 }
+
 
 print(args$pred_filenames)
 data=lapply(args$pred_filenames,read.table)

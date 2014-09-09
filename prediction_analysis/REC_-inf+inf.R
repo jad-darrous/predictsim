@@ -100,7 +100,7 @@ plot_rec_curves <- function(preds,true_values,labelnames){
 
     d$value=labelnames[i]
     colnames(d)<-c("value","type")
-    d$value=true_runtime$value-d$value
+    d$value=d$value-true_runtime$value
     #print(typeof(d))
     #print(class(d))
 
@@ -109,8 +109,13 @@ plot_rec_curves <- function(preds,true_values,labelnames){
   }
 
   print(summary(preds_dfs))
+  mi=min(preds_dfs$value)
+  ma=max(preds_dfs$value)
   p0 = ggplot(preds_dfs, aes(x = value)) +
-   stat_ecdf(aes(group = type, colour = type))
+   stat_ecdf(aes(group = type, colour = type))+
+   annotate("text", x =0.1*mi+0.9+ma , y = 0.5, label = "Over-Prediction\n Pure Backfill Mechanism")+
+   annotate("text", x =0.1*ma+0.9+mi , y = 0.5, label = "Under-Prediction\n Prediction Failure")+
+  scale_color_brewer(palette="Set3")
   print(p0)
 
   #m <- ggplot(d, aes(x=value))

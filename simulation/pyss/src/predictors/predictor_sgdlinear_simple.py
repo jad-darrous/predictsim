@@ -12,8 +12,6 @@ class PredictorSGDLinear(Predictor):
         self.user_job_last3 = {}
         self.user_job_last2 = {}
         self.user_job_last1 = {}
-        self.user_sum_runtimes = {}
-        self.user_n_jobs = {}
         self.job_x= {}
 
         #machine learning thing
@@ -52,28 +50,12 @@ class PredictorSGDLinear(Predictor):
         if not self.user_job_last3.has_key(job.user_id):
             self.user_job_last3[job.user_id] = None
 
-        if not self.user_sum_runtimes.has_key(job.user_id):
-            self.user_sum_runtimes[job.user_id] = 0
-        if not self.user_n_jobs.has_key(job.user_id):
-            self.user_n_jobs[job.user_id] = 0
-
         #TODO:make x
         #x[0] is user estimated run time
-        #x[2] is last user run time
-        #x[2] is p_i-1, p_i-2 mean
+        #x[1] is p_i-1, p_i-2 mean
 
         #Required_time (aka user estimated run time)
         x[0]= job.user_estimated_run_time
-
-        #Last runtime
-        if self.user_job_last1[job.user_id] != None:
-            j1= self.user_job_last1[job.user_id]
-            if j1.submit_time+j1.actual_run_time>current_time:
-                last=j1.actual_run_time
-            else:
-                last=current_time-j1.submit_time
-
-            x[1]    = min(job.user_estimated_run_time, last)
 
         #Moving averages
         if self.user_job_last2[job.user_id] != None:
@@ -90,16 +72,18 @@ class PredictorSGDLinear(Predictor):
                 last2=current_time-j2.submit_time
 
             average = float((last1+last2)/ 2)
-            x[2]    = min(job.user_estimated_run_time, average)
+            x[1]    = min(job.user_estimated_run_time, average)
         elif self.user_job_last1[job.user_id] != None:
-            x[2]    = x[1]
+            #TODO:check if we know already the last run time, take a choice.
+            j1= self.user_job_last1[job.user_id]
+            if j1.submit_time+j1.actual_run_time>current_time:
+                last=j1.actual_run_time
+            else:
+                last=current_time-j1.submit_time
+
+            x[1]    = min(job.user_estimated_run_time, last)
         else:
-            x[2] = job.user_estimated_run_time
-
-        #User run time mean
-        if not self.user_n_jobs ==0:
-            x[3]=float(self.user_sum_runtimes)/float(self.user_n_jobs)
-
+            x[1] = job.user_estimated_run_time
         return x
 
     def store_x(self,job,x):
@@ -142,13 +126,9 @@ class PredictorSGDLinear(Predictor):
         assert self.user_job_last1.has_key(job.user_id) == True
         assert self.user_job_last2.has_key(job.user_id) == True
         assert self.user_job_last3.has_key(job.user_id) == True
-        assert self.user_sum_runtimes.has_key(job.user_id) == True
-        assert self.user_n_jobs.has_key(job.user_id) == True
         self.user_job_last3[job.user_id] = self.user_job_last2[job.user_id]
         self.user_job_last2[job.user_id] = self.user_job_last1[job.user_id]
         self.user_job_last1[job.user_id] = job
-        self.user_n_jobs[job.user_id]+=1
-        self.user_sum_runtimes[job.user_id]+=job.actual_run_time
 
         #fit the model
         self.model.fit(x,job.actual_run_time,p=10*np.log(1+(job.actual_run_time/min(1,job.num_required_processors))))

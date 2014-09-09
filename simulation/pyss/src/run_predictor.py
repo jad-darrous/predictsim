@@ -4,7 +4,7 @@
 Runtime predictor tester.
 
 Usage:
-    run_predictor.py <swf_file> <config_file> <output_file> [-i] [-v]
+    run_predictor.py <swf_file> <config_file> <output_file> <measurement_file> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -111,9 +111,12 @@ with open(arguments['<swf_file>'], 'rt') as  f:
     env = Environment()
 
     pred=[]
+    loss=[]
     def job_process(j):
         yield env.timeout(j.submit_time)
-        predictor.predict(j,env.now,[])
+        l=predictor.predict(j,env.now,[])
+        if not l==None:
+            loss.append(l)
         pred.append(j.predicted_run_time)
         yield env.timeout(j.wait_time+j.actual_run_time)
         predictor.fit(j,env.now)
@@ -128,4 +131,6 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         from IPython import embed
         embed()
 
+print(pred)
 array_to_file(pred,arguments["<output_file>"])
+array_to_file(loss,arguments["<measurement_file>"])

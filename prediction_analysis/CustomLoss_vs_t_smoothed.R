@@ -87,50 +87,34 @@ setwd(execution_wd)
 #args for retrieving your arguments.
 library('plyr')
 library('ggplot2')
+cbbPalette <- c("#000001", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+scale_fill_manual(values=cbbPalette)
+scale_colour_manual(values=cbbPalette)
 
 
 #type stuff here.
-plot_rec_curves <- function(preds,true_values,labelnames){
-  true_runtime=ldply(true_values,data.frame)
-  colnames(true_runtime)<-c("value")
-  preds_dfs=data.frame()
+plot_rec_curves <- function(values,labelnames){
+  error_df=data.frame()
+  for (i in 1:length(values)){
+    print("OEU")
+    d=ldply(values[i],data.frame)
+    colnames(d)<-c("value")
+    d$type=labelnames[i]
+    d$id=1:nrow(d)
 
-  for (i in 1:length(preds)){
-    d=ldply(preds[i],data.frame)
-
-    d$value=labelnames[i]
-    colnames(d)<-c("value","type")
-    d$value=abs(true_runtime$value-d$value)
-    #print(typeof(d))
-    #print(class(d))
-
-    #print(summary(d))
-    preds_dfs=rbind(preds_dfs,d)
+    error_df=rbind(error_df,d)
   }
+  print(summary(error_df))
 
-  print(summary(preds_dfs))
-  p0 = ggplot(preds_dfs, aes(x = value)) +
-   stat_ecdf(aes(group = type, colour = type))+
+  p0 = ggplot(error_df, aes(x = id,y=value)) +
+  stat_smooth(aes(group = type, colour = type))+
   scale_color_brewer(palette="Set3")
   print(p0)
-
-  #m <- ggplot(d, aes(x=value))
-  #m +
-  #geom_density(aes(group=type,fill=type),adjust=4, colour="black",alpha=0.2,fill="gray20")+
-  #coord_trans(y = "sqrt")+
-  #scale_x_continuous(breaks=seq(from=0,to=86400,by=3600),labels=seq(from=0,to=24,by=1))+
-  #xlab("Absolute error (hours)")+
-  #ylab("Density")+
-  #ggtitle("Kernel density estimation of the absolute error.")+
-  #annotate("text",x=12500,y=0.000025,label="Random Forest",size=5)+
-  #annotate("text",x=4500,y=0.0003,label="Baseline",size=5)+
-  #theme_bw()
 }
 
 print(args$pred_filenames)
 data=lapply(args$pred_filenames,read.table)
-plot_rec_curves(preds=data[-1],true_values=data[1],labelnames=args$pred_filenames[-1])
-print(args$pred_filenames)
+plot_rec_curves(values=data,labelnames=args$pred_filenames)
 
 ###################END BLOCK#####################
 
