@@ -42,7 +42,7 @@ class Simulator(object):
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
 		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
-        if isinstance(scheduler, EasyPlusPlusScheduler) or isinstance(scheduler, ShrinkingEasyScheduler):
+        if hasattr(scheduler, "I_NEED_A_PREDICTOR") and scheduler.I_NEED_A_PREDICTOR:
             self.event_queue.add_handler(JobPredictionIsOverEvent, self.handle_prediction_event)
             
         for job in self.jobs:

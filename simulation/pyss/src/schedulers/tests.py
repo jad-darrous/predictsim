@@ -42,6 +42,11 @@ from perfect_easy_backfill_scheduler import PerfectEasyBackfillScheduler
 from double_perfect_easy_backfill_scheduler import DoublePerfectEasyBackfillScheduler
 
 
+from easy_prediction_backfill_scheduler import EasyPredictionBackfillScheduler
+
+from base.prototype import _job_inputs_to_jobs
+from base.workload_parser import parse_lines
+
 def parse_jobs_test_input(input_file_name):
     """
     Assumption: Job details are 'correct': submit_time,
@@ -112,11 +117,79 @@ def feasibility_check_of_cpu_snapshot(jobs, cpu_snapshot):
     assert cpu_snapshot.CpuSlicesTestEmptyFeasibility()
 
 
+def simulator_finish_time(simul):
+	last_slice = simul.scheduler.cpu_snapshot.archive_of_old_slices[-1]
+	return last_slice.start_time + last_slice.duration
+
+def get_id_last_job(simul):
+	last_slice = simul.scheduler.cpu_snapshot.archive_of_old_slices[-1]
+	if(len(last_slice.job_ids) != 1):
+		raise Exception("There is more than one job at the end")
+	
+	return last_slice.job_ids.pop()
+
+
+def get_jobs_at(simul, time):
+	jobs = simul.scheduler.cpu_snapshot.jobs_at(time)
+	return jobs
+
+
 # TODO: test each scheduler so it calls CpuSnapshot.delJobFromCpuSlices when
 #       rescheduling a job or checking backfill legality (e.g. Maui)
 
 class test_Simulator(unittest.TestCase):
 
+
+    def test_basic_easyPredictionBackfill(self):
+	    specoptions = {"num_processors":2,"scheduler":{"predictor":{"name":"predictor_from_think_time"},"corrector":{"name":"reqtime"}}}
+	    
+	    scheduler = EasyPredictionBackfillScheduler(specoptions)
+            simulator = run_simulator(
+		    no_stats = True,
+		    scheduler=scheduler,
+		    num_processors=2,
+		    jobs = _job_inputs_to_jobs(parse_lines(open(INPUT_FILE_DIR + "/estimation_starvation.swf")),2))
+	    
+	    if simulator_finish_time(simulator) != 16:
+		    raise Exception("Wrong finish time")
+	    if get_id_last_job(simulator) != 2:
+		    raise Exception("Wrong last job")
+	    
+	    scheduler = EasyPredictionBackfillScheduler(specoptions)
+            simulator = run_simulator(
+		    no_stats = True,
+		    scheduler=scheduler,
+		    num_processors=2,
+		    jobs = _job_inputs_to_jobs(parse_lines(open(INPUT_FILE_DIR + "/estimation_tsafrir_exemple.swf")),2))
+	    simulator.scheduler.cpu_snapshot._restore_old_slices()
+	    if get_jobs_at(simulator, 0) != set([1]) :
+		    raise Exception("Wrong scheduling!")
+	    
+	    scheduler = EasyPredictionBackfillScheduler(specoptions)
+            simulator = run_simulator(
+		    no_stats = True,
+		    scheduler=scheduler,
+		    num_processors=2,
+		    jobs = _job_inputs_to_jobs(parse_lines(open(INPUT_FILE_DIR + "/overestimation_exemple.swf")),2))
+	    
+	    if simulator_finish_time(simulator) != 6:
+		    raise Exception("Wrong finish time")
+	    
+	    specoptions["scheduler"]["predictor"]["name"] = "predictor_reqtime"
+	    scheduler = EasyPredictionBackfillScheduler(specoptions)
+            simulator = run_simulator(
+		    no_stats = True,
+		    scheduler=scheduler,
+		    num_processors=2,
+		    jobs = _job_inputs_to_jobs(parse_lines(open(INPUT_FILE_DIR + "/overestimation_exemple.swf")),2))
+	    
+	    if simulator_finish_time(simulator) != 8:
+		    raise Exception("Wrong finish time")
+	    
+	    
+	    
+	    
+	    
     # testing the easy plus plus scheduler 
     def test_basic_easyPlusPlusBackfill(self):
         for i in range(15):
