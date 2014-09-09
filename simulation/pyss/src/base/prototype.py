@@ -97,7 +97,7 @@ class Job(object):
         return self.start_to_run_at_time + self.predicted_run_time
 
     def __repr__(self):
-        return type(self).__name__ + "<id=%(id)s, user_estimated_run_time=%(user_estimated_run_time)s, actual_run_time=%(actual_run_time)s, required_processors=%(num_required_processors)s, start_to_run_at_time=%(start_to_run_at_time)s, submit_time=%(submit_time)s>" % vars(self)
+        return type(self).__name__ + "<id=%(id)s, user_estimated_run_time=%(user_estimated_run_time)s, actual_run_time=%(actual_run_time)s, required_processors=%(num_required_processors)s, start_to_run_at_time=%(start_to_run_at_time)s, submit_time=%(submit_time)s, predicted_run_time=%(predicted_run_time)s>" % vars(self)
 
 class StupidScheduler(object):
     "A very simple scheduler - schedules jobs one after the other with no chance of overlap"

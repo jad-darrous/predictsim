@@ -38,7 +38,7 @@ class EasyBackfillScheduler(Scheduler):
 
     def _schedule_jobs(self, current_time):
         "Schedules jobs that can run right now, and returns them"
-        jobs  = self._schedule_head_of_list(current_time)
+        jobs = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)
         return jobs
 

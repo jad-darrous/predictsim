@@ -7,6 +7,8 @@ from base.prototype import JobStartEvent
 class  ShrinkingEasyScheduler(EasyBackfillScheduler):
     """ This "toy" algorithm follows an the paper of Tsafrir, Etzion, Feitelson, june 2007
     """
+
+    I_NEED_A_PREDICTOR = True
     
     def __init__(self, options):
         super(ShrinkingEasyScheduler, self).__init__(options)
