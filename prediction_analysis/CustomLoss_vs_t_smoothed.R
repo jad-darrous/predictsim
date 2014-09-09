@@ -96,7 +96,6 @@ scale_colour_manual(values=cbbPalette)
 plot_rec_curves <- function(values,labelnames){
   error_df=data.frame()
   for (i in 1:length(values)){
-    print("OEU")
     d=ldply(values[i],data.frame)
     colnames(d)<-c("value")
     d$type=labelnames[i]
