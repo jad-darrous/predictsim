@@ -34,7 +34,7 @@ def tsafrir(job, current_time):
 #if runtime>prediction, then "99% of jobs are shorter than" value,
 def ninetynine(job, current_time):
 	print("TODO, need a communication with the predictor!")
-	return job.user_estimated_run_time
+	return 42
 
 
 
@@ -42,7 +42,7 @@ def ninetynine(job, current_time):
 #"wait"(stop backfilling (and scheduling) as soon as "shadow" reservation is delayed)
 def wait(job, current_time):
 	print("TODO")
-	return job.user_estimated_run_time
+	return 42
 
 
 
