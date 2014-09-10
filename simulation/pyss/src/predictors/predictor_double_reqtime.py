@@ -1,6 +1,6 @@
 from predictor import Predictor
 
-class PredictorReqtime(Predictor):
+class PredictorDoubleReqtime(Predictor):
 	"""
 	estimate_runtime = user value
 	"""

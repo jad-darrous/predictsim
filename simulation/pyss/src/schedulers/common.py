@@ -38,9 +38,9 @@ class Scheduler(object):
         my_class = module_to_class(my_module) 
         package = __import__ ('predictors', fromlist=[my_module])
         if my_module not in package.__dict__:
-             raise Exception("No such predictor (module file not found).")
+             raise Exception("No such predictor (module '"+my_module+"' file not found).")
         if my_class not in package.__dict__[my_module].__dict__:
-             raise Exception("No such predictor (class within the module file not found).")
+             raise Exception("No such predictor (class '"+my_class+"' within the module '"+my_module+"' file not found).")
         #load the class
         self.predictor = package.__dict__[my_module].__dict__[my_class](options)
     
@@ -51,7 +51,7 @@ class Scheduler(object):
              raise Exception("missing corrector name")
         import common_correctors
         if not hasattr(common_correctors, options["scheduler"]["corrector"]["name"]):
-             raise Exception("corrector doesn't exist")
+             raise Exception("corrector '"+str(options["scheduler"]["corrector"]["name"])+"' doesn't exist")
         self.corrector =  getattr(common_correctors, options["scheduler"]["corrector"]["name"])
         
 

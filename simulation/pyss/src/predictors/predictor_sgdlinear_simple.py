@@ -3,7 +3,7 @@ import numpy as np
 from valopt.models.linear_model import LinearModel
 from valopt.algos.nag import NAG
 
-class PredictorSGDLinear(Predictor):
+class PredictorSgdlinearSimple(Predictor):
     #Internal info
     n_features=2
 

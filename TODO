@@ -9,8 +9,6 @@
 
 **** simulateur ****
 
--ajouter un check pour verifier que "fit" et "predict" est appelé une fois par job seulement (respct al a soumission et la fin du job)
-
 -algos:
 prévoir toutes les combinaisons:
 priority list: FCFS
