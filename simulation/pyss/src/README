@@ -81,15 +81,15 @@ EasyBackfillScheduler where predicted_runtime is doubled when backfilling is don
 *** Run exemples:
 
 ** normal run:
-time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py config_profiling.py
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py sample_config_profiling.py
 
 
 ** debug:
-pypy ./run_simulator.py config_sample.py
+pypy ./run_simulator.py sample_config.py
 
 
 ** profiling/optimizing:
-time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py config_profiling.py
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py sample_config_profiling.py
 
 runsnake simul.cprof
 
@@ -98,8 +98,7 @@ runsnake simul.cprof
 
 
 *** How to test pyss?
-
-./runtests.sh > /dev/null
+./runtests.sh
 
 
 
@@ -108,7 +107,7 @@ runsnake simul.cprof
 
 *** Exemples of runs:
 
-$ pypy -m cProfile -o simul.cprof sample_config.py
+$ pypy -m cProfile -o simul.cprof ./run_simulator.py sample_config.py
 
 WARINING: [..]
 [..]
@@ -133,22 +132,24 @@ Scheduler: <class 'schedulers.easy_scheduler.EasyBackfillScheduler'>
 
 $ pypy -m cProfile -o simul.cprof ./run_simulator.py sample_config2.py
 
+WARINING: [..]
+[..]
+
 STATISTICS: 
-Wait (Tw) [minutes]:  55.3790542604
-Response time (Tw+Tr) [minutes]:  177.999373918
-Slowdown (Tw+Tr) / Tr:  533.408362987
-Bounded slowdown max(1, (Tw+Tr) / max(10, Tr):  72.9905013603
-Estimated slowdown (Tw+Tr) / Te:  465.541385187
-Tail slowdown (if bounded_sld >= 3):  784.633976239
-   Number of jobs in the tail:  902
-Tail Percentile (the top 10% sld):  5316.12341872
+Wait (Tw) [minutes]:  63.8220180529
+Response time (Tw+Tr) [minutes]:  186.442337711
+Slowdown (Tw+Tr) / Tr:  438.943506263
+Bounded slowdown max(1, (Tw+Tr) / max(10, Tr):  71.2782829212
+Estimated slowdown (Tw+Tr) / Te:  350.31818206
+Tail slowdown (if bounded_sld >= 3):  536.229754526
+   Number of jobs in the tail:  1289
+Tail Percentile (the top 10% sld):  4371.72912372
 Total Number of jobs:  9924
 Number of jobs used to calculate statistics:  9823
 
 Num of Processors:  80640
 Input file:  ../../../data/CEA-curie_sample/original_swf/log.swf
 Scheduler: <class 'schedulers.easy_plus_plus_scheduler.EasyPlusPlusScheduler'>
-
 
 
 
