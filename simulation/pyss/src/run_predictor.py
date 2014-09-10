@@ -4,7 +4,7 @@
 Runtime predictor tester.
 
 Usage:
-    run_predictor.py <swf_file> <config_file> <output_file> <measurement_file> [-i] [-v]
+    run_predictor.py <swf_file> <config_file> <output_file> <measurement_file> <coeff_file> [-i] [-v]
 
 Options:
     -h --help                                      Show this help message and exit.
@@ -16,6 +16,7 @@ from base.docopt import docopt
 from base.prototype import _job_input_to_job
 from base.workload_parser import parse_lines
 from base.np_printutils import array_to_file
+from base.np_printutils import array_to_file_n
 from base.np_printutils import np_array_to_file
 from simpy import Environment,simulate,Monitor
 from simpy.util import start_delayed
@@ -112,6 +113,9 @@ with open(arguments['<swf_file>'], 'rt') as  f:
 
     pred=[]
     loss=[]
+    if hasattr(predictor,"model"):
+        coeffs=[]
+
     def job_process(j):
         yield env.timeout(j.submit_time)
         l=predictor.predict(j,env.now,[])
@@ -120,6 +124,8 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         pred.append(j.predicted_run_time)
         yield env.timeout(j.wait_time+j.actual_run_time)
         predictor.fit(j,env.now)
+        if hasattr(predictor,"model"):
+            coeffs.append(predictor.model.model.w)
 
     #Starting the replay
     for job in jobs:
@@ -134,3 +140,10 @@ with open(arguments['<swf_file>'], 'rt') as  f:
 #print(pred)
 array_to_file(pred,arguments["<output_file>"])
 array_to_file(loss,arguments["<measurement_file>"])
+#if hasattr(predictor,"model"):
+    #print coeffs
+    #np_array_to_file(coeffs,arguments["<coeff_file>"])
+if hasattr(predictor,"model"):
+    with open(arguments["<coeff_file>"],"w") as f:
+        for item in coeffs:
+          f.write("%s\n" % item)

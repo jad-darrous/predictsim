@@ -1,0 +1,17 @@
+#!/bin/sh
+#use like make_all_swfs  prediction_folder output_folder
+#makes one swf file based on the logfile.swf per prediction.
+measurement_folder="$1"
+output_folder="$2"
+
+echo averaging last quarter of predictionswith with:
+echo measurement_folder:
+echo $measurement_folder
+echo output_folder:
+echo $output_folder
+
+for file in $measurement_folder/*
+do
+  f=`basename $file`
+  ../../data_manipulation/average_lastquarter $logfile $measurement_folder/$f > $output_folder/$f\.summary
+done

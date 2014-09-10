@@ -1,8 +1,11 @@
+MEASUREMENTS_FOLDER:=measurements
+CONFIG_FOLDER:=../../config
+
 CONFIG_FILES_FP := $(wildcard ../../config/*.cfg)
 ALL_PREDICTION_FILES := $(patsubst ../../config/%.cfg,%,$(CONFIG_FILES_FP))
 TERMINATED_JOBS_FP := $(patsubst %,dry_predictions/%,$(ALL_PREDICTION_FILES))
-MEASUREMENT_FILES  := $(patsubst %,measurements/%,$(ALL_PREDICTION_FILES))
-CUSTOM_IGNORE := measurements/clairvoyant measurements/tsafrir measurements/reqtime
+MEASUREMENT_FILES  := $(patsubst %,$(MEASUREMENTS_FOLDER)/%,$(ALL_PREDICTION_FILES))
+CUSTOM_IGNORE := $(MEASUREMENTS_FOLDER)/clairvoyant $(MEASUREMENTS_FOLDER)/tsafrir $(MEASUREMENTS_FOLDER)/reqtime
 CL_FILES := $(filter-out $(CUSTOM_IGNORE),$(MEASUREMENT_FILES))
 KDE_FILES := $(filter-out dry_predictions/clairvoyant,$(TERMINATED_JOBS_FP))
 
@@ -24,10 +27,10 @@ simulate:
 predict: $(ALL_PREDICTION_FILES)
 
 %: ../../config/%.cfg
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@ measurements/$@
+	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@ $(MEASUREMENTS_FOLDER)/$@ coeffs/$@
 
 #_______________DRY PREDICTION ANALYSIS__________:
-prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv 
+prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
 
 
 mse:
@@ -46,11 +49,12 @@ kde:
 	../../../prediction_analysis/KDE.R  $(KDE_FILES) -o analysis/KDE.pdf -r 4
 kde_indiv:
 	../../../prediction_analysis/KDE_indiv.R dry_predictions/clairvoyant  $(KDE_FILES) -o analysis/KDE_indiv.pdf -r 4
+loss_average:
+	../../data_manipulation/average_all $(MEASUREMENTS_FOLDER)/ $(MEASUREMENTS_FOLDER)/
 
 #_____________CLEANING___________:
 clean:
-	rm -rf dry_predictions/* analysis/* swf/* measurements/*
-
+	rm -rf dry_predictions/* analysis/* swf/* $(MEASUREMENTS_FOLDER)/* coeffs/*
 
 #_____________ARCHIVED___________:
 #extraction of specific information for data analysis:
