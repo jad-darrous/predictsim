@@ -48,7 +48,7 @@ class JobStartEvent(JobEvent): pass
 class JobTerminationEvent(JobEvent): pass
 class JobPredictionIsOverEvent(JobEvent):pass
 
-# tie break rule order for events occuring at the same time 
+# tie break rule order for events occuring at the same time
 JobEvent.EVENTS_ORDER = [JobPredictionIsOverEvent, JobSubmissionEvent, JobTerminationEvent, JobStartEvent]
 
 class Job(object):
@@ -61,11 +61,11 @@ class Job(object):
 
         self.id = id
         self.user_estimated_run_time = user_estimated_run_time
-        self.predicted_run_time = user_estimated_run_time  
+        self.predicted_run_time = user_estimated_run_time
         self.actual_run_time = actual_run_time
         self.num_required_processors = num_required_processors
 	self.user_id = user_id
-        
+
         # not used by base
         self.submit_time = submit_time # Assumption: submission time is greater than zero
         self.start_to_run_at_time = -1 # TODO: convert to None
@@ -81,16 +81,16 @@ class Job(object):
 
         # the next is for the probabilistic easy scheduler
         self.expected_predicted_run_time = user_estimated_run_time
-        
+
         self.think_time = think_time
 
 
-        
+
     @property
     def finish_time(self):
         assert self.start_to_run_at_time != -1
         return self.start_to_run_at_time + self.actual_run_time
-    
+
     @property
     def predicted_finish_time(self):
         assert self.start_to_run_at_time != -1
@@ -123,7 +123,7 @@ class Machine(object):
     def __init__(self, event_queue):
         self.event_queue = event_queue
         self.event_queue.add_handler(JobStartEvent, self._start_job_handler)
-        
+
     def _start_job_handler(self, event):
         assert type(event) == JobStartEvent
         if event.job.start_to_run_at_time not in (-1, event.timestamp):
@@ -134,13 +134,13 @@ class Machine(object):
 
     def _add_job(self, job, current_timestamp):
         assert job.actual_run_time  <= job.user_estimated_run_time
-        
+
         self.event_queue.add_event(JobTerminationEvent(job=job, timestamp=current_timestamp+job.actual_run_time))
         if job.predicted_run_time < job.actual_run_time:
              self.event_queue.add_event(JobPredictionIsOverEvent(job=job, timestamp=current_timestamp+job.predicted_run_time))
-            
-            
-            
+
+
+
 class ValidatingMachine(Machine):
     """
     Represents the actual parallel machine ('cluster'), validating proper
@@ -196,7 +196,7 @@ def parse_job_lines_quick_and_dirty(lines):
         )
 
 def _job_input_to_job(job_input, total_num_processors):
-    # if job input seems to be problematic  
+    # if job input seems to be problematic
     if job_input.run_time <= 0:
         print("WARNING: Job %s is not valid (run_time <= 0)." % job_input.number)
     elif job_input.num_requested_processors <= 0:
@@ -211,7 +211,7 @@ def _job_input_to_job(job_input, total_num_processors):
         if user_estimated_run_time < 1:
             print("WARNING: Job %s is not fully valid (requested_time < 1)." % job_input.number)
             user_estimated_run_time = 1
-         
+
         actual_run_time = int(job_input.run_time)
         if actual_run_time > job_input.requested_time:
             print("WARNING: Job %s is not fully valid (run_time > requested_time)." % job_input.number)
@@ -219,7 +219,7 @@ def _job_input_to_job(job_input, total_num_processors):
         if actual_run_time < 1:
             print("WARNING: Job %s is not fully valid (run_time < 1)." % job_input.number)
             actual_run_time = 1
-        
+
         num_required_processors = job_input.num_requested_processors
         if num_required_processors > total_num_processors:
             print("WARNING: Job %s is not fully valid (num_requested_processors > total_num_processors)." % job_input.number)
@@ -227,13 +227,13 @@ def _job_input_to_job(job_input, total_num_processors):
         if num_required_processors < 1:
             print("WARNING: Job %s is not fully valid (num_requested_processors < 1)." % job_input.number)
             num_required_processors = 1
-        
+
         return Job(
             id = job_input.number,
             user_estimated_run_time = user_estimated_run_time,
-            actual_run_time = actual_run_time, 
-            num_required_processors = num_required_processors, 
-            submit_time = job_input.submit_time, 
+            actual_run_time = actual_run_time,
+            num_required_processors = num_required_processors,
+            submit_time = job_input.submit_time,
             user_id = job_input.user_id,
             think_time = job_input.think_time_from_preceding_job
         )
@@ -241,10 +241,10 @@ def _job_input_to_job(job_input, total_num_processors):
     return Job(
         id = job_input.number,
         user_estimated_run_time = 1,
-        actual_run_time = 1, 
-        num_required_processors = max(1, job_input.num_allocated_processors),  
-        submit_time = max(job_input.submit_time, 1), 
-        user_id = job_input.user_id, 
+        actual_run_time = 1,
+        num_required_processors = max(1, job_input.num_allocated_processors),
+        submit_time = max(job_input.submit_time, 1),
+        user_id = job_input.user_id,
     )
 
 
@@ -282,7 +282,7 @@ class Simulator(object):
         newEvents = self.scheduler.handleTerminationOfJobEvent(event.job, event.timestamp)
         for event in newEvents:
             self.event_queue.add_event(event)
-            
+
     def handle_prediction_is_over_event(self, event):
         assert isinstance(event, JobPredictionIsOverEvent)
         newEvents = self.scheduler.handlePredictionIsOverEvent(event.job, event.timestamp)

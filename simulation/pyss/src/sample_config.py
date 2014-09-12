@@ -5,11 +5,11 @@
 #To list them: for s in schedulers/*_scheduler.py ; do basename -s .py $s; done
 scheduler = {
 	"name":'easy_backfill_scheduler',
-	
+
 	#The predictor (if needed) to use.
 	#To list them: for s in predictors/predictor_*.py ; do basename -s .py $s; done
 	'predictor': {"name":None, "option1":"bar"},
-	
+
 	#The corrector (if needed) to use.
 	#Choose between: "+str(schedulers.common_correctors.correctors_list())
 	'corrector': {"name":None, "option1":"foo"},
@@ -37,7 +37,7 @@ should output:
 WARINING: [..]
 [..]
 
-STATISTICS: 
+STATISTICS:
 Wait (Tw) [minutes]:  61.5191506329
 Response time (Tw+Tr) [minutes]:  184.139470291
 Slowdown (Tw+Tr) / Tr:  405.583038621

@@ -1,10 +1,5 @@
 **** estimation ****
-- ajouter un historique pour stocker les données
-- utiliser l'API:class Predictor
-- migrer les predictors vers cette API
--feature scaled stochastic gradient descent (with regularization???)
-
-(- nouvelle fonction de cout)
+line search?
 
 
 **** simulateur ****

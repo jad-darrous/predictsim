@@ -48,7 +48,7 @@ else:
 
 #argement management: max_cores
 config = {}
-execfile(arguments["<config_file>"], config) 
+execfile(arguments["<config_file>"], config)
 if config['max_cores']=="auto":
     with open(arguments['<swf_file>']) as input_file:
         num_processors=None
@@ -116,13 +116,19 @@ with open(arguments['<swf_file>'], 'rt') as  f:
     if hasattr(predictor,"model"):
         coeffs=[]
 
+    #system variables
+    running_jobs=[]
+
     def job_process(j):
         yield env.timeout(j.submit_time)
-        l=predictor.predict(j,env.now,[])
+        l=predictor.predict(j,env.now,running_jobs)
         if not l==None:
             loss.append(l)
         pred.append(j.predicted_run_time)
-        yield env.timeout(j.wait_time+j.actual_run_time)
+        yield env.timeout(j.wait_time)
+        running_jobs.append(j)
+        yield env.timeout(j.actual_run_time)
+        running_jobs.remove(j)
         predictor.fit(j,env.now)
         if hasattr(predictor,"model"):
             coeffs.append(predictor.model.model.w)
@@ -137,7 +143,6 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         from IPython import embed
         embed()
 
-#print(pred)
 array_to_file(pred,arguments["<output_file>"])
 array_to_file(loss,arguments["<measurement_file>"])
 #if hasattr(predictor,"model"):

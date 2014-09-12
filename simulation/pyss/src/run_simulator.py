@@ -1,6 +1,20 @@
-#! /usr/bin/env python2
+#!/usr/bin/python
+# encoding: utf-8
+'''
+Run the PySS Simulator. You should specify a config file, an enforce input and output swfs over that via commandline if you so desire.
 
-import sys, os
+Usage:
+    run_simulator.py <swf_file> <config_file> <output_file> [-i] [-v]
+
+Options:
+    -h --help                                      Show this help message and exit.
+    -v --verbose                                   Be verbose.
+    -i --interactive                               Interactive mode at key points in script.
+'''
+
+from base.docopt import docopt
+import sys
+
 if __debug__:
     import warnings
     #warnings.warn("Running in debug mode, this will be slow... try 'python2.4 -O %s'" % sys.argv[0])
@@ -15,7 +29,7 @@ import schedulers.common_correctors
 
 
 def parse_and_run_simulator(options):
-	
+
 	if options["input_file"] is None:
 		parser.error("missing input file")
 
@@ -38,7 +52,7 @@ def parse_and_run_simulator(options):
 				break
 	if options["num_processors"] is None:
 		parser.error("missing num processors")
-         
+
 	if options["stats"] is None:
 		options["stats"] = False
 
@@ -47,10 +61,10 @@ def parse_and_run_simulator(options):
 
 	if options["scheduler"]["name"] is None:
 		parser.error("missing scheduler name")
-	
-	
-	
-	
+
+
+
+
 	my_module = options["scheduler"]["name"]
 	my_class = module_to_class(my_module)
 
@@ -58,7 +72,7 @@ def parse_and_run_simulator(options):
 	package = __import__ ('schedulers', fromlist=[my_module])
 	if my_module not in package.__dict__:
 		print "No such scheduler (module file not found)."
-		return 
+		return
 	if my_class not in package.__dict__[my_module].__dict__:
 		print "No such scheduler (class within the module file not found)."
 		return
@@ -69,18 +83,18 @@ def parse_and_run_simulator(options):
 
 
 	#if hasattr(scheduler_non_instancied, 'I_NEED_A_PREDICTOR'):
-	
+
 	try:
-		print "...." 
+		print "...."
 		run_simulator(
-			num_processors = options["num_processors"], 
+			num_processors = options["num_processors"],
 			jobs = _job_inputs_to_jobs(parse_lines(input_file), options["num_processors"]),
 			scheduler = scheduler,
 			output_swf = options["output_swf"],
 			input_file = options["input_file"],
 			no_stats = not(options["stats"])
 			)
-	
+
 		print "Num of Processors: ", options["num_processors"]
 		print "Input file: ", options["input_file"]
 		print "Scheduler:", type(scheduler)
@@ -91,11 +105,13 @@ def parse_and_run_simulator(options):
 
 
 if __name__ == "__main__":
-	if len(sys.argv) != 2:
-		print("Usage: python2 "+sys.argv[0]+" config_file.py")
-		os._exit(1)
+        #Retrieve arguments
+        arguments = docopt(__doc__, version='1.0.0rc2')
+
 	config = {}
-	execfile(sys.argv[1], config) 
+	execfile(arguments["<config_file>"], config)
+        config["input_file"]=arguments["<swf_file>"]
+        config["output_swf"]=arguments["<output_file>"]
 	# python 3: exec(open("example.conf").read(), config)
 
 	parse_and_run_simulator(config)

@@ -14,3 +14,8 @@ def array_to_file(a, filename):
     na=np.array(a)
     na=np.reshape(na,(-1,1))
     np.savetxt(filename,na,fmt="%d")
+
+def array_to_file_n(a, filename,n):
+    na=np.array(a)
+    #na=np.reshape(na,(-1,n))
+    np.savetxt(filename,na,fmt="%d")

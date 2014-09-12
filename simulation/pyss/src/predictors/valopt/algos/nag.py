@@ -43,7 +43,13 @@ class NAG(object):
             if np.abs(x[i])>self.s[i]:
                 W[i]*=self.s[i]/np.abs(x[i])
                 self.s[i]=np.abs(x[i])
+
+        for i in range(0,self.model.dim):
+            if self.s[i]==0:
+                self.s[i]=0.01
+
         self.N=self.N+np.sum(x*x/(self.s*self.s))
+
         self.model.set_param_vector(W)
 
         for i in range(0,self.model.dim):

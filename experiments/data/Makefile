@@ -1,13 +1,28 @@
-MEASUREMENTS_FOLDER:=measurements
-CONFIG_FOLDER:=../../config
+SWF_FOLDER:=swf
+SWF_FILE:=log.swf
 
-CONFIG_FILES_FP := $(wildcard ../../config/*.cfg)
-ALL_PREDICTION_FILES := $(patsubst ../../config/%.cfg,%,$(CONFIG_FILES_FP))
-TERMINATED_JOBS_FP := $(patsubst %,dry_predictions/%,$(ALL_PREDICTION_FILES))
+ANALYSIS_FOLDER:=analysis
+
+#dry prediction stuff
+MEASUREMENTS_FOLDER:=measurements
+DRY_CONFIG_FOLDER:=../../dry_prediction_config
+DRY_PREDICTION_FOLDER=dry_predictions
+COEFFS_FOLDER=coeffs
+DRY_CONFIG_FILES_FP := $(wildcard $(DRY_CONFIG_FOLDER)/*.cfg)
+ALL_PREDICTION_FILES := $(patsubst $(DRY_CONFIG_FOLDER)/%.cfg,%,$(DRY_CONFIG_FILES_FP))
+ALL_PREDICTION_FILES_p := $(patsubst %,%.p,$(ALL_PREDICTION_FILES))
+TERMINATED_JOBS_FP := $(patsubst %,$(DRY_PREDICTION_FOLDER)/%,$(ALL_PREDICTION_FILES))
 MEASUREMENT_FILES  := $(patsubst %,$(MEASUREMENTS_FOLDER)/%,$(ALL_PREDICTION_FILES))
 CUSTOM_IGNORE := $(MEASUREMENTS_FOLDER)/clairvoyant $(MEASUREMENTS_FOLDER)/tsafrir $(MEASUREMENTS_FOLDER)/reqtime
 CL_FILES := $(filter-out $(CUSTOM_IGNORE),$(MEASUREMENT_FILES))
 KDE_FILES := $(filter-out dry_predictions/clairvoyant,$(TERMINATED_JOBS_FP))
+
+#simulation stuff
+SIM_CONFIG_FOLDER :=../../simulation_config
+SIM_FOLDER :=simulations
+SIM_FILES_FP := $(wildcard $(SIM_CONFIG_FOLDER)/*.cfg)
+ALL_SIMULATION_FILES := $(patsubst $(SIM_CONFIG_FOLDER)/%.cfg,%,$(SIM_FILES_FP))
+ALL_SIMULATION_FILES_s := $(patsubst %,%.s,$(ALL_SIMULATION_FILES))
 
 all:filter
 val_task1:filter predict prediction_analysis
@@ -19,47 +34,50 @@ filter:
 
 #TODO:_______________SIMULATION___________________:
 #logfile simulation
-simulate:
-	../../simulation/run_simulator.sh predicted_swf_filtered $(max_procs) simulated_swf
+
+simulate: filter  $(ALL_SIMULATION_FILES_s)
+
+%.s: $(SIM_CONFIG_FOLDER)/%.cfg
+	../../../simulation/pyss/src/run_simulator.py $(SWF_FOLDER)/$(SWF_FILE) $< $(SIM_FOLDER)/$(patsubst %.s,%,$@)
 
 #_____________DRY_PREDICTION_________________:
 
-predict: $(ALL_PREDICTION_FILES)
+predict: filter $(ALL_PREDICTION_FILES_p)
 
-%: ../../config/%.cfg
-	../../../simulation/pyss/src/run_predictor.py swf/log.swf $< dry_predictions/$@ $(MEASUREMENTS_FOLDER)/$@ coeffs/$@
+%.p: $(DRY_CONFIG_FOLDER)/%.cfg
+	../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
 
 #_______________DRY PREDICTION ANALYSIS__________:
-prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
+prediction_analysis: predict mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
 
 
 mse:
-	../../../prediction_analysis/MSE_vs_t_smoothed.R dry_predictions/clairvoyant $(TERMINATED_JOBS_FP) -o analysis/MSE.pdf -r 2
+	../../../prediction_analysis/MSE_vs_t_smoothed.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP) -o $(ANALYSIS_FOLDER)/MSE.pdf -r 2
 mae:
-	../../../prediction_analysis/MAE_vs_t_smoothed.R dry_predictions/clairvoyant $(TERMINATED_JOBS_FP)  -o analysis/MAE.pdf -r 2
+	../../../prediction_analysis/MAE_vs_t_smoothed.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP)  -o $(ANALYSIS_FOLDER)/MAE.pdf -r 2
 rec:
-	../../../prediction_analysis/REC_-inf+inf.R dry_predictions/clairvoyant $(TERMINATED_JOBS_FP) -o analysis/REC.pdf -r 2
+	../../../prediction_analysis/REC_-inf+inf.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP) -o $(ANALYSIS_FOLDER)/REC.pdf -r 2
 rec_abs:
-	../../../prediction_analysis/REC_abs.R dry_predictions/clairvoyant $(TERMINATED_JOBS_FP)  -o analysis/REC_ABS.pdf -r 2
+	../../../prediction_analysis/REC_abs.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP)  -o $(ANALYSIS_FOLDER)/REC_ABS.pdf -r 2
 customloss:
-	../../../prediction_analysis/CustomLoss_vs_t_smoothed.R $(CL_FILES) -o analysis/custom_loss.pdf -r 2
+	../../../prediction_analysis/CustomLoss_vs_t_smoothed.R $(CL_FILES) -o $(ANALYSIS_FOLDER)/custom_loss.pdf -r 2
 cdfs:
-	../../../prediction_analysis/compare_cdfs.R dry_predictions/clairvoyant $(TERMINATED_JOBS_FP) -o analysis/compare_cdfs.pdf -r 2
+	../../../prediction_analysis/compare_cdfs.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP) -o $(ANALYSIS_FOLDER)/compare_cdfs.pdf -r 2
 kde:
-	../../../prediction_analysis/KDE.R  $(KDE_FILES) -o analysis/KDE.pdf -r 4
+	../../../prediction_analysis/KDE.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(KDE_FILES) -o $(ANALYSIS_FOLDER)/KDE.pdf -r 4
 kde_indiv:
-	../../../prediction_analysis/KDE_indiv.R dry_predictions/clairvoyant  $(KDE_FILES) -o analysis/KDE_indiv.pdf -r 4
+	../../../prediction_analysis/KDE_indiv.R $(DRY_PREDICTION_FOLDER)/clairvoyant  $(KDE_FILES) -o $(ANALYSIS_FOLDER)/KDE_indiv.pdf -r 4
 loss_average:
 	../../data_manipulation/average_all $(MEASUREMENTS_FOLDER)/ $(MEASUREMENTS_FOLDER)/
 
 #_____________CLEANING___________:
 clean:
-	rm -rf dry_predictions/* analysis/* swf/* $(MEASUREMENTS_FOLDER)/* coeffs/*
+	rm -rf $(DRY_PREDICTION_FOLDER)/* $(ANALYSIS_FOLDER)/* $(SWF_FOLDER)/* $(MEASUREMENTS_FOLDER)/* $(COEFFS_FOLDER)/* $(SIM_FOLDER)/*
 
 #_____________ARCHIVED___________:
 #extraction of specific information for data analysis:
 #extract_req_time:
-#../../data_manipulation/extract_req_time original_swf/log.swf > dry_predictions/prediction_req_time
+#../../data_manipulation/extract_req_time original_swf/log.swf > $(DRY_PREDICTION_FOLDER)/prediction_req_time
 #extraction of specific information for data analysis:
 #extract_run_time:
 #../../data_manipulation/extract_run_time original_swf/log.swf > prediction_results/clairvoyant

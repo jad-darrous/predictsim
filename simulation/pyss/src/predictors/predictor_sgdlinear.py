@@ -1,11 +1,13 @@
 from predictor import Predictor
 import numpy as np
+import itertools
+from scipy.special import binom
 from valopt.models.linear_model import LinearModel
 from valopt.algos.nag import NAG
 
 class PredictorSgdlinear(Predictor):
     #Internal info
-    n_features=7
+    n_features=18
 
     def __init__(self, options):
         #Data structures for storing info
@@ -20,6 +22,10 @@ class PredictorSgdlinear(Predictor):
 
         #Statistics oriented.
         self.last_loss=0
+
+        if options["quadratic"]:
+            self.quadratic=True
+            self.n_features=int(self.n_features+binom(self.n_features,2))
 
         #machine learning thing
         m=LinearModel(self.n_features)
@@ -37,7 +43,9 @@ class PredictorSgdlinear(Predictor):
             from valopt.losses.asymetric_weighted_squared_loss import AsymetricWeightedSquaredLoss
             if not options["beta"]:
                 raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
-            l=AsymetricWeightedSquaredLoss(m,options["beta"])
+            if not options["gamma"]:
+                raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
+            l=AsymetricWeightedSquaredLoss(m,options['beta'],options["gamma"])
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
@@ -59,6 +67,7 @@ class PredictorSgdlinear(Predictor):
             log=np.log
             return eval(wstr)
         self.weight=weight
+
 
     def make_x(self,job,current_time,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
@@ -145,12 +154,14 @@ class PredictorSgdlinear(Predictor):
             x[5]=job.user_estimated_run_time
             x[6]=x[5]
 
-        """
         #User run time mean
         if not self.user_n_jobs[job.user_id] ==0:
-            x[7]=float(self.user_sum_runtimes[job.user_id])/float(self.user_n_jobs[job.user_id])
+            x[7]=self.user_sum_runtimes[job.user_id]/self.user_n_jobs[job.user_id]
+            #print "ifed"
+            #print x[7]
         else:
             x[7]=0
+            #print "elsed"
 
         #T since Last job ending of this user
         if not self.user_last_ending[job.user_id]==0:
@@ -165,7 +176,43 @@ class PredictorSgdlinear(Predictor):
             x[9]=job.num_required_processors
         else:
             x[9]=0
-        """
+
+        running_mine=[j for j in list_running_jobs if j.user_id==job.user_id]
+
+        #total cores running by this user
+        x[10]=sum([j.num_required_processors for j in running_mine])
+
+        #sum of runtime of already running jobs of the user
+        lengths_running=[current_time-j.submit_time for j in running_mine]
+        x[11]=sum(lengths_running)
+
+        #amount of jobs  of this user already running
+        x[12]=len(running_mine)
+
+        #length of longest job of user already running
+        if len(lengths_running)==0:
+            x[13]=0
+        else:
+            x[13]=max(lengths_running)
+
+        #second of day
+        #x[14]=current_time % 3600*60
+        #cos second of day
+        x[14]=np.cos(3600*60*2*np.pi*x[14])
+        #sin second of day
+        x[15]=np.sin(3600*60*2*np.pi*x[14])
+        #day of week trough seconds:
+        #x[14]=current_time % 3600*60*7
+        #cos day of week
+        x[16]=np.cos(7*3600*60*2*np.pi*x[14])
+        #sin day of week
+        x[17]=np.sin(7*3600*60*2*np.pi*x[14])
+
+        if self.quadratic:
+            i=1
+            for a,b in itertools.combinations(x[0:18],2):
+                x[17+i]=a*b
+                i+=1
 
         return x
 
@@ -186,10 +233,14 @@ class PredictorSgdlinear(Predictor):
         Modify the predicted_run_time of a job.
         Called when a job is submitted to the system.
         """
-        #make x
-        x=self.make_x(job,current_time,list_running_jobs)
-        #store x
-        self.store_x(job,x)
+        if not job in self.job_x.keys():
+            #make x
+            x=self.make_x(job,current_time,list_running_jobs)
+            #store x
+            self.store_x(job,x)
+        else:
+            x=self.job_x[job]
+
         #make the prediction
         job.predicted_run_time=abs(self.model.predict(x))
         if not self.max_runtime==False:

@@ -2,7 +2,7 @@
 import numpy as np
 
 class AsymetricWeightedSquaredLoss(object):
-    def __init__(self,model,beta):
+    def __init__(self,model,beta,gamma):
         """
         Instanciate an asymetric weighted squared loss for a specific model.
         beta: scaling factor to positive error/negative error (prediction>true value)loss ratio to (true value>prediction) weighting.
@@ -10,18 +10,19 @@ class AsymetricWeightedSquaredLoss(object):
         """
         self.model=model
         self.beta=beta
+        self.gamma=gamma
 
     def loss(self,x,y,w):
         """Return the squared loss of the model on example (x,y) with weight p"""
         p=self.model.predict(x)
         r=0.5*(p-y)*(p-y)*w
-        return r*self.beta if p>y else r
+        return r*self.beta if p>y else r*self.gamma
 
     def d_loss_directional(self,x,y,i,w):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
         p=self.model.predict(x)
         r=self.model.d_predict_directional(x, i)*(p-y)*w
-        return r*self.beta if p>y else r
+        return r*self.beta if p>y else r*self.gamma
 
     def grad_loss(self,x,y,w):
         """
@@ -31,4 +32,4 @@ class AsymetricWeightedSquaredLoss(object):
         """
         p=self.model.predict(x)
         r=(p-y)*np.array(map(lambda i:self.model.d_predict_directional(x, i),range(0,self.model.dim)))*w
-        return r*self.beta if p>y else r
+        return r*self.beta if p>y else r*self.gamma
