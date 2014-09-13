@@ -96,8 +96,6 @@ plot_rec_curves <- function(preds,true_values,labelnames){
 
   mi=Inf
   ma=-Inf
-  print(mi)
-  print(ma)
 
   for (i in 1:length(preds)){
     d=ldply(preds[i],data.frame)
@@ -120,7 +118,8 @@ plot_rec_curves <- function(preds,true_values,labelnames){
     geom_density()+
     theme(legend.position="bottom")+
     xlab(paste("Value of the error for predictor:", labelnames[i]))+
-  scale_color_brewer(palette="Set3")
+    scale_color_brewer(palette="Set3")+
+    coord_cartesian(xlim = c(mi, ma))
     print(p0)
 
   }

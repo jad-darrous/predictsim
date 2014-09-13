@@ -23,43 +23,43 @@ class PredictorSgdlinear(Predictor):
         #Statistics oriented.
         self.last_loss=0
 
-        if options["quadratic"]:
+        if options["scheduler"]["predictor"]["quadratic"]:
             self.quadratic=True
             self.n_features=int(self.n_features+binom(self.n_features,2))
 
         #machine learning thing
         m=LinearModel(self.n_features)
 
-        if options["loss"]=="squaredloss":
+        if options["scheduler"]["predictor"]["loss"]=="squaredloss":
             from valopt.losses.squared_loss import SquaredLoss
             l=SquaredLoss(m)
-        elif options["loss"]=="absloss":
+        elif options["scheduler"]["predictor"]["loss"]=="absloss":
             from valopt.losses.abs_loss import AbsLoss
             l=AbsLoss(m)
-        elif options["loss"]=="weightedsquaredloss":
+        elif options["scheduler"]["predictor"]["loss"]=="weightedsquaredloss":
             from valopt.losses.weighted_squared_loss import WeightedSquaredLoss
             l=WeightedSquaredLoss(m)
-        elif options["loss"]=="asymetricweightedsquaredloss":
+        elif options["scheduler"]["predictor"]["loss"]=="asymetricweightedsquaredloss":
             from valopt.losses.asymetric_weighted_squared_loss import AsymetricWeightedSquaredLoss
-            if not options["beta"]:
+            if not options["scheduler"]["predictor"]["beta"]:
                 raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
-            if not options["gamma"]:
+            if not options["scheduler"]["predictor"]["gamma"]:
                 raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
-            l=AsymetricWeightedSquaredLoss(m,options['beta'],options["gamma"])
+            l=AsymetricWeightedSquaredLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
-        if "max_runtime" in options.keys():
-            self.max_runtime=options["max_runtime"]
+        if "max_runtime" in options["scheduler"]["predictor"].keys():
+            self.max_runtime=options["scheduler"]["predictor"]["max_runtime"]
         else:
             self.max_runtime=False
 
-        self.model=NAG(m,l,options["eta"],verbose=False)
+        self.model=NAG(m,l,options["scheduler"]["predictor"]["eta"],verbose=False)
 
-        if not options["weight"]:
+        if not options["scheduler"]["predictor"]["weight"]:
             wstr="1"
         else:
-            wstr=options["weight"]
+            wstr=options["scheduler"]["predictor"]["weight"]
 
         def weight(job):
             m=float(job.num_required_processors)

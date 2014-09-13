@@ -143,6 +143,7 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         from IPython import embed
         embed()
 
+print pred
 array_to_file(pred,arguments["<output_file>"])
 array_to_file(loss,arguments["<measurement_file>"])
 #if hasattr(predictor,"model"):

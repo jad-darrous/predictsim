@@ -113,6 +113,7 @@ plot_rec_curves <- function(preds,true_values,labelnames){
   p0 = ggplot(preds_dfs, aes(x = value)) +
    geom_density(aes(group = type, colour = type))+
   scale_color_brewer(palette="Set3")
+  coord_cartesian(xlim=c(mi,ma))
   print(p0)
 
   #m <- ggplot(d, aes(x=value))
