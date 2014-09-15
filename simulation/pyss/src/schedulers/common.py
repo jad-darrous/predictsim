@@ -342,6 +342,7 @@ class CpuSnapshot(object):
         assigns the job to start at the given job_start time.
         Important assumption: job_start was returned by jobEarliestAssignment.
         """
+        assert job.predicted_run_time > 0
         job.start_to_run_at_time = job_start
         self._ensure_a_slice_starts_at(job_start)
         self._ensure_a_slice_starts_at(job.predicted_finish_time)
