@@ -11,11 +11,13 @@ COEFFS_FOLDER=coeffs
 DRY_CONFIG_FILES_FP := $(wildcard $(DRY_CONFIG_FOLDER)/*.cfg)
 ALL_PREDICTION_FILES := $(patsubst $(DRY_CONFIG_FOLDER)/%.cfg,%,$(DRY_CONFIG_FILES_FP))
 ALL_PREDICTION_FILES_p := $(patsubst %,%.p,$(ALL_PREDICTION_FILES))
+ALL_PREDICTION_FILES_pd := $(patsubst %,%.pd,$(ALL_PREDICTION_FILES))
 TERMINATED_JOBS_FP := $(patsubst %,$(DRY_PREDICTION_FOLDER)/%,$(ALL_PREDICTION_FILES))
 MEASUREMENT_FILES  := $(patsubst %,$(MEASUREMENTS_FOLDER)/%,$(ALL_PREDICTION_FILES))
 CUSTOM_IGNORE := $(MEASUREMENTS_FOLDER)/clairvoyant $(MEASUREMENTS_FOLDER)/tsafrir $(MEASUREMENTS_FOLDER)/reqtime
 CL_FILES := $(filter-out $(CUSTOM_IGNORE),$(MEASUREMENT_FILES))
 KDE_FILES := $(filter-out dry_predictions/clairvoyant,$(TERMINATED_JOBS_FP))
+PRED_CPROFILE_FOLDER:=pred_cprofile
 
 #simulation stuff
 SIM_CONFIG_FOLDER :=../../simulation_config
@@ -23,6 +25,9 @@ SIM_FOLDER :=simulations
 SIM_FILES_FP := $(wildcard $(SIM_CONFIG_FOLDER)/*.cfg)
 ALL_SIMULATION_FILES := $(patsubst $(SIM_CONFIG_FOLDER)/%.cfg,%,$(SIM_FILES_FP))
 ALL_SIMULATION_FILES_s := $(patsubst %,%.s,$(ALL_SIMULATION_FILES))
+ALL_SIMULATION_FILES_sd := $(patsubst %,%.sd,$(ALL_SIMULATION_FILES))
+SIM_CPROFILE_FOLDER:=sim_cprofile
+
 
 all:filter
 val_task1:filter predict prediction_analysis
@@ -36,19 +41,28 @@ filter:
 #logfile simulation
 
 simulate: filter  $(ALL_SIMULATION_FILES_s)
+simulate_d: filter  $(ALL_SIMULATION_FILES_sd)
 
 %.s: $(SIM_CONFIG_FOLDER)/%.cfg
 	../../../simulation/pyss/src/run_simulator.py $(SWF_FOLDER)/$(SWF_FILE) $< $(SIM_FOLDER)/$(patsubst %.s,%,$@)
 
+%.sd: $(SIM_CONFIG_FOLDER)/%.cfg
+	pypy -m cProfile -o $(SIM_CPROFILE_FOLDER)/$@ ../../../simulation/pyss/src/run_simulator.py $(SWF_FOLDER)/$(SWF_FILE) $< $(SIM_FOLDER)/$(patsubst %.sd,%,$@)
+
+
 #_____________DRY_PREDICTION_________________:
 
 predict: filter $(ALL_PREDICTION_FILES_p)
+predict_d: filter $(ALL_PREDICTION_FILES_pd)
 
 %.p: $(DRY_CONFIG_FOLDER)/%.cfg
-	../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
+	pypy -m cProfile -o $@.profile  ../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
+
+%.pd: $(DRY_CONFIG_FOLDER)/%.cfg
+	pypy -m cProfile -o $(PRED_CPROFILE_FOLDER)$@  ../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.pd,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.pd,%,$@) $(COEFFS_FOLDER)/$(patsubst %.pd,%,$@)
 
 #_______________DRY PREDICTION ANALYSIS__________:
-prediction_analysis: predict mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
+prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
 
 
 mse:
@@ -72,7 +86,7 @@ loss_average:
 
 #_____________CLEANING___________:
 clean:
-	rm -rf $(DRY_PREDICTION_FOLDER)/* $(ANALYSIS_FOLDER)/* $(SWF_FOLDER)/* $(MEASUREMENTS_FOLDER)/* $(COEFFS_FOLDER)/* $(SIM_FOLDER)/*
+	rm -rf $(DRY_PREDICTION_FOLDER)/* $(ANALYSIS_FOLDER)/* $(SWF_FOLDER)/* $(MEASUREMENTS_FOLDER)/* $(COEFFS_FOLDER)/* $(SIM_FOLDER)/* $(PRED_CPROFILE_FOLDER)/* $(SIM_CPROFILE_FOLDER)/*
 
 #_____________ARCHIVED___________:
 #extraction of specific information for data analysis:
