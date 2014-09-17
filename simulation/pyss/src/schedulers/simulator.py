@@ -28,6 +28,9 @@ class Simulator(object):
         self.output_swf = None
 
         self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
+        
+        if hasattr(self.scheduler, "I_NEED_A_PREDICTOR") and self.scheduler.I_NEED_A_PREDICTOR:
+                self.scheduler.running_jobs =  self.machine.jobs
 
         self.event_queue.add_handler(JobSubmissionEvent, self.handle_submission_event)
         self.event_queue.add_handler(JobTerminationEvent, self.handle_termination_event)

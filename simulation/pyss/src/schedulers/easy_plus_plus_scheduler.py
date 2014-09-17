@@ -60,7 +60,7 @@ class  EasyPlusPlusScheduler(Scheduler):
         "Schedules jobs that can run right now, and returns them"
    
         for job in self.unscheduled_jobs:
-            self.predictor.predict(job, current_time, self.cpu_snapshot.jobs_at(current_time))
+            self.predictor.predict(job, current_time, self.running_jobs)
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)
