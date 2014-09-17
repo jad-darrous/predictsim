@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pypy
 # encoding: utf-8
 '''
 Runtime predictor tester.
@@ -15,9 +15,9 @@ Options:
 from base.docopt import docopt
 from base.prototype import _job_input_to_job
 from base.workload_parser import parse_lines
-from base.np_printutils import array_to_file
-from base.np_printutils import array_to_file_n
-from base.np_printutils import np_array_to_file
+#from base.np_printutils import array_to_file
+#from base.np_printutils import array_to_file_n
+#from base.np_printutils import np_array_to_file
 from simpy import Environment,simulate,Monitor
 from simpy.util import start_delayed
 
@@ -49,7 +49,7 @@ else:
 #argement management: max_cores
 config = {}
 execfile(arguments["<config_file>"], config)
-if config['max_cores']=="auto":
+if config['scheduler']['predictor']['max_cores']=="auto":
     with open(arguments['<swf_file>']) as input_file:
         num_processors=None
         for line in input_file:
@@ -88,16 +88,16 @@ with open(arguments['<swf_file>'], 'rt') as  f:
     print("Parsed swf file.")
 
     print("Choosing predictor.")
-    if config["predictor"]=="tsafrir":
+    if config["scheduler"]["predictor"]["predictor"]=="tsafrir":
         from predictors.predictor_tsafrir import PredictorTsafrir
         predictor=PredictorTsafrir({})
-    elif config["predictor"]=="clairvoyant":
+    elif config["scheduler"]["predictor"]["predictor"]=="clairvoyant":
         from predictors.predictor_clairvoyant import PredictorClairvoyant
         predictor=PredictorClairvoyant({})
-    elif config["predictor"]=="reqtime":
+    elif config["scheduler"]["predictor"]["predictor"]=="reqtime":
         from predictors.predictor_reqtime import PredictorReqtime
         predictor=PredictorReqtime({})
-    elif config["predictor"]=="sgd":
+    elif config["scheduler"]["predictor"]["predictor"]=="sgd":
         #if arguments["<loss>"] not in ["squared_loss"]:
             #raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
         #if arguments["<penalty>"] not in ["none"]:
@@ -143,7 +143,13 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         from IPython import embed
         embed()
 
-print pred
+#print pred
+
+def array_to_file(L,fn):
+    with open(fn,"w") as f:
+        for item in L:
+            f.write("%s\n" % item)
+
 array_to_file(pred,arguments["<output_file>"])
 array_to_file(loss,arguments["<measurement_file>"])
 #if hasattr(predictor,"model"):

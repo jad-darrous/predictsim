@@ -1,9 +1,15 @@
 from predictor import Predictor
-import numpy as np
+#import numpy as np
+import math
 import itertools
-from scipy.special import binom
 from valopt.models.linear_model import LinearModel
 from valopt.algos.nag import NAG
+
+from operator import mul    # or mul=lambda x,y:x*y
+from fractions import Fraction
+
+def kPn(n,k):
+  return int( reduce(mul, (Fraction(n-i, i+1) for i in range(k)), 1) )
 
 class PredictorSgdlinear(Predictor):
     #Internal info
@@ -25,7 +31,7 @@ class PredictorSgdlinear(Predictor):
 
         if options["scheduler"]["predictor"]["quadratic"]:
             self.quadratic=True
-            self.n_features=int(self.n_features+binom(self.n_features,2))
+            self.n_features=int(self.n_features+kPn(self.n_features,2))
 
         #machine learning thing
         m=LinearModel(self.n_features)
@@ -64,14 +70,16 @@ class PredictorSgdlinear(Predictor):
         def weight(job):
             m=float(job.num_required_processors)
             r=float(job.actual_run_time)
-            log=np.log
+            #log=np.log
+            log=math.log
             return eval(wstr)
         self.weight=weight
 
 
     def make_x(self,job,current_time,list_running_jobs):
         """Make a vector from a job. requires job, current time and system state."""
-        x=np.empty(self.n_features,dtype=np.float32)
+        #x=np.empty(self.n_features,dtype=np.float32)
+        x=[0]*self.n_features
 
         #checks on user internal memory
         if not self.user_job_last1.has_key(job.user_id):
@@ -147,7 +155,7 @@ class PredictorSgdlinear(Predictor):
         elif self.user_job_last2[job.user_id] != None:
             x[5]=0.5*(x[1]+x[2])
             x[6]=x[5]
-        elif self.user_job_last1[job.user_id] != None: 
+        elif self.user_job_last1[job.user_id] != None:
             x[5]=x[1]
             x[6]=x[5]
         else:
@@ -198,15 +206,15 @@ class PredictorSgdlinear(Predictor):
         #second of day
         #x[14]=current_time % 3600*60
         #cos second of day
-        x[14]=np.cos(3600*60*2*np.pi*x[14])
+        x[14]=math.cos(3600*60*2*math.pi*x[14])
         #sin second of day
-        x[15]=np.sin(3600*60*2*np.pi*x[14])
+        x[15]=math.sin(3600*60*2*math.pi*x[14])
         #day of week trough seconds:
         #x[14]=current_time % 3600*60*7
         #cos day of week
-        x[16]=np.cos(7*3600*60*2*np.pi*x[14])
+        x[16]=math.cos(7*3600*60*2*math.pi*x[14])
         #sin day of week
-        x[17]=np.sin(7*3600*60*2*np.pi*x[14])
+        x[17]=math.sin(7*3600*60*2*math.pi*x[14])
 
         if self.quadratic:
             i=1
@@ -242,9 +250,9 @@ class PredictorSgdlinear(Predictor):
             x=self.job_x[job]
 
         #make the prediction
-        job.predicted_run_time=abs(self.model.predict(x))
+        job.predicted_run_time=max(1,abs(self.model.predict(x)))
         if not self.max_runtime==False:
-            job.predicted_run_time=min(job.predicted_run_time,self.max_runtime)
+            job.predicted_run_time=max(1,min(job.predicted_run_time,self.max_runtime))
 
         return self.model.loss.loss(x,job.actual_run_time,self.weight(job))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-import numpy as np
+import math
 
 class NAG(object):
     """
@@ -17,8 +17,8 @@ class NAG(object):
         self.eta=eta
         self.verbose=verbose
         self.n=1
-        self.s=np.zeros(model.dim)
-        self.G=np.zeros(model.dim)
+        self.s=[0]*model.dim
+        self.G=[0]*model.dim
         self.N=0
 
     def predict(self, x):
@@ -40,21 +40,22 @@ class NAG(object):
     def fit(self, x,y,w=1):
         W=self.model.get_param_vector()
         for i in range(0,self.model.dim):
-            if np.abs(x[i])>self.s[i]:
-                W[i]*=self.s[i]/np.abs(x[i])
-                self.s[i]=np.abs(x[i])
+            if abs(x[i])>self.s[i]:
+                W[i]*=self.s[i]/abs(x[i])
+                self.s[i]=abs(x[i])
 
-        for i in range(0,self.model.dim):
-            if self.s[i]==0:
-                self.s[i]=0.01
+        #for i in range(0,self.model.dim):
+            #if self.s[i]==0:
+                #self.s[i]=0.01
 
-        self.N=self.N+np.sum(x*x/(self.s*self.s))
+        self.N=self.N+sum([a*a/(b*b) for a,b in zip(x,self.s) if not b==0])
 
         self.model.set_param_vector(W)
 
         for i in range(0,self.model.dim):
-            self.G+= (self.loss.d_loss_directional(x,y,i,w))**2
-            W[i]-= self.eta*self.loss.d_loss_directional(x,y,i,w)/(np.sqrt(self.N*self.G[i]/self.n)*self.s[i])
+            self.G[i]+= (self.loss.d_loss_directional(x,y,i,w))**2
+            if not self.G[i]==0:
+                W[i]-= self.eta*self.loss.d_loss_directional(x,y,i,w)/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])
 
         self.n+=1
         self.model.set_param_vector(W)

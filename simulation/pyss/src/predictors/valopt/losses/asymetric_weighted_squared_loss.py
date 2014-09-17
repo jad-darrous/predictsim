@@ -1,5 +1,4 @@
 # encoding: utf-8
-import numpy as np
 
 class AsymetricWeightedSquaredLoss(object):
     def __init__(self,model,beta,gamma):
@@ -31,5 +30,5 @@ class AsymetricWeightedSquaredLoss(object):
         In the case where this can be optimized, it will be different.
         """
         p=self.model.predict(x)
-        r=(p-y)*np.array(map(lambda i:self.model.d_predict_directional(x, i),range(0,self.model.dim)))*w
+        r=(p-y)*map(lambda i:self.model.d_predict_directional(x, i),range(0,self.model.dim))*w
         return r*self.beta if p>y else r*self.gamma

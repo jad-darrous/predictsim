@@ -1,11 +1,10 @@
 # encoding: utf-8
-import numpy as np
 
 class LinearModel(object):
 
     def __init__(self, dim, verbose=False):
         """Linear Model, y=<w,x>"""
-        self.w=np.zeros(dim,dtype=np.float32)
+        self.w=[0]*dim
         self.dim=dim
 
     def get_param_vector(self):
@@ -18,7 +17,10 @@ class LinearModel(object):
 
     def predict(self, x):
         """Return the model prediction for an instance x"""
-        return np.dot(self.w,x)
+        r=0
+        for i in range(0,self.dim):
+            r+=self.w[i]*x[i]
+        return r
 
     def d_predict_directional(self, x, i):
         """Return the first order directional derivative with regard to the i-th entry of the parameter vector of the model at point x"""

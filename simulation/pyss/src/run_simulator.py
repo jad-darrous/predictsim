@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pypy
 # encoding: utf-8
 '''
 Run the PySS Simulator. You should specify a config file, an enforce input and output swfs over that via commandline if you so desire.
