@@ -250,7 +250,7 @@ class PredictorSgdlinear(Predictor):
             x=self.job_x[job]
 
         #make the prediction
-        job.predicted_run_time=max(1,abs(self.model.predict(x)))
+        job.predicted_run_time=max(1,int(abs(self.model.predict(x))))
         if not self.max_runtime==False:
             job.predicted_run_time=max(1,min(job.predicted_run_time,self.max_runtime))
 
