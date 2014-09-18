@@ -10,6 +10,7 @@ class Predictor(object):
 		"""
 		Modify the predicted_run_time of job.
 		Called when a job is submitted to the system.
+		the predited runtime should be an int!
 		"""
 		print("Do it")
 
