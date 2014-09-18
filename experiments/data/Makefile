@@ -56,7 +56,7 @@ predict: filter $(ALL_PREDICTION_FILES_p)
 predict_d: filter $(ALL_PREDICTION_FILES_pd)
 
 %.p: $(DRY_CONFIG_FOLDER)/%.cfg
-	pypy -m cProfile -o $@.profile  ../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
+	../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
 
 %.pd: $(DRY_CONFIG_FOLDER)/%.cfg
 	pypy -m cProfile -o $(PRED_CPROFILE_FOLDER)/$@  ../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.pd,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.pd,%,$@) $(COEFFS_FOLDER)/$(patsubst %.pd,%,$@)
