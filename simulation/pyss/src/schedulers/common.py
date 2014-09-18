@@ -323,6 +323,7 @@ class CpuSnapshot(object):
 	This function extends the duration of a job, if the predicted duration is smaller
 	than the user estimated duration, then the function adds more slices to the job accordingly.
 	"""
+	assert isinstance(new_predicted_run_time, int)
 	job_estimated_finish_time = job.start_to_run_at_time + new_predicted_run_time
         self._ensure_a_slice_starts_at(job_estimated_finish_time)
         for s in self._slices_time_range(job.predicted_finish_time, job_estimated_finish_time):

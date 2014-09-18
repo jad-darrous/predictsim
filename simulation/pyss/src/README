@@ -91,6 +91,9 @@ pypy ./run_simulator.py sample_config.py
 ** profiling/optimizing:
 time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py sample_config_profiling.py
 
+time pypy -OO -m cProfile -o simul.cprof . run_simulator.py '../../../data/CEA-curie_sample/original_swf/log.swf' sample_config_profiling.py res.swf
+
+
 runsnake simul.cprof
 
 
