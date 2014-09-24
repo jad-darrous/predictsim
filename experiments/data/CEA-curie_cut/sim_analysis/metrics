@@ -1,0 +1,44 @@
+Curie Log metrics for the various prediction techniques.
+Name                                         avg stretch                     max stretch
+sgd_symm_abs_cor_reqt                        23                              473344
+tsaf_cor_reqt                                25                              472747
+sgd_symm_abs_cor_recu                        26                              481916
+clairvoyant                                  40                               32130
+sgd_asym_strong_squared_cor_recu             60                              201184
+tsaf_cor_recu                                63                              471465
+sgd_asym_weak_squared_cor_recu               103                             450963
+sgd_symm_squared_cor_reqt                    109                             472954
+sgd_asym_weak_abs_cor_recu                   111                            1359273
+sgd_weighted_asym_strong_squared_cor_recu    114                             183789
+sgd_weighted_symm_abs_cor_recu               120                             479164
+sgd_weighted_symm_squared_cor_recu           120                             605705
+sgd_weighted_symm_abs_cor_reqt               125                             473460
+sgd_asym_strong_abs_cor_recu                 134                             187466
+sgd_weighted_asym_strong_abs_cor_recu        159                             286446
+sgd_weighted_symm_squared_cor_reqt           169                             279033
+sgd_weighted_asym_strong_abs_cor_tsaf        225                              91430
+reqtime                                      226                              63479  EASY backfilling
+sgd_weighted_asym_strong_abs_cor_reqt        226                              92196
+sgd_symm_squared_cor_recu                    240                             608944
+sgd_weighted_asym_weak_abs_cor_recu          273                            1416775
+sgd_weighted_asym_strong_squared_cor_tsaf    324                              88285
+sgd_asym_weak_abs_cor_reqt                   335                             157276
+sgd_weighted_asym_strong_squared_cor_reqt    338                             105051
+sgd_weighted_asym_weak_abs_cor_reqt          351                              65317
+sgd_weighted_asym_weak_squared_cor_tsaf      356                             115954
+sgd_asym_strong_abs_cor_reqt                 369                              93574
+sgd_asym_strong_squared_cor_reqt             378                              68801
+sgd_asym_weak_abs_cor_tsaf                   403                              82079
+sgd_asym_strong_squared_cor_tsaf             431                             102288
+sgd_asym_strong_abs_cor_tsaf                 444                             105497
+sgd_asym_weak_squared_cor_reqt               445                              63719
+double_reqt                                  459                             110379
+sgd_symm_squared_cor_tsaf                    476                            1065577
+sgd_asym_weak_squared_cor_tsaf               477                             125244
+sgd_weighted_asym_weak_squared_cor_reqt      486                             177538
+sgd_symm_abs_cor_tsaf                        549                             608749
+sgd_weighted_symm_abs_cor_tsaf               580                            2596441
+sgd_weighted_asym_weak_abs_cor_tsaf          733                             177767
+tsaf_cor_tsaf                                773                            2160343  Baseline from the Tsafir article.. is worse than Easy?? implementation failure?
+sgd_weighted_asym_weak_squared_cor_recu      852                            1096245
+sgd_weighted_symm_squared_cor_tsaf           6147                           1465056
