@@ -43,7 +43,7 @@ parser=parser_swf_minimal(description,epilog)
 
 #files you want to source from the rfold folder for this Rscript
 #e.g. c('common.R','histogram.R')
-userfiles=c('common.R',"analysis.R","visu.R")
+userfiles=c('common.R')
 ###################END BLOCK#####################
 
 
@@ -60,7 +60,7 @@ verb(args,"Parameters to the script")
 setwd(rfold)
 rfold_wd=getwd()
 for (filename in userfiles) {
-	source(filename)
+  source(filename)
 }
 
 
@@ -71,8 +71,6 @@ rm(parser,rfold,userfiles)
 
 #####################OUTPUT_MANAGEMENT###########
 ################MODIFY IF NEEDED####################
-source('Rscript/output_management.R')
-options_vector=set_output(args$device,args$output,args$ratio,execution_wd)
 ###################END BLOCK#####################
 
 
@@ -88,25 +86,59 @@ setwd(execution_wd)
 
 
 #type stuff here.
-do_one_file <- function( swf_filename ) {
-  print(swf_filename)
-	data=swf_read(swf_filename)
-  print("Average flow time")
-	print(sum(data$wait_time+data$run_time)/nrow(data))
-  print("Max flow time")
-	print(max(data$wait_time+data$run_time)/nrow(data))
-  print("Average job stretch : (Wi+Pi)/Pi")
-  print(sum((data$wait_time+data$run_time)/data$run_time)/nrow(data))
-  print("Max job stretch : (Wi+Pi)/Pi")
-  print(max((data$wait_time+data$run_time)/data$run_time))
-  print("-------------------------------------------------")
+
+name       =c()
+avgft      =c()
+maxft      =c()
+RMSFT      =c()
+avgstretch =c()
+maxstretch =c()
+RMSS       =c()
+avgbsld    =c()
+maxbsld    =c()
+RMSBSLD    =c()
+
+for (i in 1:length(args$swf_filenames)) {
+  swf_filename=args$swf_filenames[i]
+  data=swf_read(swf_filename)
+
+  data$ft=data$wait_time+data$run_time
+  data$stretch=data$ft/data$run_time
+  data$bsld=max(1,data$ft/max(10,data$run_time))
+  n=nrow(data)
+
+  name=append(name,swf_filename)
+  avgft=append(avgft, sum(data$ft)/nrow(data))
+  maxft=append(maxft, max(data$ft))
+  RMSFT=append(RMSFT, sqrt(sum(data$ft*data$ft)/n))
+  avgstretch=append(avgstretch, sum(data$stretch)/nrow(data))
+  maxstretch=append(maxstretch, max(data$stretch))
+  RMSS=append(RMSS, sqrt(sum(data$stretch*data$stretch)/n))
+  avgbsld=append(avgbsld, sum(data$bsld)/nrow(data))
+  maxbsld=append(maxbsld, max(data$bsld))
+  RMSBSLD=append(RMSBSLD, sqrt(sum(data$bsld*data$bsld)/n))
+
 }
 
-lapply(args$swf_filenames,do_one_file)
+df=data.frame(name=name,
+              avgft=avgft,
+              maxft=maxft,
+              RMSFT=RMSFT,
+              avgstretch=avgstretch,
+              maxstretch=maxstretch,
+              RMSS=RMSS,
+              avgbsld=avgbsld,
+              maxbsld=maxbsld,
+              RMSBSLD=RMSBSLD)
+df=df[with(df,order(avgstretch,RMSBSLD)),]
+write.table(df,args$output,sep="   ",row.names=FALSE)
 
+
+#L1=c("Filename   Average_Flow_time    Max_Flow_time    RMSFT    Average_Stretch    Max_Stretch    RMSS    Average_Bsld    Max_Bsld    RMBSLD")
+#lapply(L1, write, args$output, append=TRUE, ncolumns=1)
+#lapply(L, write, args$output, append=TRUE, ncolumns=1)
 
 ###################END BLOCK#####################
-
 
 #############X11 OUTPUT MANAGEMENT###############
 #################MODIFY IF NEEDED################
