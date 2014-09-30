@@ -104,7 +104,7 @@ for (i in 1:length(args$swf_filenames)) {
 
   data$ft=data$wait_time+data$run_time
   data$stretch=data$ft/data$run_time
-  data$bsld=max(1,data$ft/max(10,data$run_time))
+  data$bsld=max(1,data$ft/pmax(rep(10, nrow(data)),data$run_time))
   n=nrow(data)
 
   name=append(name,swf_filename)
