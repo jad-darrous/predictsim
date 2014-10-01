@@ -52,6 +52,13 @@ class PredictorSgdlinear(Predictor):
             if not options["scheduler"]["predictor"]["gamma"]:
                 raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
             l=AsymetricWeightedSquaredLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
+        elif options["scheduler"]["predictor"]["loss"]=="asymetricweightedabsloss":
+            from valopt.losses.asymetric_weighted_abs_loss import AsymetricWeightedAbsLoss
+            if not options["scheduler"]["predictor"]["beta"]:
+                raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
+            if not options["scheduler"]["predictor"]["gamma"]:
+                raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
+            l=AsymetricWeightedAbsLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
@@ -251,6 +258,7 @@ class PredictorSgdlinear(Predictor):
 
         #make the prediction
         job.predicted_run_time=max(1,int(abs(self.model.predict(x))))
+        job.predicted_run_time=min(job.predicted_run_time,job.user_estimated_run_time)
         if not self.max_runtime==False:
             job.predicted_run_time=max(1,min(job.predicted_run_time,self.max_runtime))
 
