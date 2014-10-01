@@ -43,6 +43,7 @@ class Scheduler(object):
              raise Exception("No such predictor (class '"+my_class+"' within the module '"+my_module+"' file not found).")
         #load the class
         self.predictor = package.__dict__[my_module].__dict__[my_class](options)
+
     
     def init_corrector(self, options):
         if options["scheduler"]["corrector"] is None:
@@ -53,6 +54,11 @@ class Scheduler(object):
         if not hasattr(common_correctors, options["scheduler"]["corrector"]["name"]):
              raise Exception("corrector '"+str(options["scheduler"]["corrector"]["name"])+"' doesn't exist")
         self.corrector =  getattr(common_correctors, options["scheduler"]["corrector"]["name"])
+
+
+        if self.corrector.__name__=="ninetynine":
+            from base.sequential_estimation import PercentileEstimator
+            self.pestimator=PercentileEstimator(0.9)
         
 
     def new_events_on_job_submission(self, job, current_time):

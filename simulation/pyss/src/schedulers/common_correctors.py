@@ -30,20 +30,19 @@ def tsafrir(job, current_time):
 	new_predicted_run_time = min(new_predicted_run_time, job.user_estimated_run_time)
 	return new_predicted_run_time
 
-
-
 #if runtime>prediction, then "99% of jobs are shorter than" value,
-def ninetynine(job, current_time):
-	print("TODO, need a communication with the predictor!")
-	return 42
-
-
-
+def ninetynine(pestimator,job, current_time):
+	if(not hasattr(job, "corrected")):
+            job.corrected = True
+            v=abs(1+pestimator.estimate()*job.user_estimated_run_time)
+            return int(min(job.predicted_run_time+v,job.user_estimated_run_time))
+        else:
+            return job.user_estimated_run_time
 
 #"wait"(stop backfilling (and scheduling) as soon as "shadow" reservation is delayed)
 def wait(job, current_time):
 	print("TODO")
-	return 42
+	return job.user_estimated_run_time
 
 
 
