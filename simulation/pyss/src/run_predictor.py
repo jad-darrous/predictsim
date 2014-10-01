@@ -88,16 +88,19 @@ with open(arguments['<swf_file>'], 'rt') as  f:
     print("Parsed swf file.")
 
     print("Choosing predictor.")
-    if config["scheduler"]["predictor"]["predictor"]=="tsafrir":
+    if config["scheduler"]["predictor"]["name"]=="predictor_tsafrir":
         from predictors.predictor_tsafrir import PredictorTsafrir
         predictor=PredictorTsafrir({})
-    elif config["scheduler"]["predictor"]["predictor"]=="clairvoyant":
+    elif config["scheduler"]["predictor"]["name"]=="predictor_clairvoyant":
         from predictors.predictor_clairvoyant import PredictorClairvoyant
         predictor=PredictorClairvoyant({})
-    elif config["scheduler"]["predictor"]["predictor"]=="reqtime":
+    elif config["scheduler"]["predictor"]["name"]=="predictor_reqtime":
         from predictors.predictor_reqtime import PredictorReqtime
         predictor=PredictorReqtime({})
-    elif config["scheduler"]["predictor"]["predictor"]=="sgd":
+    elif config["scheduler"]["predictor"]["name"]=="predictor_double_reqtime":
+        from predictors.predictor_double_reqtime import PredictorDoubleReqtime
+        predictor=PredictorDoubleReqtime({})
+    elif config["scheduler"]["predictor"]["name"]=="predictor_sgdlinear":
         #if arguments["<loss>"] not in ["squared_loss"]:
             #raise ValueError("loss not supported. supported losses=%s"%(supported_losses.__str__()))
         #if arguments["<penalty>"] not in ["none"]:
