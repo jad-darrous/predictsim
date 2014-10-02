@@ -27,6 +27,8 @@ ALL_SIMULATION_FILES := $(patsubst $(SIM_CONFIG_FOLDER)/%.cfg,%,$(SIM_FILES_FP))
 ALL_SIMULATION_FILES_s := $(patsubst %,%.s,$(ALL_SIMULATION_FILES))
 ALL_SIMULATION_FILES_sd := $(patsubst %,%.sd,$(ALL_SIMULATION_FILES))
 SIM_CPROFILE_FOLDER:=sim_cprofile
+ALL_SIMULATION_RESULTS := $(patsubst %,$(SIM_FOLDER)/%,$(ALL_SIMULATION_FILES))
+SIM_ANALYSIS_FOLDER:=sim_analysis
 
 
 all:filter
@@ -40,8 +42,8 @@ filter:
 #TODO:_______________SIMULATION___________________:
 #logfile simulation
 
-simulate: filter  $(ALL_SIMULATION_FILES_s)
-simulate_d: filter  $(ALL_SIMULATION_FILES_sd)
+simulate:   $(ALL_SIMULATION_FILES_s)
+simulate_d:   $(ALL_SIMULATION_FILES_sd)
 
 %.s: $(SIM_CONFIG_FOLDER)/%.cfg
 	../../../simulation/pyss/src/run_simulator.py $(SWF_FOLDER)/$(SWF_FILE) $< $(SIM_FOLDER)/$(patsubst %.s,%,$@)
@@ -52,8 +54,8 @@ simulate_d: filter  $(ALL_SIMULATION_FILES_sd)
 
 #_____________DRY_PREDICTION_________________:
 
-predict: filter $(ALL_PREDICTION_FILES_p)
-predict_d: filter $(ALL_PREDICTION_FILES_pd)
+predict:  $(ALL_PREDICTION_FILES_p)
+predict_d:  $(ALL_PREDICTION_FILES_pd)
 
 %.p: $(DRY_CONFIG_FOLDER)/%.cfg
 	../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.p,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.p,%,$@) $(COEFFS_FOLDER)/$(patsubst %.p,%,$@)
@@ -84,9 +86,18 @@ kde_indiv:
 loss_average:
 	../../data_manipulation/average_all $(MEASUREMENTS_FOLDER)/ $(MEASUREMENTS_FOLDER)/
 
+#___________SIMULATION_ANALYSIS__:
+simulation_analysis: simu_stretch simu_metrics
+
+simu_stretch:
+	../../../simulation_analysis/swf2vis_stretchCDF_KDE.R $(ALL_SIMULATION_RESULTS)  -o $(SIM_ANALYSIS_FOLDER)/stretch.pdf -r 2
+
+simu_metrics:
+	../../../simulation_analysis/swf2vis_metrics.R $(ALL_SIMULATION_RESULTS) -o $(SIM_ANALYSIS_FOLDER)/metrics 
+
 #_____________CLEANING___________:
 clean:
-	rm -rf $(DRY_PREDICTION_FOLDER)/* $(ANALYSIS_FOLDER)/* $(SWF_FOLDER)/* $(MEASUREMENTS_FOLDER)/* $(COEFFS_FOLDER)/* $(SIM_FOLDER)/* $(PRED_CPROFILE_FOLDER)/* $(SIM_CPROFILE_FOLDER)/*
+	rm -rf $(DRY_PREDICTION_FOLDER)/* $(ANALYSIS_FOLDER)/* $(SWF_FOLDER)/* $(MEASUREMENTS_FOLDER)/* $(COEFFS_FOLDER)/* $(SIM_FOLDER)/* $(PRED_CPROFILE_FOLDER)/* $(SIM_CPROFILE_FOLDER)/* $(SIM_ANALYSIS_FOLDER)/*
 
 #_____________ARCHIVED___________:
 #extraction of specific information for data analysis:
