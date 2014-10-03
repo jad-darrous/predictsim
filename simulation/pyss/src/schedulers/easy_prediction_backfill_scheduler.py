@@ -21,6 +21,7 @@ class EasyPredictionBackfillScheduler(EasyBackfillScheduler):
 	def new_events_on_job_submission(self, job, current_time):
 		"Overriding parent method"
 		self.predictor.predict(job, current_time, self.running_jobs)
+                job.initial_prediction=job.predicted_run_time
 		return super(EasyPredictionBackfillScheduler, self).new_events_on_job_submission(job, current_time)
 
 	# If you uncomment this, the prediction is called several time, just before a possible schedule for the job.

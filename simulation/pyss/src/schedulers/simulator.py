@@ -45,6 +45,7 @@ class Simulator(object):
 		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
 		self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
+                self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
 		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
         if hasattr(scheduler, "I_NEED_A_PREDICTOR") and scheduler.I_NEED_A_PREDICTOR:
@@ -111,7 +112,10 @@ class Simulator(object):
         #17. Preceding Job Number
         outl.append("-1")
         #18. Think Time
-        outl.append("-1")
+        if hasattr(event.job,"initial_prediction"):
+            outl.append(str(event.job.initial_prediction))
+        else:
+            outl.append("-1")
 
         self.output_swf.write(' '.join(outl)+"\n")
         self.pbari+=1

@@ -50,6 +50,7 @@ class  EasyPlusPlusScheduler(Scheduler):
     def new_events_on_job_under_prediction(self, job, current_time):
         assert job.predicted_run_time <= job.user_estimated_run_time
 
+
         if self.corrector.__name__=="ninetynine":
             new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
         else:
@@ -67,6 +68,8 @@ class  EasyPlusPlusScheduler(Scheduler):
 
         for job in self.unscheduled_jobs:
             self.predictor.predict(job, current_time, self.running_jobs)
+            if not hasattr(job,"initial_prediction"):
+                job.initial_prediction=job.predicted_run_time
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)
