@@ -93,7 +93,12 @@ simu_stretch:
 	../../../simulation_analysis/swf2vis_stretchCDF_KDE.R $(ALL_SIMULATION_RESULTS)  -o $(SIM_ANALYSIS_FOLDER)/stretch.pdf -r 2
 
 simu_metrics:
-	../../../simulation_analysis/swf2vis_metrics.R $(ALL_SIMULATION_RESULTS) -o $(SIM_ANALYSIS_FOLDER)/metrics 
+	../../../simulation_analysis/swf2vis_metrics.R $(ALL_SIMULATION_RESULTS) -o $(SIM_ANALYSIS_FOLDER)/metrics
+
+simu_allmetrics: simu_metrics_sort_avgbsld simu_metrics_sort_avgstretch simu_metrics_sort_RMSBSLD simu_metrics_sort_RMSS
+
+simu_metrics_sort_%:simu_metrics
+	../../data_manipulation/$@  $(SIM_ANALYSIS_FOLDER)/metrics >$(SIM_ANALYSIS_FOLDER)/$@
 
 #_____________CLEANING___________:
 clean:

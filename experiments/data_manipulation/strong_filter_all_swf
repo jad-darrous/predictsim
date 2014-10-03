@@ -49,16 +49,19 @@ awk '($4>0){print}' |
 #time_req to runtime if time_req<=0
 awk '{
 if ($9<=0)
-  {$9=86400;
-  print;}
+  p=43
 else
   print;
 }' |
 
-#run_time <= req_time
-awk '($9>=$4){print}' |
+#if req_time < run_time
+awk '{
+if ($9<$4){$4=$9;print;}
+else
+  print;
+}' |
 
 #sub_time >0
-awk '($2>0){print}' >> $output_swf_folder/`basename $file`
+awk '($2>=0){print}' >> $output_swf_folder/`basename $file`
 
 done
