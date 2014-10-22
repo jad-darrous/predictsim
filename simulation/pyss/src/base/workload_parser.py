@@ -10,7 +10,7 @@
 class JobInput(object):
     def __init__(self, line):
         self.fields = line.split()
-        assert len(self.fields) == 18
+        assert 18 <= len(self.fields) <= 19
 
     # lazy access as properties, for efficiency
     @property
@@ -72,6 +72,12 @@ class JobInput(object):
     @property
     def think_time_from_preceding_job(self):
         return int(self.fields[17])
+    @property
+    def energy(self):
+        if(len(self.fields) == 18):
+            return 0
+        else:
+            return int(self.fields[18])
 
     def __str__(self):
         return "JobInput<number=%s>" % self.number
@@ -108,6 +114,10 @@ def _test():
     job = JobInput("   59    26613      0    716   32     -1    -1   -1     -1    -1 -1   4   1   3  0 -1 -1 -1")
     assert str(job).startswith("JobInput")
     assert job.number == 59
+    job = JobInput("   59    26613      0    716   32     -1    -1   -1     -1    -1 -1   4   1   3  0 -1 -1 -1 12")
+    assert str(job).startswith("JobInput")
+    assert job.number == 59
+    assert job.energy == 12
 
 if __name__ == "__main__":
     import optparse
