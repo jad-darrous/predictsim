@@ -29,8 +29,10 @@ class EnergeticFairshareScheduler(Scheduler):
 		self.user_cputime_max = 0.000001
 		self.user_energy_counter = {}
 		self.user_energy_max = 0.000001
-		
-		
+		#see slurm/priority_multifactor.c for more info on this:
+		decay_hl = 60*60*24*7
+		self.decay_factor = 1.0-(0.693/decay_hl)
+		self.last_decay_run = -1
 		
 		if "weights" in options["scheduler"]:
 			self.weights = Weights(
@@ -73,6 +75,27 @@ class EnergeticFairshareScheduler(Scheduler):
 		"Overriding parent method"
 		#print ("cputime at %i: "%current_time, self.user_cputime_counter)
 		#print ("energy  at %i: "%current_time, self.user_energy_counter, "// free: %i VS %i"%(self.cpu_snapshot.free_processors_available_at(current_time), self.free_processors))
+		
+		if self.last_decay_run == -1:
+			self.last_decay_run = current_time
+		
+		#print("BEFORE @ %i"%current_time)
+		run_delta = current_time - self.last_decay_run
+		assert run_delta >= 0
+		if run_delta != 0:
+			real_decay = pow(self.decay_factor, run_delta)
+			
+			
+			for i in self.user_cputime_counter:
+				self.user_cputime_counter[i] *= real_decay
+			for i in self.user_energy_counter:
+				self.user_energy_counter[i] *= real_decay
+
+			self.last_decay_run = current_time
+		#print("AFTER @ %i"%current_time)
+		#print self.user_energy_counter
+		
+		
 		self.unscheduled_jobs.sort(
 			key = lambda x: self.waiting_list_weight(x, current_time)
 			#reverse=True
