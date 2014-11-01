@@ -370,7 +370,7 @@ class CpuSnapshot(object):
 	while size > 0:
 	    s = self.slices[0]
             if s.end_time <= current_time:
-                self.archive_of_old_slices.append(s)
+                #self.archive_of_old_slices.append(s)
                 self.slices.pop(0)
 		size -= 1 
             else:
