@@ -30,8 +30,8 @@ class EnergeticFairshareScheduler(Scheduler):
 		self.user_energy_counter = {}
 		self.user_energy_max = 0.000001
 		#see slurm/priority_multifactor.c for more info on this:
-		decay_hl = 60*60*24*7
-		self.decay_factor = 1.0-(0.693/decay_hl)
+		self.decay_hl = 60*60*24*7
+		self.decay_factor = 1.0-(0.693/self.decay_hl)
 		self.last_decay_run = -1
 		
 		if "weights" in options["scheduler"]:
@@ -82,7 +82,7 @@ class EnergeticFairshareScheduler(Scheduler):
 		#print("BEFORE @ %i"%current_time)
 		run_delta = current_time - self.last_decay_run
 		assert run_delta >= 0
-		if run_delta != 0:
+		if run_delta > self.decay_hl*0.01:
 			real_decay = pow(self.decay_factor, run_delta)
 			
 			
