@@ -77,7 +77,7 @@ class JobInput(object):
     @property
     def energy(self):
         if(len(self.fields) == 18):
-            e = 700 * self.run_time * self.num_allocated_processors
+            e = 700 * self.run_time * self.num_requested_processors
             if self.user_id == self.userE:
                 if self.green:
                     return int(e * 0.70)
