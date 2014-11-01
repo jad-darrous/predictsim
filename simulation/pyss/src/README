@@ -91,12 +91,52 @@ pypy ./run_simulator.py sample_config.py
 ** profiling/optimizing:
 time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py sample_config_profiling.py
 
-time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py '../../../data_TODELETE/CEA-curie_sample/original_swf/log.swf' sample_config_fse.py res.swf
 
-time pypy -OO -m cProfile -o simul.cprof . run_simulator.py '../../../data/CEA-curie_sample/original_swf/log.swf' sample_config_profiling.py res.swf
 
+
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py '../../../experiments/data/CEA-curie_sample/swf/log.swf' sample_config_profiling.py res.swf
 
 runsnake simul.cprof
+
+
+
+
+
+
+
+
+
+
+
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py '../../../experiments/data/CEA-curie_sample/swf/log.swf' sample_config_fse.py res.swf
+
+
+# Jobs Terminated: 29874 Elapsed Time: 0:00:08                                                
+STATISTICS: 
+Wait (Tw) [minutes]:  7.5805737122
+Response time (Tw+Tr) [minutes]:  128.578251544
+Slowdown (Tw+Tr) / Tr:  4.90267970078
+Bounded slowdown max(1, (Tw+Tr) / max(10, Tr):  3.37905581551
+Estimated slowdown (Tw+Tr) / Te:  0.292570729046
+Tail slowdown (if bounded_sld >= 3):  59.971901103
+   Number of jobs in the tail:  1178
+Tail Percentile (the top 10% sld):  40.0246153379
+Total Number of jobs:  29998
+Number of jobs used to calculate statistics:  29527
+
+Num of Processors:  80640
+Input file:  ../../../experiments/data/CEA-curie_sample/swf/log.swf
+Scheduler: <class 'schedulers.energetic_fairshare_scheduler.EnergeticFairshareScheduler'>
+
+
+
+
+
+
+
+
+
+
 
 
 

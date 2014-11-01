@@ -20,29 +20,34 @@ class Simulator(object):
     Assumption 2: self.jobs holds every job that was introduced to the simulation.
     """
 
-    def __init__(self, jobs, num_processors, scheduler, output_swf, input_file):
-        self.num_processors = num_processors
+    def __init__(self, options, jobs, scheduler):   
+
+        input_file = options["input_file"]
+
+        self.num_processors = options["num_processors"]
         self.jobs = jobs
         self.terminated_jobs=[]
         self.scheduler = scheduler
         self.time_of_last_job_submission = 0
         self.event_queue = EventQueue()
-        self.output_swf = None
+        self.output_swf = options["output_swf"]
+        
+        self.output_swf_energy = options["output_swf_energy"]
 
-        self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
+        self.machine = ValidatingMachine(num_processors=self.num_processors, event_queue=self.event_queue)
 
         if hasattr(self.scheduler, "I_NEED_A_PREDICTOR") and self.scheduler.I_NEED_A_PREDICTOR:
                 self.scheduler.running_jobs =  self.machine.jobs
 
         self.event_queue.add_handler(JobSubmissionEvent, self.handle_submission_event)
         self.event_queue.add_handler(JobTerminationEvent, self.handle_termination_event)
-        if(output_swf != None):
-		self.output_swf = open(output_swf, 'w+')
+        if(self.output_swf != None):
+		self.output_swf = open(self.output_swf, 'w+')
 		version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
 		self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
 		self.output_swf.write("; Preemption: No\n")
 		self.output_swf.write("; MaxNodes: -1\n")
-		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
+		self.output_swf.write("; MaxProcs: "+str(self.num_processors)+"\n")
 		self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
                 self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
@@ -116,6 +121,9 @@ class Simulator(object):
             outl.append(str(event.job.initial_prediction))
         else:
             outl.append("-1")
+        
+        if self.output_swf_energy:
+            outl.append(str(event.job.energy))
 
         self.output_swf.write(' '.join(outl)+"\n")
         self.pbari+=1
@@ -136,12 +144,15 @@ class Simulator(object):
             self.event_queue.advance()
 
 
-def run_simulator(num_processors, jobs, scheduler, output_swf=None, input_file=None, no_stats=False):
-    simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file)
-    simulator.run()
-    if(not no_stats):
-	print_simulator_stats(simulator)
-    return simulator
+def run_simulator(options, jobs, scheduler):
+	
+	no_stats = not(options["stats"])
+	
+	simulator = Simulator(options, jobs, scheduler)
+	simulator.run()
+	if(not no_stats):
+		print_simulator_stats(simulator)
+	return simulator
 
 def print_simulator_stats(simulator):
     simulator.scheduler.cpu_snapshot._restore_old_slices()

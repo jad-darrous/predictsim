@@ -8,8 +8,10 @@
 # http://www.cs.huji.ac.il/labs/parallel/workload/
 
 class JobInput(object):
-    def __init__(self, line):
+    def __init__(self, line, userE = None, green = True):
         self.fields = line.split()
+        self.userE = userE
+        self.green = green
         assert 18 <= len(self.fields) <= 19
 
     # lazy access as properties, for efficiency
@@ -75,14 +77,21 @@ class JobInput(object):
     @property
     def energy(self):
         if(len(self.fields) == 18):
-            return 0
+            e = 700 * self.run_time * self.num_allocated_processors
+            if self.user_id == self.userE:
+                if self.green:
+                    return int(e * 0.70)
+                else:
+                    return int(e * 1.30)
+            return int(e)
         else:
-            return int(self.fields[18])
+            #float() because of scientific notations
+            return int(float(self.fields[18]))
 
     def __str__(self):
         return "JobInput<number=%s>" % self.number
 
-def parse_lines(lines_iterator):
+def parse_lines(lines_iterator, userE = None, green = True):
     "returns an iterator of JobInput objects"
 
     def _should_skip(line): # TODO: skip if runtime, num allocated processors, submit time is problematic
@@ -93,7 +102,7 @@ def parse_lines(lines_iterator):
         if _should_skip(line):
             continue # skipping
 
-        yield JobInput(line)
+        yield JobInput(line, userE, green)
 
 def _measure_performance():
     import sys

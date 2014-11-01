@@ -42,6 +42,11 @@ class EnergeticFairshareScheduler(Scheduler):
 		
 
 	def new_events_on_job_submission(self, just_submitted_job, current_time):
+		
+		#if current_time == 45607600 :
+			#import pdb; pdb.set_trace()
+
+		
 		if not self.user_cputime_counter.has_key(just_submitted_job.user_id):
 			self.user_cputime_counter[just_submitted_job.user_id] = 0.0
 			self.user_energy_counter[just_submitted_job.user_id] = 0.0

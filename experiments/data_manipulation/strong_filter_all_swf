@@ -49,7 +49,8 @@ awk '($4>0){print}' |
 #time_req to runtime if time_req<=0
 awk '{
 if ($9<=0)
-  p=43
+  {$9=$4;
+  print;}
 else
   print;
 }' |
