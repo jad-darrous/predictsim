@@ -1,6 +1,7 @@
 \documentclass{llncs}
 
-% \usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{mathtools}
@@ -125,13 +126,13 @@ Détail de la contribution:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Learning}
 \label{sec:learning}
-Runtime prediction has first been attempted~\cite{gibbons} by clustering jobs according to a predefined set of rules and using the cluster mean as a prediction. In this method, often-times called "Templates" by subsequent authors, the partitioning has to be provided by the RMS or the system administrator. This method is an ancestor of tree-based regression models. Moreover, the binning has to be obtained trough careful, manual statistical analysis of the specific system and population. The technique was subsequently adapted~\cite{gibbons-GA} using a more automatic way to generate the rules.
+Runtime prediction has first been attempted~\cite{gibbons} by clustering jobs according to predefined set of rules before using cluster statistics as predicted values. In this method, often-times called "Templates" by subsequent authors, the partitioning has to be provided by the RMS or the system administrator. This model can be seen as an ancestor of tree-based regression models in which the binning has to be obtained trough careful, manual statistical analysis of the specific system and population. The technique was subsequently adapted~\cite{gibbons-GA} using a more automatic way to generate the rules.
 
-Other approaches leverage CPU load information from the machine~\cite{predict-load}, or use more application-centric modeling ~\cite{Schopf99usingstochastic}\cite{Nadeem:2009:PET:1654059.1654093}\cite{6495803}.
+Other approaches leverage CPU load information from the machine~\cite{predict-load}, or use more application-centric modeling~\cite{Schopf99usingstochastic}\cite{Nadeem:2009:PET:1654059.1654093}\cite{6495803}.
 
 A recent survey~\cite{ML-predictruntime-survey} compares methods based on generic supervised learning tools.
 
-All these approaches assume jobs and their run-times to be identically distributed and independent. Therefore it does not make use of dependency between successive jobs.
+All these approaches assume jobs and their run-times to be identically distributed and independent; it does not make use of dependency between successive jobs.
 
 A stochastic model~\cite{hmm} has been proposed for predicting full job run-time distributions. This technique only relies on historical run-time information as opposed to previous works that only used job descriptions. It treats successive run-times of a given user as the observations of a Hidden Markov Model~\cite{rabiner}, hence it does not make the hypothesis that jobs submission are the result of an independent sampling of a distribution.
 A related, but much simpler approach~\cite{tsafir} averages the two last available run-times of the job's user as a prediction. It enjoys surprising success given its simplicity.
@@ -143,7 +144,11 @@ We describe here our model.
 TODO:
 
 A job is maped to a vector $x \in \mathbb{R}^{n}$ where $n$ is the number of features of our model.
-The prediction is achieved via a Generalized Linear Model..
+The prediction is achieved via a Generalized Linear Model:
+\[
+  y = w^{\intercal} \Phi(x)
+\]
+Where $\phi(x)$ is ...
 
 
 
