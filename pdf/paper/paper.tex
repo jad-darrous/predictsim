@@ -1,0 +1,111 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+%\usepackage{titling}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+%\usepackage{fullpage}
+\usepackage[scientific-notation=true]{siunitx}
+
+%Commands for including external source code files
+\newcommand{\Sscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=Scilab,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+\end{itemize}
+}
+\newcommand{\Rscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=R,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+\end{itemize}
+}
+\newcommand{\Jscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=Java,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+\end{itemize}
+}
+
+\newcommand{\Cscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=C,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+\end{itemize}
+}
+
+\newcommand{\Pscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=Python,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+\end{itemize}
+}
+
+\lstdefinelanguage{codeoutput} { %this is the name that you are going to use when you want to use the formatting
+basicstyle=\ttfamily\scriptsize, %font family & size
+}
+\newcommand{\Oscript}[2]{
+\begin{itemize}
+  \item[]\lstinputlisting[caption=#2,label=#1,language=codeoutput]{src/#1}
+\end{itemize}
+}
+
+\setlength{\abovecaptionskip}{1pt plus 1pt minus 1pt} % Chosen fairly arbitrarily
+
+\title{Does Runtime Prediction Matter?}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+constat: l'estimation -user des runtimes est mauvaise. (est plutôt une deadline)
+
+Les batch schedulers sont des politiques rudimentaires, simples et robustes (FIFO backfilling), qui guarantissent l'absence de famine. Ces politiques permettent une forte utilisation de la machine.
+Les politiques prop. (eg torque pbs ) sont légèrement plus sophistiquées mais restent basées sur des listes.
+
+question: peut-on tirer parti d'une meilleure conaissance des temps de prédiction afin de mieux gérer les ressources?
+
+On montre ici qu'en se basant sur des techniques classiques de prédiction, il es possible d'améliorer  l'allocation obtenue avec les politiques classiques (ici backfilling.).
+Détail de la contribution:
+-comment prédire
+-nouvelles politiques pour  utiliser ces prédictions
+-validation expérimentale
+
+\section{Problem Statement}
+\label{sec:problem_statement}
+
+\section{Learning}
+\label{sec:learning}
+
+\section{Scheduling strategies}
+\label{sec:scheduling_strategies}
+
+\subsection{Objective Functions}
+\label{sub:objective_functions}
+
+\subsection{Backfilling with Correction}
+\label{sub:backfilling_with_correction}
+
+
+\section{Experimental Validation}
+\label{sec:experimental_validation}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+
+
+
+
+
+
+
+
+
+\end{document}
