@@ -1,6 +1,3 @@
-\documentclass[a4paper,10pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{tikz}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -17,45 +14,45 @@
 
 %Commands for including external source code files
 \newcommand{\Sscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=Scilab,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=Scilab,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+  \end{itemize}
 }
 \newcommand{\Rscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=R,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=R,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+  \end{itemize}
 }
 \newcommand{\Jscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=Java,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=Java,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+  \end{itemize}
 }
 
 \newcommand{\Cscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=C,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=C,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+  \end{itemize}
 }
 
 \newcommand{\Pscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=Python,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=Python,basicstyle=\ttfamily\footnotesize,breaklines=true]{#1}
+  \end{itemize}
 }
 
 \lstdefinelanguage{codeoutput} { %this is the name that you are going to use when you want to use the formatting
-basicstyle=\ttfamily\scriptsize, %font family & size
+  basicstyle=\ttfamily\scriptsize, %font family & size
 }
 \newcommand{\Oscript}[2]{
-\begin{itemize}
-  \item[]\lstinputlisting[caption=#2,label=#1,language=codeoutput]{src/#1}
-\end{itemize}
+  \begin{itemize}
+    \item[]\lstinputlisting[caption=#2,label=#1,language=codeoutput]{src/#1}
+  \end{itemize}
 }
 
 \setlength{\abovecaptionskip}{1pt plus 1pt minus 1pt} % Chosen fairly arbitrarily
 
-\title{Does Runtime Prediction Matter?}
+\title{Does Run-time Prediction Matter?}
 \author{}
 \date{\today}
 
@@ -67,14 +64,14 @@ basicstyle=\ttfamily\scriptsize, %font family & size
 constat: l'estimation -user des runtimes est mauvaise. (est plutôt une deadline)
 
 Les batch schedulers sont des politiques rudimentaires, simples et robustes (FIFO backfilling), qui guarantissent l'absence de famine. Ces politiques permettent une forte utilisation de la machine.
-Les politiques prop. (eg torque pbs ) sont légèrement plus sophistiquées mais restent basées sur des listes.
+Les politiques prop. (eg torque pbs ) sont légèrement plus sophistiquées mais restent basées sur des listes.\
 
 question: peut-on tirer parti d'une meilleure conaissance des temps de prédiction afin de mieux gérer les ressources?
 
 On montre ici qu'en se basant sur des techniques classiques de prédiction, il es possible d'améliorer  l'allocation obtenue avec les politiques classiques (ici backfilling.).
 Détail de la contribution:
 -comment prédire
--nouvelles politiques pour  utiliser ces prédictions
+-nouvelles politiques pour utiliser ces prédictions
 -validation expérimentale
 
 \section{Problem Statement}
@@ -82,6 +79,13 @@ Détail de la contribution:
 
 \section{Learning}
 \label{sec:learning}
+Runtime prediction has first been attempted~\cite{gibbons} by classifying jobs according to predefined set of rules. In this method, the partitioning had to be provided by the RMS or the system administrator. This method is an ancestor of tree-based regression models which assume the job characteristics to be identically distributed and independent. It does not make use of dependency between successive jobs. Moreover, the binning had to be obtained trough careful, manual statistical analysis of the specific system and population.
+
+A model~\cite{hmm} has been proposed for predicting full job run-time distributions. This technique only relies on historical run-time information as opposed to previous works that only used job descriptions. It treats successive run-times of a given user as the observations of a Hidden Markov Model~\cite{rabiner}, hence it does not make the hypothesis that jobs submission are the result of an independent sampling of a distribution.
+A related, but much simpler approach~\cite{tsafir} averages the two last available run-times of the job's user. It enjoys surprising success given its simplicity.
+
+Our approach is that of combining both job descriptions and temporal dependency of run-times. We chose to combine both informations with an on-line linear regression approach:
+
 
 \section{Scheduling strategies}
 \label{sec:scheduling_strategies}
@@ -99,13 +103,12 @@ Détail de la contribution:
 \section{Conclusion}
 \label{sec:conclusion}
 
+\section{Acknowledgements}
+\label{sec:ack}
+merci yannis ect
 
-
-
-
-
-
-
-
+-cite
+workload archive
+pyss
 
 \end{document}
