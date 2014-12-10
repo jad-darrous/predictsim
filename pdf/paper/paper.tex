@@ -1,4 +1,6 @@
-\usepackage{amsthm}
+\documentclass{llncs}
+
+% \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{mathtools}
@@ -7,7 +9,7 @@
 %\usepackage{titling}
 \usepackage{float}
 \usepackage{caption}
-\usepackage{subcaption}
+% \usepackage{subcaption}
 \usepackage{listings}
 %\usepackage{fullpage}
 \usepackage[scientific-notation=true]{siunitx}
@@ -52,12 +54,40 @@
 
 \setlength{\abovecaptionskip}{1pt plus 1pt minus 1pt} % Chosen fairly arbitrarily
 
-\title{Does Run-time Prediction Matter?}
-\author{}
-\date{\today}
+
+
+
+
 
 \begin{document}
-\maketitle
+\mainmatter
+
+
+\author{Ivar Ekeland\inst{1} \and Roger Temam\inst{2}
+Jeffrey Dean \and David Grove \and Craig Chambers \and Kim~B.~Bruce \and
+Elsa Bertino}
+
+\institute{Princeton University, Princeton NJ 08544, USA,\\
+\email{I.Ekeland@princeton.edu},\\ WWW home page:
+\texttt{http://users/\homedir iekeland/web/welcome.html}
+\and
+Universit\'{e} de Paris-Sud,
+Laboratoire d'Analyse Num\'{e}rique, B\^{a}timent 425,\\
+F-91405 Orsay Cedex, France}
+
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+
+Abstract is here.
+\keywords{computational geometry, graph theory, Hamilton cycles}
+
+\end{abstract}
+
+
+
+
+
 
 \section{Introduction}
 \label{sec:introduction}
@@ -103,12 +133,17 @@ Our approach is that of combining both job descriptions and temporal dependency 
 \section{Conclusion}
 \label{sec:conclusion}
 
-\section{Acknowledgements}
+\section*{Acknowledgements.}
 \label{sec:ack}
 merci yannis ect
 
 -cite
 workload archive
 pyss
+
+
+\bibliographystyle{splncs03}
+\bibliography{references}
+
 
 \end{document}

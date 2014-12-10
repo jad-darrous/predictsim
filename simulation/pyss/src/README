@@ -78,6 +78,15 @@ EasyBackfillScheduler where predicted_runtime is doubled when backfilling is don
 
 
 
+
+
+time pypy -OO -m cProfile -o simul.cprof ./run_simulator.py '../../../experiments/data/CEA-curie_sample/swf_unfiltered/log.swf' sample_config_profiling.py res.swf
+
+
+
+
+
+
 *** Run exemples:
 
 ** normal run:
