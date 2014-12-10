@@ -161,11 +161,12 @@ class CpuSnapshot(object):
     represents the time table with the assignments of jobs to available processors
     """
     # Assumption: the snapshot always has at least one slice
-    def __init__(self, total_processors):
+    def __init__(self, total_processors, archive_snapshots):
         self.total_processors = total_processors
         self.slices=[]
         self.slices.append(CpuTimeSlice(self.total_processors, start_time=0, duration=1000, total_processors=total_processors))
         self.archive_of_old_slices=[]
+        self.archive_snapshots= archive_snapshots
         
     @property
     def snapshot_end_time(self):
@@ -370,7 +371,8 @@ class CpuSnapshot(object):
 	while size > 0:
 	    s = self.slices[0]
             if s.end_time <= current_time:
-                self.archive_of_old_slices.append(s)
+                if self.archive_snapshots:
+                    self.archive_of_old_slices.append(s)
                 self.slices.pop(0)
 		size -= 1 
             else:
@@ -415,12 +417,12 @@ class CpuSnapshot(object):
 
 
     def copy(self):
-        result = CpuSnapshot(self.total_processors)
+        result = CpuSnapshot(self.total_processors, self.archive_snapshots)
         result.slices = [slice.copy() for slice in self.slices]
         return result
     
     def quick_copy(self):
-        result = CpuSnapshot(self.total_processors)
+        result = CpuSnapshot(self.total_processors, self.archive_snapshots)
         result.slices = [slice.quick_copy() for slice in self.slices]
         return result
 

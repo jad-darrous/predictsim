@@ -5,7 +5,7 @@ class EasyBackfillScheduler(Scheduler):
 
     def __init__(self, options):
         super(EasyBackfillScheduler, self).__init__(options)
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         self.unscheduled_jobs = []
 
     def new_events_on_job_submission(self, just_submitted_job, current_time):

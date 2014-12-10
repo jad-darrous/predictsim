@@ -19,7 +19,7 @@ class  EasyPlusPlusScheduler(Scheduler):
         self.init_predictor(options)
         self.init_corrector(options)
 
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         self.unscheduled_jobs = []
 
 

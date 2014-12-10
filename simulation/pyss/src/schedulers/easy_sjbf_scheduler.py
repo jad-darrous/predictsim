@@ -15,7 +15,7 @@ class  EasySjbfScheduler(EasyBackfillScheduler):
     
     def __init__(self, options):
         super(EasySjbfScheduler, self).__init__(options)
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
 
     
     def _backfill_jobs(self, current_time):

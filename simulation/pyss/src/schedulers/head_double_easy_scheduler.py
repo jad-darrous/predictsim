@@ -11,7 +11,7 @@ class HeadDoubleEasyScheduler(EasyBackfillScheduler):
 
     def __init__(self, options):
         super(HeadDoubleEasyScheduler, self).__init__(options)
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
 
 
     def _schedule_head_of_list(self, current_time):

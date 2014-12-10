@@ -5,7 +5,7 @@ class ConservativeScheduler(Scheduler):
 
     def __init__(self, options):
         super(ConservativeScheduler, self).__init__(options)
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         self.unfinished_jobs_by_submit_time = []
 
     def new_events_on_job_submission(self, job, current_time):

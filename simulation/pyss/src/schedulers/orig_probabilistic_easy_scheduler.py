@@ -88,7 +88,7 @@ class  OrigProbabilisticEasyScheduler(Scheduler):
         super(OrigProbabilisticEasyScheduler, self).__init__(options)
         self.threshold    = threshold
         self.window_size  = window_size # a parameter for the distribution 
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         
         self.user_distribution = {}
 

@@ -5,7 +5,7 @@ class FcfsScheduler(Scheduler):
 
     def __init__(self, options):
         super(FcfsScheduler, self).__init__(options)
-        self.cpu_snapshot = CpuSnapshot(self.num_processors)
+        self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         self.waiting_queue_of_jobs = []
 
     def new_events_on_job_submission(self, job, current_time):
