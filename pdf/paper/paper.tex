@@ -1,7 +1,7 @@
 \documentclass{llncs}
 
 \usepackage{amssymb}
-\usepackage{amsthm}
+% \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{mathtools}
@@ -119,8 +119,17 @@ Détail de la contribution:
 \section{Problem Statement}
 \label{sec:problem_statement}
 
+Scheduling classic.
+a machine composed of multiple nodes.
+a job is made of submit time, runtime, number of required nodes.
+Objective are discussed in \ref{sub:objective_functions}.
 
+In HPC, runtime is not known.
+User are asked for a ``runtime'', but in fact its a maximum runtime (job is killed).
+So user over-estimates this time.
+Also, in some system, there is a default value.
 
+Most theorical sched algo needs the runtime => these algo can't be used in production systems.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,12 +166,47 @@ Where $\phi(x)$ is ...
 \section{Scheduling strategies}
 \label{sec:scheduling_strategies}
 
+
 \subsection{Objective Functions}
 \label{sub:objective_functions}
+
+Cmax : not applicable in our case.
+
+Flow : good, but...
+
+Stretch : good, but...
+
+Max, L1, L2, L2... ?
+
+\section{Scheduling algorithms}
+\label{sec:scheduling_algorithms}
+
+FIFO
+
+FIFO+EASY backfill
+
+In real system :
+Slurm: Ordered list + Best fit backfill
+OAR: ??
+PBS: ???
+...
+
+
+
 
 \subsection{Backfilling with Correction}
 \label{sub:backfilling_with_correction}
 
+guessing runtime =>
+over-estimation : same problem without, which are...
+under-estimation : new problem ! EASY backfill garantee that a job N will not be delayed by a job N+x.
+If an N+x job is backfilled before N, N can be delayed due to this job. There is even a situation when a job can starve.
+
+Which strategies to counter this ?
+reqtime: if over estimation => user reqtime
+tsafrir: +1min, then +5min, then 15min, then 1h...
+ninetynine: ``if runtime>prediction, then "99\% of jobs are shorter than" value,''
+recursive doubling: we double the already run time
 
 
 
