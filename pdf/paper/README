@@ -1,0 +1,5 @@
+Paper moved to :
+git clone git+ssh://vreis@scm.forge.imag.fr/var/lib/gforge/chroot/scmrepos/git/thesis-dg/thesis-dg.git
+cd thesis-dg/articles/runtime_estimation/
+
+Because Denis.
