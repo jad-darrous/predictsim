@@ -38,7 +38,7 @@ class PredictorKNN(Predictor):
             mrun=5000
 
         dist=lambda x,y:sqrt(
-         (x==y)*options["scheduler"]["predictor"]["alpha_uid"]                       +# x[0] is 1
+         (x==y)*options["scheduler"]["predictor"]["alpha_uid"]                      +# x[0] is 1
          options["scheduler"]["predictor"]["alpha_mas"]*(0.9/mrun)*(x[1] -y[1] )**2 +# x[1] is last user run time
          options["scheduler"]["predictor"]["alpha_mas"]*(0.9/mrun)*(x[2] -y[2] )**2 +# x[2] is last user run time2
          options["scheduler"]["predictor"]["alpha_mas"]*(0.9/mrun)*(x[3] -y[3] )**2 +# x[3] is last user run time3
@@ -48,12 +48,12 @@ class PredictorKNN(Predictor):
          options["scheduler"]["predictor"]["alpha_umean"]*(1/mrun)*(x[7] -y[7] )**2 +# x[7] is user runtime mean
          options["scheduler"]["predictor"]["alpha_think"]*(1/mrun)*(x[8] -y[8] )**2 +# x[8] is time since last time a job of the user ended.
          options["scheduler"]["predictor"]["alpha_cores"]*(x[9] -y[9] )**2          +# x[9] Ratio of Cores from user mean to this one.
-         options["scheduler"]["predictor"]["alpha_cores"]*(1/50)*(x[10]-y[10])**2                   +# x[10] total cores running by this user
-         options["scheduler"]["predictor"]["alpha_cores"]*1/mrun)*(x[11]-y[11])**2                 +# x[11] sum of runtime of already running jobs of the user
-         options["scheduler"]["predictor"]["alpha_cores"]*/10*(x[12]-y[12])**2                     +# x[12] amount of jobs  of this user already running
-         options["scheduler"]["predictor"]["alpha_cores"]*1/mrun)*(x[13]-y[13])**2                 +# x[13] length of longest job of user already running
-         options["scheduler"]["predictor"]["alpha_sod"]*1/12)*(min(x[14]-y[14],y[14]-x[14]))**2  +# x[14] second of day
-         options["scheduler"]["predictor"]["alpha_dow"]**(min(x[15]-y[15],y[15]-x[15]))**2        # x[15] day of week
+         options["scheduler"]["predictor"]["alpha_cores"]*(1/50)*(x[10]-y[10])**2   +#> x10>tota>core running by this user
+         options["scheduler"]["predictor"]["alpha_cores"]*(1/mrun)*(x[11]-y[11])**2 +# x[11] sum of runtime of already running jobs of the user
+         options["scheduler"]["predictor"]["alpha_cores"]*(x[12]-y[12])**2           +# x[12] amount of jobs  of this user already running
+         options["scheduler"]["predictor"]["alpha_cores"]*(1/mrun)*(x[13]-y[13])**2  +# x[13] length of longest job of user already running
+         options["scheduler"]["predictor"]["alpha_hod"]*(min(x[14]-y[14],y[14]-x[14])/12)**2  +# x[14] second of day
+         options["scheduler"]["predictor"]["alpha_dow"]*(min(x[15]-y[15],y[15]-x[15])/7)**2        # x[15] day of week
         )
         self.model=KNN(dist,lambda y: y,lambda d:1/max(0.05,d),options["scheduler"]["predictor"]["k"])
 
@@ -184,14 +184,14 @@ class PredictorKNN(Predictor):
         else:
             x[13]=max(lengths_running)
 
-        #second of day
-        x[14]=current_time % 3600*60
+        #hour of day
+        x[14]=current_time % (3600*60
         #cos second of day
         #x[14]=math.cos(3600*60*2*math.pi*x[14])
         #sin second of day
         #x[15]=math.sin(3600*60*2*math.pi*x[14])
         #day of week trough seconds:
-        x[15]=current_time % 3600*60*7
+        x[15]=current_time % (3600*60*7)
         #cos day of week
         #x[16]=math.cos(7*3600*60*2*math.pi*x[14])
         #sin day of week
