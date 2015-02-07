@@ -1,3 +1,0 @@
-"name"   "avgft"   "maxft"   "RMSFT"   "avgstretch"   "maxstretch"   "RMSS"   "avgbsld"   "maxbsld"   "RMSBSLD"
-"simulations/fcfs_reqtime"   15790.8508759486   309231   NA   199.248863297641   124477   2024.60666425355   92.8699341098226   14805.2   478.234826414757
-"simulations/sjbf_tsaf_cor_tsaf"   15301.2483864104   541044   NA   138.388227335289   176986   1997.56925272873   65.9949637271533   41201.1   619.392057047093
