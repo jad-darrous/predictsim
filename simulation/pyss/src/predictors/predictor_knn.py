@@ -185,7 +185,7 @@ class PredictorKNN(Predictor):
             x[13]=max(lengths_running)
 
         #hour of day
-        x[14]=current_time % (3600*60
+        x[14]=current_time % (3600*60)
         #cos second of day
         #x[14]=math.cos(3600*60*2*math.pi*x[14])
         #sin second of day
