@@ -107,6 +107,9 @@ with open(arguments['<swf_file>'], 'rt') as  f:
             #raise ValueError("penalty not supported. supported penalties=%s"%(supported_penalties.__str__()))
         from predictors.predictor_sgdlinear import PredictorSgdlinear
         predictor=PredictorSgdlinear(config)
+    elif config["scheduler"]["predictor"]["name"]=="predictor_knn":
+        from predictors.predictor_knn import PredictorKNN
+        predictor=PredictorKNN(config)
     else:
         raise ValueError("no valid predictor specified")
     iprint("Predictor created.")
