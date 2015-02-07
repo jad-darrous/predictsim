@@ -136,8 +136,8 @@ with open(arguments['<swf_file>'], 'rt') as  f:
         yield env.timeout(j.actual_run_time)
         running_jobs.remove(j)
         predictor.fit(j,env.now)
-        if hasattr(predictor,"model"):
-            coeffs.append(predictor.model.model.w)
+        #if hasattr(predictor,"model"):
+            #coeffs.append(predictor.model.model.w)
 
     #Starting the replay
     for job in jobs:
