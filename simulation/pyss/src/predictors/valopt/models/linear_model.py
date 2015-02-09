@@ -1,4 +1,5 @@
 # encoding: utf-8
+#import copy
 
 class LinearModel(object):
 
@@ -9,6 +10,7 @@ class LinearModel(object):
 
     def get_param_vector(self):
         """Return a vector representation of the parameters."""
+        #return copy.deepcopy(self.w)
         return self.w
 
     def set_param_vector(self, w):

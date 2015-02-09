@@ -4,6 +4,7 @@ import math
 import itertools
 from valopt.models.linear_model import LinearModel
 from valopt.algos.nag import NAG
+from valopt.algos.sgd import SGD
 
 from operator import mul    # or mul=lambda x,y:x*y
 from fractions import Fraction
@@ -30,8 +31,9 @@ class PredictorSgdlinear(Predictor):
         self.last_loss=0
 
         if options["scheduler"]["predictor"]["quadratic"]:
+            print("Using predictor with quadratic features")
             self.quadratic=True
-            self.n_features=int(self.n_features+kPn(self.n_features,2))
+            self.n_features=int(self.n_features+kPn(self.n_features,2)+kPn(self.n_features,3))
 
         #machine learning thing
         m=LinearModel(self.n_features)
@@ -61,6 +63,19 @@ class PredictorSgdlinear(Predictor):
             l=AsymetricWeightedAbsLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
         else:
             raise ValueError("predictor config error: no valid loss specified.")
+
+
+        if "lambda" in options["scheduler"]["predictor"].keys():
+            if options["scheduler"]["predictor"]["regularization"]=="l1":
+                from valopt.losses.regularizations.l1 import L1
+                from valopt.losses.regularized_loss import RegularizedLoss
+                l=RegularizedLoss(m,l,L1(),options["scheduler"]["predictor"]["lambda"])
+            elif options["scheduler"]["predictor"]["regularization"]=="l2":
+                from valopt.losses.regularizations.l2 import L2
+                from valopt.losses.regularized_loss import RegularizedLoss
+                l=RegularizedLoss(m,l,L2(),options["scheduler"]["predictor"]["lambda"])
+            else:
+                raise ValueError("predictor config error: lambda present and no valid regularizer specified.")
 
         if "max_runtime" in options["scheduler"]["predictor"].keys():
             self.max_runtime=options["scheduler"]["predictor"]["max_runtime"]
@@ -224,9 +239,12 @@ class PredictorSgdlinear(Predictor):
         x[17]=math.sin(7*3600*60*2*math.pi*x[14])
 
         if self.quadratic:
-            i=1
-            for a,b in itertools.combinations(x[0:18],2):
-                x[17+i]=a*b
+            i=18
+            for a,b in itertools.combinations(x[0:17],2):
+                x[i]=a*b
+                i+=1
+            for a,b,c in itertools.combinations(x[0:17],3):
+                x[i]=a*b*c
                 i+=1
 
         return x

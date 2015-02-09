@@ -64,7 +64,8 @@ predict_d:  $(ALL_PREDICTION_FILES_pd)
 	pypy -m cProfile -o $(PRED_CPROFILE_FOLDER)/$@  ../../../simulation/pyss/src/run_predictor.py $(SWF_FOLDER)/$(SWF_FILE) $< $(DRY_PREDICTION_FOLDER)/$(patsubst %.pd,%,$@) $(MEASUREMENTS_FOLDER)/$(patsubst %.pd,%,$@) $(COEFFS_FOLDER)/$(patsubst %.pd,%,$@)
 
 #_______________DRY PREDICTION ANALYSIS__________:
-prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
+prediction_analysis: mae mse rec rec_abs cdfs kde kde_indiv 
+#prediction_analysis: mae mse rec rec_abs customloss cdfs kde kde_indiv loss_average
 
 
 mse:
@@ -75,16 +76,16 @@ rec:
 	../../../prediction_analysis/REC_-inf+inf.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP) -o $(ANALYSIS_FOLDER)/REC.pdf -r 2
 rec_abs:
 	../../../prediction_analysis/REC_abs.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP)  -o $(ANALYSIS_FOLDER)/REC_ABS.pdf -r 2
-customloss:
-	../../../prediction_analysis/CustomLoss_vs_t_smoothed.R $(CL_FILES) -o $(ANALYSIS_FOLDER)/custom_loss.pdf -r 2
+#customloss:
+	#../../../prediction_analysis/CustomLoss_vs_t_smoothed.R $(CL_FILES) -o $(ANALYSIS_FOLDER)/custom_loss.pdf -r 2
 cdfs:
 	../../../prediction_analysis/compare_cdfs.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(TERMINATED_JOBS_FP) -o $(ANALYSIS_FOLDER)/compare_cdfs.pdf -r 2
 kde:
 	../../../prediction_analysis/KDE.R $(DRY_PREDICTION_FOLDER)/clairvoyant $(KDE_FILES) -o $(ANALYSIS_FOLDER)/KDE.pdf -r 4
 kde_indiv:
 	../../../prediction_analysis/KDE_indiv.R $(DRY_PREDICTION_FOLDER)/clairvoyant  $(KDE_FILES) -o $(ANALYSIS_FOLDER)/KDE_indiv.pdf -r 4
-loss_average:
-	../../data_manipulation/average_all $(MEASUREMENTS_FOLDER)/ $(MEASUREMENTS_FOLDER)/
+#loss_average:
+	#../../data_manipulation/average_all $(MEASUREMENTS_FOLDER)/ $(MEASUREMENTS_FOLDER)/
 
 #___________SIMULATION_ANALYSIS__:
 simulation_analysis: simu_stretch simu_metrics

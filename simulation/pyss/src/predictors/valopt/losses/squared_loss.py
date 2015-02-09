@@ -1,5 +1,4 @@
 # encoding: utf-8
-import numpy as np
 
 class SquaredLoss(object):
     def __init__(self,model):
@@ -21,4 +20,5 @@ class SquaredLoss(object):
         Should be np.array(map(lambda i:d_loss_directional(model, x, i),range(0,len(x))).
         In the case where this can be optimized, it will be different.
         """
-        return (self.model.predict(x)-y)*np.array(map(lambda i:self.model.d_predict_directional(x, i),range(0,self.model.dim)))
+        dif=self.model.predict(x)-y
+        return [dif*self.model.d_predict_directional(x, i) for i in range(0,self.model.dim)]
