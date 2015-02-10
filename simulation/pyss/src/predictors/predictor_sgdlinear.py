@@ -3,8 +3,6 @@ from predictor import Predictor
 import math
 import itertools
 from valopt.models.linear_model import LinearModel
-from valopt.algos.nag import NAG
-from valopt.algos.sgd import SGD
 
 from operator import mul    # or mul=lambda x,y:x*y
 from fractions import Fraction
@@ -33,14 +31,29 @@ class PredictorSgdlinear(Predictor):
         if options["scheduler"]["predictor"]["quadratic"]:
             print("Using predictor with quadratic features")
             self.quadratic=True
-            self.n_features=int(self.n_features+kPn(self.n_features,2)+kPn(self.n_features,3))
+            self.n_features=int(self.n_features+kPn(self.n_features,2))
+        else:
+            self.quadratic=False
+
+        if options["scheduler"]["predictor"]["cubic"]:
+            print("Using predictor with cubic features")
+            self.cubic=True
+            self.n_features=int(self.n_features+kPn(self.n_features,3))
+        else:
+            self.cubic=False
+
 
         #machine learning thing
         m=LinearModel(self.n_features)
 
+        if "max_runtime" in options["scheduler"]["predictor"].keys():
+            self.max_runtime=options["scheduler"]["predictor"]["max_runtime"]
+        else:
+            self.max_runtime=False
+
         if options["scheduler"]["predictor"]["loss"]=="squaredloss":
             from valopt.losses.squared_loss import SquaredLoss
-            l=SquaredLoss(m)
+            l=SquaredLoss(m,maxloss=self.max_runtime)
         elif options["scheduler"]["predictor"]["loss"]=="absloss":
             from valopt.losses.abs_loss import AbsLoss
             l=AbsLoss(m)
@@ -77,12 +90,14 @@ class PredictorSgdlinear(Predictor):
             else:
                 raise ValueError("predictor config error: lambda present and no valid regularizer specified.")
 
-        if "max_runtime" in options["scheduler"]["predictor"].keys():
-            self.max_runtime=options["scheduler"]["predictor"]["max_runtime"]
-        else:
-            self.max_runtime=False
 
-        self.model=NAG(m,l,options["scheduler"]["predictor"]["eta"],verbose=False)
+
+        if options["scheduler"]["predictor"]["gd"]=="NAG":
+            from valopt.algos.nag import NAG
+            self.model=NAG(m,l,options["scheduler"]["predictor"]["eta"],verbose=False)
+        elif options["scheduler"]["predictor"]["gd"]=="sNAG":
+            from valopt.algos.snag import sNAG
+            self.model=sNAG(m,l,options["scheduler"]["predictor"]["eta"],verbose=False)
 
         if not options["scheduler"]["predictor"]["weight"]:
             wstr="1"
@@ -243,6 +258,7 @@ class PredictorSgdlinear(Predictor):
             for a,b in itertools.combinations(x[0:17],2):
                 x[i]=a*b
                 i+=1
+        if self.cubic:
             for a,b,c in itertools.combinations(x[0:17],3):
                 x[i]=a*b*c
                 i+=1
