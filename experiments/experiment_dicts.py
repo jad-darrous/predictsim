@@ -2,7 +2,7 @@ rightside=['abs','square','exp']
 leftside=['abs','square','exp']
 leftparam=['0.0001','0,001','0.01','0.1','1','10','100','1000']
 rightparam=['0.0001','0,001','0.01','0.1','1','10','100','1000']
-threshold=['-6400','-600','-60','-10','0','10','60','600','6400']
+threshold=['-600','-10','0','10','600']
 weight=["1+10*log(r/m)","1+10*log(m/r)","1+10*log(1/(r*m))","1+10*log(m*r)"]
 sgdlinear_configs= [
         {
@@ -43,15 +43,13 @@ configs=[{"predictor":None, #schedulers without prediction
     "corrector":None
     }
     for s in scheds_without_predictors
-    ]
-+[{"predictor":p, #schedulers wiht upper-bounding predictions
+    ]+[{"predictor":p, #schedulers wiht upper-bounding predictions
     "name":s,
     "corrector":None
     }
-    for p in predictor_without_correctors
+    for p in predictors_without_correctors
     for s in scheds_with_predictors
-    ]
-+[{"predictor":p,  #schedulers with non-guarante on predictions
+    ]+[{"predictor":p,  #schedulers with non-guarante on predictions
     "name":s,
     "corrector":c
     }
