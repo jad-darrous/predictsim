@@ -2,7 +2,7 @@ rightside=['abs','square','exp']
 leftside=['abs','square','exp']
 leftparam=['0.0001','0,001','0.01','0.1','1','10','100','1000']
 rightparam=['0.0001','0,001','0.01','0.1','1','10','100','1000']
-threshold=['-600','-10','0','10','600']
+threshold=['-600','-60','0','60','600']
 weight=["1+10*log(r/m)","1+10*log(m/r)","1+10*log(1/(r*m))","1+10*log(m*r)"]
 sgdlinear_configs= [
         {
