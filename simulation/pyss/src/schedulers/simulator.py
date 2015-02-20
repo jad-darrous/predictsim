@@ -20,7 +20,7 @@ class Simulator(object):
     Assumption 2: self.jobs holds every job that was introduced to the simulation.
     """
 
-    def __init__(self, jobs, num_processors, scheduler, output_swf, input_file):
+    def __init__(self, jobs, num_processors, scheduler, output_swf, input_file, options):
         self.num_processors = num_processors
         self.jobs = jobs
         self.terminated_jobs=[]
@@ -28,6 +28,7 @@ class Simulator(object):
         self.time_of_last_job_submission = 0
         self.event_queue = EventQueue()
         self.output_swf = None
+        self.options = options
 
         self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
 
@@ -45,6 +46,7 @@ class Simulator(object):
 		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
 		self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
+		self.output_swf.write("; Note: options:"+str(options)+"\n")
                 self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
 		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
@@ -136,8 +138,8 @@ class Simulator(object):
             self.event_queue.advance()
 
 
-def run_simulator(num_processors, jobs, scheduler, output_swf=None, input_file=None, no_stats=False):
-    simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file)
+def run_simulator(num_processors, jobs, scheduler, output_swf, input_file, no_stats, options):
+    simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file, options)
     simulator.run()
     if(not no_stats):
 	print_simulator_stats(simulator)
