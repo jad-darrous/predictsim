@@ -60,6 +60,7 @@ class EasyBackfillScheduler(Scheduler):
     def _backfill_jobs(self, current_time):
         """
         Find jobs that can be backfilled and update the cpu snapshot.
+        DEPRECATED FUNCTION !!!!!!
         """
         if len(self.unscheduled_jobs) <= 1:
             return []
@@ -73,8 +74,6 @@ class EasyBackfillScheduler(Scheduler):
         self.cpu_snapshot.assignJobEarliest(first_job, current_time)
         
         for job in tail_of_waiting_list:
-            if self.cpu_snapshot.free_processors_available_at(current_time) < job.num_required_processors:
-                continue
             if self.cpu_snapshot.canJobStartNow(job, current_time):
                 self.unscheduled_jobs.remove(job)
                 self.cpu_snapshot.assignJob(job, current_time)
@@ -82,4 +81,3 @@ class EasyBackfillScheduler(Scheduler):
         self.cpu_snapshot.unAssignJob(first_job)
 
         return result
-

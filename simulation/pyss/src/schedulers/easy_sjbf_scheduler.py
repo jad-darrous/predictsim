@@ -17,7 +17,7 @@ class  EasySjbfScheduler(EasyBackfillScheduler):
         super(EasySjbfScheduler, self).__init__(options)
         self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
 
-    
+
     def _backfill_jobs(self, current_time):
         "Overriding parent method"
         if len(self.unscheduled_jobs) <= 1:
@@ -36,7 +36,7 @@ class  EasySjbfScheduler(EasyBackfillScheduler):
                 self.cpu_snapshot.assignJob(job, current_time)
                 result.append(job)
                 
-        self.cpu_snapshot.delJobFromCpuSlices(first_job)
+        self.cpu_snapshot.unAssignJob(first_job)
 
         return result
 
