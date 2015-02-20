@@ -69,32 +69,17 @@ class EasyBackfillScheduler(Scheduler):
 
         tail_of_waiting_list = list_copy(self.unscheduled_jobs[1:])
         
+        first_job = self.unscheduled_jobs[0]
+        self.cpu_snapshot.assignJobEarliest(first_job, current_time)
+        
         for job in tail_of_waiting_list:
-            if self.canBeBackfilled(job, current_time):
+            if self.cpu_snapshot.free_processors_available_at(current_time) < job.num_required_processors:
+                continue
+            if self.cpu_snapshot.canJobStartNow(job, current_time):
                 self.unscheduled_jobs.remove(job)
                 self.cpu_snapshot.assignJob(job, current_time)
                 result.append(job)
+        self.cpu_snapshot.unAssignJob(first_job)
 
-        return result 
+        return result
 
-    def canBeBackfilled(self, second_job, current_time):
-        assert len(self.unscheduled_jobs) >= 2
-        assert second_job in self.unscheduled_jobs[1:]
-
-        if self.cpu_snapshot.free_processors_available_at(current_time) < second_job.num_required_processors:
-            return False
-
-        first_job = self.unscheduled_jobs[0]
-
-        self.cpu_snapshot.assignJobEarliest(first_job, current_time)
-        
-        # if true, this means that the 2nd job is "independent" of the 1st, and thus can be backfilled
-        ret = self.cpu_snapshot.canJobStartNow(second_job, current_time)
-
-	#undo things
-	self.cpu_snapshot.unAssignJob(first_job)
-        
-        return ret
-
-
-   
