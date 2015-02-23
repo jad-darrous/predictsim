@@ -6,7 +6,7 @@ In this file, you will find a collection of corrector.
 """
 
 def correctors_list():
-	return ["reqtime","tsafrir","ninetynine","wait","recursive_doubling"]
+	return ["reqtime","tsafrir","ninetynine","wait","recursive_doubling", "throw_an_error"]
 
 #reqtime (assume reqtime if runtime >prediction)
 def reqtime(job, current_time):
@@ -51,3 +51,7 @@ def recursive_doubling(job, current_time):
 	new_predicted_run_time = job.predicted_run_time * 2
 	return new_predicted_run_time
 
+
+#throw_an_error: used when a prediction algorithm garatee that no correction will be done
+def throw_an_error(job, current_time):
+	raise Exception('throw_an_error: Corrector have been called')

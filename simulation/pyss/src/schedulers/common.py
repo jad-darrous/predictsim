@@ -250,7 +250,44 @@ class CpuSnapshot(object):
         return set()
 
     def canJobStartNow(self, job, current_time):
-        return self.jobEarliestAssignment(job, current_time) == current_time
+        """
+        Do the same that jobEarliestAssignment, but force the start to current_time
+        """
+        assert job.num_required_processors <= self.total_processors, str(self.total_processors)
+        time = current_time
+
+        self._append_time_slice(self.total_processors, time + job.predicted_run_time + 1)
+
+        partially_assigned = False
+        tentative_start_time = accumulated_duration = 0
+
+        assert time >= 0
+
+        for s in self.slices: # continuity assumption: if t' is the successor of t, then: t' = t + duration_of_slice_t
+            #reach the current_time
+            if s.start_time < time:
+                continue
+
+            if s.end_time <= time or s.free_processors < job.num_required_processors:
+                # the job can't be assigned to this slice, need to reset
+                #the job can't be launch right now
+                return False
+
+            elif not partially_assigned:
+                # we'll check if the job can be assigned to this slice and perhaps to its successive
+                partially_assigned = True
+                tentative_start_time =  max(time, s.start_time)
+                accumulated_duration = s.end_time - tentative_start_time
+
+            else:
+                # job is partially_assigned:
+                accumulated_duration += s.duration
+
+            if accumulated_duration >= job.predicted_run_time:
+                self.slices[-1].updateDuration(1000) # making sure that the last "empty" slice we've just added will not be huge
+                return True
+
+        assert False # should never reach here
 
     def jobEarliestAssignment(self, job, time):
         """
@@ -309,6 +346,7 @@ class CpuSnapshot(object):
         Deletes an _entire_ job from the slices.
         Assumption: job resides at consecutive slices (no preemptions), and
         nothing is archived!
+        DEPRECATED: see unAssignJob
         """
         for s in self._slices_time_range(job.start_to_run_at_time, job.predicted_finish_time):
             s.delJob(job)

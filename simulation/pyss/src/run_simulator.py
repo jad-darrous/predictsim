@@ -92,7 +92,8 @@ def parse_and_run_simulator(options):
 			scheduler = scheduler,
 			output_swf = options["output_swf"],
 			input_file = options["input_file"],
-			no_stats = not(options["stats"])
+			no_stats = not(options["stats"]),
+			options = options
 			)
 
 		print "Num of Processors: ", options["num_processors"]
