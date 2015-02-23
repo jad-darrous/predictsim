@@ -12,7 +12,7 @@ def kPn(n,k):
 
 class PredictorSgdlinear(Predictor):
     #Internal info
-    n_features=18
+    n_features=19
 
     def __init__(self, options):
         #Data structures for storing info
@@ -31,16 +31,15 @@ class PredictorSgdlinear(Predictor):
         if options["scheduler"]["predictor"]["quadratic"]:
             print("Using predictor with quadratic features")
             self.quadratic=True
-            self.n_features=int(self.n_features+kPn(self.n_features,2))
-        else:
-            self.quadratic=False
-
-        if options["scheduler"]["predictor"]["cubic"]:
-            print("Using predictor with cubic features")
-            self.cubic=True
-            self.n_features=int(self.n_features+kPn(self.n_features,3))
+            if options["scheduler"]["predictor"]["cubic"]:
+                self.cubic=True
+                self.n_features=int(3*self.n_features+kPn(self.n_features,2)+kPn(self.n_features,3))
+            else:
+                self.n_features=int(3*self.n_features+2*kPn(self.n_features,2))
+                self.cubic=False
         else:
             self.cubic=False
+            self.quadratic=False
 
 
         #machine learning thing
@@ -54,26 +53,35 @@ class PredictorSgdlinear(Predictor):
         if options["scheduler"]["predictor"]["loss"]=="squaredloss":
             from valopt.losses.squared_loss import SquaredLoss
             l=SquaredLoss(m,maxloss=self.max_runtime)
-        elif options["scheduler"]["predictor"]["loss"]=="absloss":
-            from valopt.losses.abs_loss import AbsLoss
-            l=AbsLoss(m)
-        elif options["scheduler"]["predictor"]["loss"]=="weightedsquaredloss":
-            from valopt.losses.weighted_squared_loss import WeightedSquaredLoss
-            l=WeightedSquaredLoss(m)
-        elif options["scheduler"]["predictor"]["loss"]=="asymetricweightedsquaredloss":
-            from valopt.losses.asymetric_weighted_squared_loss import AsymetricWeightedSquaredLoss
-            if not options["scheduler"]["predictor"]["beta"]:
-                raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
-            if not options["scheduler"]["predictor"]["gamma"]:
-                raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
-            l=AsymetricWeightedSquaredLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
-        elif options["scheduler"]["predictor"]["loss"]=="asymetricweightedabsloss":
-            from valopt.losses.asymetric_weighted_abs_loss import AsymetricWeightedAbsLoss
-            if not options["scheduler"]["predictor"]["beta"]:
-                raise ValueError("predictor config error: no valid beta value for asymetric loss specified.")
-            if not options["scheduler"]["predictor"]["gamma"]:
-                raise ValueError("predictor config error: no valid gamma value for asymetric loss specified.")
-            l=AsymetricWeightedAbsLoss(m,options["scheduler"]["predictor"]['beta'],options["scheduler"]["predictor"]["gamma"])
+        elif options["scheduler"]["predictor"]["loss"]=="composite":
+
+            from valopt.losses.composite import CompositeLoss
+            if options["scheduler"]["predictor"]["leftside"]=="abs":
+                from valopt.losses.losscurves.abs import Abscurve
+                leftside=Abscurve(m,options["scheduler"]["predictor"]["leftparam"])
+            elif options["scheduler"]["predictor"]["leftside"]=="square":
+                from valopt.losses.losscurves.square import Squarecurve
+                leftside=Squarecurve(m,options["scheduler"]["predictor"]["leftparam"])
+            elif options["scheduler"]["predictor"]["leftside"]=="exp":
+                from valopt.losses.losscurves.exp import Expcurve
+                leftside=Expcurve(m,options["scheduler"]["predictor"]["leftparam"])
+            else:
+                raise ValueError("predictor config error: no leftside specified")
+
+            if options["scheduler"]["predictor"]["rightside"]=="abs":
+                from valopt.losses.losscurves.abs import Abscurve
+                rightside=Abscurve(m,options["scheduler"]["predictor"]["rightparam"])
+            elif options["scheduler"]["predictor"]["rightside"]=="square":
+                from valopt.losses.losscurves.square import Squarecurve
+                rightside=Squarecurve(m,options["scheduler"]["predictor"]["rightparam"])
+            elif options["scheduler"]["predictor"]["rightside"]=="exp":
+                from valopt.losses.losscurves.exp import Expcurve
+                rightside=Expcurve(m,options["scheduler"]["predictor"]["rightparam"])
+            else:
+                raise ValueError("predictor config error: no rightside specified")
+
+            l=CompositeLoss(m,rightside,leftside,options["scheduler"]["predictor"]["threshold"])
+
         else:
             raise ValueError("predictor config error: no valid loss specified.")
 
@@ -253,15 +261,37 @@ class PredictorSgdlinear(Predictor):
         #sin day of week
         x[17]=math.sin(7*3600*60*2*math.pi*x[14])
 
+        #Job cores
+        x[18]=job.num_required_processors
+
+
         if self.quadratic:
-            i=18
-            for a,b in itertools.combinations(x[0:17],2):
+            i=19
+            for a,b in itertools.combinations(x[1:17],2):
                 x[i]=a*b
                 i+=1
+            for k in range(1,19):
+                x[i]=x[k]*x[k]
+                i+=1
+            #for k in range(1,19):
+                #x[i]=1/max(0.001,x[k])
+                #i+=1
+            #for a,b in itertools.combinations(x[1:17],2):
+                #x[i]=1/max(0.001,a*b)
+                #i+=1
+
         if self.cubic:
-            for a,b,c in itertools.combinations(x[0:17],3):
+            for a,b,c in itertools.combinations(x[1:17],3):
                 x[i]=a*b*c
                 i+=1
+            for k in range(1,19):
+                x[i]=x[k]*x[k]*x[k]
+                i+=1
+
+        #if self.cubic:
+            #for a,b,c in itertools.combinations(x[0:17],3):
+                #x[i]=a*b*c
+                #i+=1
 
         return x
 
@@ -296,7 +326,7 @@ class PredictorSgdlinear(Predictor):
         if not self.max_runtime==False:
             job.predicted_run_time=max(1,min(job.predicted_run_time,self.max_runtime))
 
-        return self.model.loss.loss(x,job.actual_run_time,self.weight(job))
+        #return self.model.loss.loss(x,job.actual_run_time,self.weight(job))
 
 
     def fit(self, job, current_time):

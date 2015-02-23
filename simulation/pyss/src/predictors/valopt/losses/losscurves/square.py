@@ -12,10 +12,3 @@ class Squarecurve(object):
            error e
         """
         return self.gamma*2*self.model.d_predict_directional(x, i)*e
-
-    def grad_loss(self,e,x):
-        """
-        instace x
-        prediction
-        """
-        return map(lambda i:self.model.d_predict_directional(e,x, i),range(0,len(x)))

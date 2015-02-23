@@ -2,21 +2,11 @@
 
 class CompositeLoss(object):
     def __init__(self,model,rightside,leftside,threshold):
-        """Instanciate a squared loss for a specific model"""
+        """Instanciate a composite loss for a specific model"""
         self.model=model
         self.rightside=rightside
         self.leftside=leftside
         self.threshold=threshold
-
-    #def loss(self,x,y,w=1):
-        #"""Return the squared loss of the model on example (x,y)"""
-        #p=self.model.predict(x)
-        #if p-y>self.threshold:
-            #return w*self.rightside.loss(p-y-self.threshold)
-        #elif p-y==self.threshold:
-            #return 0
-        #else:
-            #return -w*self.rightside.loss(self.threshold-p+y)
 
     def d_loss_directional(self,x,y,i,w=1):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
