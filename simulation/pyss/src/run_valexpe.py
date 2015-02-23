@@ -10,13 +10,13 @@ import multiprocessing
 
 
 ouput_dir = "tmp/"
-input_file = '../../../experiments/data/CEA-curie_sample/swf/log.swf'
+input_file = '../../../experiments/data/CEA-curie/swf/log.swf'
 
 num_processors = 80640
 
 skip_always_done = True
 
-pool_size = 2
+pool_size = 8
 
 
 
@@ -62,15 +62,10 @@ def launchExpe(options):
 
 
 
-
-
 pool = multiprocessing.Pool(processes=pool_size)
 pool.map(launchExpe, configs)
 pool.close() # no more tasks
 pool.join()  # wrap up current tasks
-
-
-
 
 
 
