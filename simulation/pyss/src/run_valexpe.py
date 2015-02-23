@@ -27,7 +27,7 @@ execfile('../../../experiments/experiment_dicts.py')
 
 def nice(s):
 	# transform an dict into something command-line compatible, the ugliest way!
-	return str(s).translate(None, " ':/(){},\"")
+	return str(s).translate(None, " ':/(){},\"").replace("name", "").replace("predictor_sgdlinear", "gdl").replace("max_coresauto", "").replace("regularizationl2", "").replace("lambda4000000000", "").replace("gdNAG", "")
 
 
 
