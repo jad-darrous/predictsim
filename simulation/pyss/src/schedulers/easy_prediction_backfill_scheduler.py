@@ -35,9 +35,10 @@ class EasyPredictionBackfillScheduler(EasyBackfillScheduler):
 
 	def new_events_on_job_termination(self, job, current_time):
 		"Overriding parent method"
+		
 		self.predictor.fit(job, current_time)
                 if self.corrector.__name__=="ninetynine":
-                    self.pestimator.fit(job.actual_run_time/job.user_estimated_run_time)
+			self.pestimator.fit(job.actual_run_time/job.user_estimated_run_time)
 
 
 		return super(EasyPredictionBackfillScheduler, self).new_events_on_job_termination(job, current_time)
@@ -46,10 +47,16 @@ class EasyPredictionBackfillScheduler(EasyBackfillScheduler):
 	def new_events_on_job_under_prediction(self, job, current_time):
 		assert job.predicted_run_time <= job.user_estimated_run_time
 
-                if self.corrector.__name__=="ninetynine":
-                    new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
-                else:
-                    new_predicted_run_time = self.corrector(job, current_time)
+		
+		if not hasattr(job,"num_underpredict"):
+			job.num_underpredict = 0
+		else:
+			job.num_underpredict += 1
+		
+		if self.corrector.__name__=="ninetynine":
+			new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
+		else:
+			new_predicted_run_time = self.corrector(job, current_time)
 
 		#set the new predicted runtime
 		self.cpu_snapshot.assignTailofJobToTheCpuSlices(job, new_predicted_run_time)

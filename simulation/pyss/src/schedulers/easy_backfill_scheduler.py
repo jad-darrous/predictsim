@@ -75,6 +75,7 @@ class EasyBackfillScheduler(Scheduler):
         
         for job in tail_of_waiting_list:
             if self.cpu_snapshot.canJobStartNow(job, current_time):
+                job.is_backfilled = 1
                 self.unscheduled_jobs.remove(job)
                 self.cpu_snapshot.assignJob(job, current_time)
                 result.append(job)

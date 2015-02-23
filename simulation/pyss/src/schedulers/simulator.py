@@ -48,6 +48,8 @@ class Simulator(object):
 		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
 		self.output_swf.write("; Note: options:"+str(options)+"\n")
                 self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
+                self.output_swf.write("; Note: if a predictor is used, the Preceding Job Number column represents the number of under-predictions. (-1 <=> 0) \n")
+                self.output_swf.write("; Note: the Partition Number column can represents it have been backfilled (-1<=>False, 1<=>True) \n")
 		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
         if hasattr(scheduler, "I_NEED_A_PREDICTOR") and scheduler.I_NEED_A_PREDICTOR:
@@ -110,9 +112,15 @@ class Simulator(object):
         #15. Queue Number
         outl.append("-1")
         #16. Partition Number
-        outl.append("-1")
+        if hasattr(event.job,"is_backfilled"):
+            outl.append(str(event.job.is_backfilled))
+        else:
+            outl.append("-1")
         #17. Preceding Job Number
-        outl.append("-1")
+        if hasattr(event.job,"num_underpredict"):
+            outl.append(str(event.job.num_underpredict))
+        else:
+            outl.append("-1")
         #18. Think Time
         if hasattr(event.job,"initial_prediction"):
             outl.append(str(event.job.initial_prediction))

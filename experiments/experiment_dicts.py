@@ -48,7 +48,7 @@ sched_configs=[
 	]+[{
 			"name":s,
 			"predictor": p, #schedulers wiht upper-bounding predictions
-			"corrector":None
+			"corrector": "throw_an_error"
 	}
 	for p in predictors_without_correctors
 	for s in scheds_with_predictors

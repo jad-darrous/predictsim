@@ -31,7 +31,8 @@ class  EasySjbfScheduler(EasyBackfillScheduler):
         self.cpu_snapshot.assignJobEarliest(first_job, current_time)
         
         for job in tail_of_jobs_by_sjf_order:
-            if self.cpu_snapshot.canJobStartNow(job, current_time): 
+            if self.cpu_snapshot.canJobStartNow(job, current_time):
+                job.is_backfilled = 1
                 self.unscheduled_jobs.remove(job)
                 self.cpu_snapshot.assignJob(job, current_time)
                 result.append(job)

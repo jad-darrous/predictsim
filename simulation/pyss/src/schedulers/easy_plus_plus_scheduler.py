@@ -50,6 +50,10 @@ class  EasyPlusPlusScheduler(Scheduler):
     def new_events_on_job_under_prediction(self, job, current_time):
         assert job.predicted_run_time <= job.user_estimated_run_time
 
+        if not hasattr(job,"num_underpredict"):
+            job.num_underpredict = 0
+        else:
+            job.num_underpredict += 1
 
         if self.corrector.__name__=="ninetynine":
             new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
@@ -105,6 +109,7 @@ class  EasyPlusPlusScheduler(Scheduler):
 
         for job in tail_of_jobs_by_sjf_order:
             if self.cpu_snapshot.canJobStartNow(job, current_time):
+                job.is_backfilled = 1
                 self.unscheduled_jobs.remove(job)
                 self.cpu_snapshot.assignJob(job, current_time)
                 result.append(job)
