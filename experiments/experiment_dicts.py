@@ -53,15 +53,9 @@ sched_configs=[
 	for p in predictors_without_correctors
 	for s in scheds_with_predictors
 	]+[{
-		'input_file': input_file,
-		"num_processors":num_processors,
-		'output_swf': ouput_dir+"res_"+s+"_"+nice(p)+"_"+nice(c)+".swf",
-		'stats': False,
-		"scheduler":{
 			"name":s,
 			"predictor":p,  #schedulers with non-guarante on predictions
 			"corrector": {'name':c}
-		}
 	}
 	for p in predictors_with_correctors
 	for s in scheds_with_predictors
