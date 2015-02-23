@@ -6,11 +6,22 @@ import sys
 import os.path
 from run_simulator import parse_and_run_simulator
 import multiprocessing
+import pprint
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 
 ouput_dir = "tmp/"
-input_file = '../../../experiments/data/CEA-curie/swf/log.swf'
+input_file = '../../../experiments/data/CEA-curie_sample/swf/log.swf'
 
 num_processors = 80640
 
@@ -42,23 +53,42 @@ configs=[
 	for s in sched_configs]
 
 
+import threading
+iid = 1
+iid_lock = threading.Lock()
+
+def next_id():
+    global iid
+    with iid_lock:
+        result = iid
+        iid += 1
+    return result
 
 
 
-global_expe_counter = 0
 
 def launchExpe(options):
-	global global_expe_counter
-	myid = global_expe_counter
-	global_expe_counter += 1
-	print "Start expe "+str(myid)+" : "+str(options)
-	tempout = sys.stdout
-	sys.stdout = open(options["output_swf"]+".out", 'w')
-	sys.stderr = sys.stdout
+	myid = next_id()
+	
 	if not ( skip_always_done and os.path.isfile(options["output_swf"]) ):
-		parse_and_run_simulator(options)
-	sys.stdout = tempout
-	print "End   epxe "+str(myid)
+		print bcolors.WARNING+"Start expe "+str(myid)+ bcolors.ENDC+" : "+str(options)
+		error = False
+		tempout = sys.stdout
+		sys.stdout = open(options["output_swf"]+".out", 'w')
+		sys.stderr = sys.stdout
+		try:
+			parse_and_run_simulator(options)
+		except Exception,e:
+			print "Exception: "+str(e)
+			error = str(e)
+		sys.stdout = tempout
+		if not error:
+			print bcolors.OKBLUE+"End   epxe "+str(myid)+ bcolors.ENDC
+		else:
+			print bcolors.FAIL+"ERROR on "+str(myid)+": "+str(e)+ bcolors.ENDC
+	else:
+		print bcolors.OKGREEN+"Already done"+str(myid)+ bcolors.ENDC+" : "+str(options)
+
 
 
 
