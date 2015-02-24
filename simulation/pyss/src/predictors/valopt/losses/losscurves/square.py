@@ -4,7 +4,7 @@ class Squarecurve(object):
     def __init__(self,model,gamma):
         """slope gamma"""
         self.model=model
-        self.gamma=gamma
+        self.gamma=float(gamma)
 
     def d_loss_directional(self,e,x,i):
         """

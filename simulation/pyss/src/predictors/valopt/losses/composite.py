@@ -6,7 +6,7 @@ class CompositeLoss(object):
         self.model=model
         self.rightside=rightside
         self.leftside=leftside
-        self.threshold=threshold
+        self.threshold=float(threshold)
 
     def d_loss_directional(self,x,y,i,w=1):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""

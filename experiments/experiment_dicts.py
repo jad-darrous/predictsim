@@ -25,7 +25,7 @@ sgdlinear_configs= [
         for rs in rightside
         for rp in rightparam
         for ls in leftside
-        for lp in leftside
+        for lp in leftparam
         for tr in threshold
         for w in weight
         if (not rs=="exp" and rp>0.01)
