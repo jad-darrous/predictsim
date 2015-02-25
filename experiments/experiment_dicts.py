@@ -1,8 +1,8 @@
 rightside=['abs','square','exp']
 leftside=['abs','square','exp']
-leftparam=['0.0001','0.001','0.01','0.1','1','10','100','1000']
-rightparam=['0.0001','0.001','0.01','0.1','1','10','100','1000']
-threshold=['0','60','600']
+leftparam=[0.0001,0.01,1,100,10000]
+rightparam=[0.0001,0.01,1,100,10000]
+threshold=[0,60,600]
 weight=["1+10*log(r/m)","1+10*log(m/r)","1+10*log(1/(r*m))","1+10*log(m*r)"]
 sgdlinear_configs= [
         {
@@ -28,8 +28,12 @@ sgdlinear_configs= [
         for lp in leftparam
         for tr in threshold
         for w in weight
-        if (not rs=="exp" and rp>0.01)
-        if (not ls=="exp" and lp>0.01)
+        if not( rs=="exp"    and rp>0.01)
+        if not( ls=="exp"    and lp>0.01)
+        if not( ls=="abs"    and lp<1)
+        if not( ls=="square" and lp<1)
+        if not( rs=="abs"    and rp<1)
+        if not( rs=="square" and rp<1)
         ]
 
 predictors_with_correctors= sgdlinear_configs+[{"name":"predictor_tsafrir"}]
