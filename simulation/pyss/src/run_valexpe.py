@@ -46,7 +46,7 @@ configs=[
 	{
 		'input_file': input_file,
 		"num_processors":num_processors,
-		'output_swf': ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf",
+		'output_swf': ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz",
 		'stats': False,
 		"scheduler":s
 	}
