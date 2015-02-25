@@ -29,6 +29,7 @@ class Simulator(object):
         self.event_queue = EventQueue()
         self.output_swf = None
         self.options = options
+        self.pbar_activated = options["scheduler"]["progressbar"]
 
         self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
 
@@ -61,11 +62,10 @@ class Simulator(object):
 
         for job in self.jobs:
             self.event_queue.add_event( JobSubmissionEvent(job.submit_time, job) )
-
-        widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
-
-        self.pbar = progressbar.ProgressBar(widgets=widgets,maxval=10000000, poll=0.1).start()
-        self.pbari=1
+	if self.pbar_activated:
+		widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
+		self.pbar = progressbar.ProgressBar(widgets=widgets,maxval=10000000, poll=0.1).start()
+		self.pbari=1
 
     def handle_submission_event(self, event):
         assert isinstance(event, JobSubmissionEvent)
@@ -132,8 +132,9 @@ class Simulator(object):
             outl.append("-1")
 
         self.output_swf.write(' '.join(outl)+"\n")
-        self.pbari+=1
-        self.pbar.update(self.pbari)
+        if self.pbar_activated:
+            self.pbari+=1
+            self.pbar.update(self.pbari)
 
 
     def handle_prediction_event(self, event):

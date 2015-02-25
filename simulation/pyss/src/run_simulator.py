@@ -55,6 +55,11 @@ def parse_and_run_simulator(options):
 
 	if options["stats"] is None:
 		options["stats"] = False
+	
+	if sys.stdout.isatty():# You're running in a real terminal
+		options["scheduler"]["progressbar"] = True
+	else:# You're being piped or redirected
+		options["scheduler"]["progressbar"] = False
 
 	if options["scheduler"] is None:
 		parser.error("missing scheduler")
