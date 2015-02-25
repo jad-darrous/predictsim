@@ -26,7 +26,7 @@ from schedulers.common import module_to_class
 import optparse
 import schedulers.common_correctors
 
-
+from datetime import datetime
 
 def parse_and_run_simulator(options):
 
@@ -86,6 +86,7 @@ def parse_and_run_simulator(options):
 
 	try:
 		print "...."
+		starttime = datetime.today()
 		run_simulator(
 			num_processors = options["num_processors"],
 			jobs = _job_inputs_to_jobs(parse_lines(input_file), options["num_processors"]),
@@ -95,10 +96,12 @@ def parse_and_run_simulator(options):
 			no_stats = not(options["stats"]),
 			options = options
 			)
-
+		print "\n"
 		print "Num of Processors: ", options["num_processors"]
 		print "Input file: ", options["input_file"]
 		print "Scheduler:", type(scheduler)
+		
+		print "Elapsed Time:", datetime.today() - starttime
 
 	finally:
 		if input_file is not sys.stdin:
