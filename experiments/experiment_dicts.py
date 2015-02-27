@@ -3,7 +3,7 @@ leftside=['abs','square','exp']
 leftparam=[0.0001,0.01,1,100,10000]
 rightparam=[0.0001,0.01,1,100,10000]
 threshold=[0,60,600]
-weight=["5+log(r/m)","5+log(m/r)","11+log(1/(r*m))","1+log(m*r)"]
+weight=["1","5+log(r/m)","5+log(m/r)","11+log(1/(r*m))","1+log(m*r)"]
 sgdlinear_configs= [
         {
             "name":"predictor_sgdlinear",
