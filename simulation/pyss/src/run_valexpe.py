@@ -7,6 +7,7 @@ import os.path
 from run_simulator import parse_and_run_simulator
 import multiprocessing
 import pprint
+import random
 
 class bcolors:
     HEADER = '\033[95m'
@@ -90,7 +91,8 @@ def launchExpe(options):
 		print bcolors.OKGREEN+"Already done"+str(myid)+ bcolors.ENDC+" : "+str(options)
 
 
-
+#to have more quickly a wild range of different configs
+random.shuffle(configs)
 
 pool = multiprocessing.Pool(processes=pool_size)
 pool.map(launchExpe, configs)
