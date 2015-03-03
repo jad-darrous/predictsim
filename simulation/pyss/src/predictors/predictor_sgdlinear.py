@@ -108,9 +108,9 @@ class PredictorSgdlinear(Predictor):
             self.model=sNAG(m,l,options["scheduler"]["predictor"]["eta"],verbose=False)
 
         if not options["scheduler"]["predictor"]["weight"]:
-            wstr="1"
+            wstr=compile("1", "<string>", "eval")
         else:
-            wstr=options["scheduler"]["predictor"]["weight"]
+            wstr=compile(options["scheduler"]["predictor"]["weight"], "<string>", "eval")
 
         def weight(job):
             m=float(job.num_required_processors)
@@ -251,15 +251,15 @@ class PredictorSgdlinear(Predictor):
         #second of day
         #x[14]=current_time % 3600*60
         #cos second of day
-        x[14]=math.cos(3600*60*2*math.pi*x[14])
+        x[14]=math.cos(1357168.0263507906*x[14]) #3600*60*2*math.pi
         #sin second of day
-        x[15]=math.sin(3600*60*2*math.pi*x[14])
+        x[15]=math.sin(1357168.0263507906*x[14]) #3600*60*2*math.pi
         #day of week trough seconds:
         #x[14]=current_time % 3600*60*7
         #cos day of week
-        x[16]=math.cos(7*3600*60*2*math.pi*x[14])
+        x[16]=math.cos(9500176.184455534*x[14]) #7*3600*60*2*math.pi
         #sin day of week
-        x[17]=math.sin(7*3600*60*2*math.pi*x[14])
+        x[17]=math.sin(9500176.184455534*x[14]) #7*3600*60*2*math.pi
 
         #Job cores
         x[18]=job.num_required_processors
@@ -297,7 +297,7 @@ class PredictorSgdlinear(Predictor):
 
     def store_x(self,job,x):
         """store x for a given job if its not already stored"""
-        if job not in self.job_x.keys():
+        if job not in self.job_x:
             self.job_x[job]=x
 
     def pop_x(self, job):
@@ -312,7 +312,7 @@ class PredictorSgdlinear(Predictor):
         Modify the predicted_run_time of a job.
         Called when a job is submitted to the system.
         """
-        if not job in self.job_x.keys():
+        if not job in self.job_x:
             #make x
             x=self.make_x(job,current_time,list_running_jobs)
             #store x

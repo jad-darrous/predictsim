@@ -31,18 +31,20 @@ class NAG(object):
         #print("G: %s" %self.G)
         #print("W: %s" %W)
         for i in range(0,self.model.dim):
-            if abs(x[i])>self.s[i]:
-                W[i]*=self.s[i]/abs(x[i])
-                self.s[i]=abs(x[i])
+            absx = abs(x[i])
+            if absx>self.s[i]:
+                W[i]*=self.s[i]/absx
+                self.s[i]=absx
 
         self.model.set_param_vector(W)
         self.N=self.N+sum([a*a/(b*b) for a,b in zip(x,self.s) if not b==0])
 
         l=[0]*self.model.dim
         for i in range(0,self.model.dim):
-            self.G[i]+= (self.loss.d_loss_directional(x,y,i,w))**2
+            tloss = self.loss.d_loss_directional(x,y,i,w)
+            self.G[i]+= (tloss)**2
             if not self.G[i]==0:
-                l[i]= -self.eta*self.loss.d_loss_directional(x,y,i,w)/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])
+                l[i]= -self.eta*tloss/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])
         W=[a+b for a,b in zip(l,W)]
         self.model.set_param_vector(W)
 
