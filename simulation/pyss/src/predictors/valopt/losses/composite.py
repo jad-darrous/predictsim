@@ -16,7 +16,7 @@ class CompositeLoss(object):
         elif p-y==self.threshold:
             return 0
         else:
-            return -w*self.rightside.d_loss_directional(self.threshold-p+y,x,i)
+            return -w*self.leftside.d_loss_directional(self.threshold-p+y,x,i)
 
     def grad_loss(self,x,y,w=1):
         """
