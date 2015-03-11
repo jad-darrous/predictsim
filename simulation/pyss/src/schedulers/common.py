@@ -16,7 +16,7 @@ def module_to_class(module):
 	"""
 	transform foo_bar to FooBar
 	"""
-	return ''.join(w.title() for w in str.split(module, "_"))
+	return ''.join(w.title() for w in str.split(str(module), "_"))
 
 
 class Scheduler(object):
