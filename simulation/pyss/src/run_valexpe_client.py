@@ -17,15 +17,21 @@ from run_simulator import parse_and_run_simulator
 import pprint
 import random
 
+from fabric.network import ssh
+ssh.util.log_to_file("paramiko.log", 10)
 
+server_path = "/home/glesser/FSE_simul/internship/simulation/pyss/src/run_valexpe_server.py"
 
-server_path = "/home/davandg/runtime_estimation/simulation/pyss/src/run_valexpe_server.py"
+num_threads = 24
 
-num_threads = 2
+env.use_ssh_config = True
 
-#env.gateway = 'dglesser@access.grid5000.fr'
-#env.hosts = ['dglesser@frontend.rennes.grid5000.fr']
-env.hosts = ['localhost']
+#env.gateway = 'dglesser@stremi-6:22'
+#env.hosts = ['glesser@localhost:12345']
+env.hosts = ['houlette']
+#env.hosts = ['localhost']
+#env.key_filename = "/home/dglesser/.ssh/id_rsa.notsosecret"
+#env.password = ""
 
 my_name = str(socket.gethostname())
 
@@ -59,6 +65,7 @@ env.use_ssh_config = True
 thread_counter = multiprocessing.Value('i', 0)
 
 expe_counter = multiprocessing.Value('i', 0)
+ssh_lock = multiprocessing.Lock()
 
 
 def get_expe_task():
@@ -67,8 +74,11 @@ def get_expe_task():
 	return res
 
 def get_expe():
+	global ssh_lock
+	ssh_lock.acquire()
 	res = execute(get_expe_task)
 	#res = {'localhost': "(u'3', u'WAIT', u'None', u'optionssss')"}
+	ssh_lock.release()
 
 	#dont look, it's dirty
 	for r in res:
@@ -87,7 +97,10 @@ def expe_done_task(hash):
 	return res
 
 def expe_done(hash):
+	global ssh_lock
+	ssh_lock.acquire()
 	res = execute(expe_done_task, hash)
+	ssh_lock.release()
 
 
 def expe_error_task(hash):
@@ -96,7 +109,10 @@ def expe_error_task(hash):
 	return res
 
 def expe_error(hash):
+	global ssh_lock
+	ssh_lock.acquire()
 	res = execute(expe_done_task, hash)
+	ssh_lock.release()
 	
 
 
@@ -157,11 +173,11 @@ def worker():
 
 
 def useless_task():
-	run("echo OK")
+	print run("hostname")
 
 #we run first a useless task to open the connection
 #execute(useless_task)
-
+#exit(0)
 
 ts = []
 

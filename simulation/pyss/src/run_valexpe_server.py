@@ -191,7 +191,7 @@ def action_stats():
 	configs=[]
 	for s in sched_configs:
 		output_swf = ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz"
-		if os.path.isfile(output_swf) :
+		if os.path.isfile(output_swf+".out") :
 			wrong = True
 			for line in open(output_swf+".out"):
 				if "Traceback" in line:
@@ -243,6 +243,63 @@ def action_stats():
 	print nconf, "expes =", len(configs), "todo +", nconf_skipped, "in error +", nconf_finished, "finished"
 
 
+def action_stats_db():
+	c = conn.cursor()
+	
+	count = len(c.execute('SELECT * FROM expes WHERE state="WAIT"').fetchall())
+	print "Wait:", count
+	count = len(c.execute('SELECT * FROM expes WHERE state="DONE"').fetchall())
+	print "Done:", count
+	count = len(c.execute('SELECT * FROM expes WHERE state="ERROR"').fetchall())
+	print "Error:", count
+	count = len(c.execute('SELECT * FROM expes WHERE state="DOING"').fetchall())
+	print "Doing:", count
+
+
+
+def action_copy():
+	printf = sys.stdout.write
+	
+	exec(open(dict_path).read())
+	
+	ncopy = 0
+	nerror = 0
+	nunkn = 0
+	
+	for s in sched_configs:
+		output_swf = ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz"
+		if os.path.isfile(output_swf) :
+			state = "UNKNOWN"
+			for line in open(output_swf+".out"):
+				if "Traceback" in line:
+					state = "ERROR"
+					break
+				if "Exception" in line:
+					state = "ERROR"
+					break
+				if "Elapsed Time" in line:
+					state = "DONE"
+					break
+			if state == "ERROR":
+				print "rm", output_swf
+				print "rm", output_swf+".out"
+				nerror += 1
+			elif state == "DONE":
+				cmd = "rsync -avz --remove-source-files -e 'ssh -p 12345' "+output_swf+" glesser@localhost:/home/glesser/FSE_simul/internship/experiments/data/"+expe_name+"/simulations/"
+				print cmd
+				os.system(cmd)
+				cmd = "rsync -avz -e 'ssh -p 12345' "+output_swf+".out"+" glesser@localhost:/home/glesser/FSE_simul/internship/experiments/data/"+expe_name+"/simulations/"
+				print cmd
+				os.system(cmd)
+				ncopy += 1
+			else:
+				#print 'nano "'+output_swf+".out"+'"'
+				nunkn += 1
+	print "Copied:", ncopy, " // Error:", nerror, " // Unknwown:", nunkn
+
+
+
+
 
 def usage():
 	print("""
@@ -265,6 +322,10 @@ def usage():
 		run_valexpe_server.py init_db_dumb
 		
 		run_valexpe_server.py stats
+		
+		run_valexpe_server.py stats_db
+		
+		run_valexpe_server.py copy
 	""")
 	exit(0)
 
@@ -302,6 +363,10 @@ elif action == "init_db_dumb":
 	db_init_new_db_dumb()
 elif action == "stats":
 	action_stats()
+elif action == "stats_db":
+	action_stats_db()
+elif action == "copy":
+	action_copy()
 else:
 	print("not an  action")
 	usage()
