@@ -300,6 +300,40 @@ def action_copy():
 
 
 
+def action_check_db(reset=False):
+	c = conn.cursor()
+	expes = c.execute('SELECT * FROM expes').fetchall()
+	for expedb in expes:
+		options = json.loads(expedb[3])
+		output_swf = options["output_swf"]
+		new_state = "UNKNOWN"
+		if not os.path.isfile(output_swf) :
+			if os.path.isfile(output_swf+".out") :
+				print("rm", output_swf+".out")
+				exit(0)
+			new_state = "WAIT"
+		else:
+			for line in open(output_swf+".out"):
+				if "Traceback" in line:
+					new_state = "ERROR"
+					break
+				if "Exception" in line:
+					new_state = "ERROR"
+					break
+				if "Elapsed Time" in line:
+					new_state = "DONE"
+					break
+		if expedb[1] != new_state:
+			print expedb[1], "!=", new_state, "for", expedb[0]
+			if reset:
+				if expedb[1] == "DOING":
+					c.execute('UPDATE expes SET state="WAIT" WHERE hash=?', (expedb[0],))
+			if new_state == "UNKNOWN":
+				print "investigate '"+output_swf+"'"
+	
+	conn.commit()
+
+
 
 def usage():
 	print("""
@@ -326,6 +360,8 @@ def usage():
 		run_valexpe_server.py stats_db
 		
 		run_valexpe_server.py copy
+		
+		run_valexpe_server.py check_db (reset)
 	""")
 	exit(0)
 
@@ -367,6 +403,13 @@ elif action == "stats_db":
 	action_stats_db()
 elif action == "copy":
 	action_copy()
+elif action == "check_db":
+	if len(sys.argv) == 2:
+		action_check_db()
+	elif len(sys.argv) == 3:
+		action_check_db(True)
+	else:
+		usage()
 else:
 	print("not an  action")
 	usage()
