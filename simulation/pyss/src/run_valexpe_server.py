@@ -313,16 +313,20 @@ def action_check_db(reset=False):
 				exit(0)
 			new_state = "WAIT"
 		else:
-			for line in open(output_swf+".out"):
-				if "Traceback" in line:
-					new_state = "ERROR"
-					break
-				if "Exception" in line:
-					new_state = "ERROR"
-					break
-				if "Elapsed Time" in line:
-					new_state = "DONE"
-					break
+			if os.path.isfile(output_swf+".out") :
+				for line in open(output_swf+".out"):
+					if "Traceback" in line:
+						new_state = "ERROR"
+						break
+					if "Exception" in line:
+						new_state = "ERROR"
+						break
+					if "Elapsed Time" in line:
+						new_state = "DONE"
+						break
+			else:
+				new_state = "NOOUT"
+				
 		if expedb[1] != new_state:
 			print expedb[1], "!=", new_state, "for", expedb[0]
 			if reset:
