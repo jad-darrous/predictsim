@@ -332,6 +332,8 @@ def action_check_db(reset=False):
 			if reset:
 				if expedb[1] == "DOING":
 					c.execute('UPDATE expes SET state="WAIT" WHERE hash=?', (expedb[0],))
+				if expedb[1] == "DONE" and new_state == "WAIT":
+					c.execute('UPDATE expes SET state="WAIT" WHERE hash=?', (expedb[0],))
 			if new_state == "UNKNOWN":
 				print "investigate '"+output_swf+"'"
 	
