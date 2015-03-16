@@ -340,6 +340,13 @@ def action_check_db(reset=False):
 	conn.commit()
 
 
+def action_sql(cmd):
+	c = conn.cursor()
+	expes = c.execute(cmd).fetchall()
+	for expedb in expes:
+		print expedb
+	conn.commit()
+
 
 def usage():
 	print("""
@@ -368,6 +375,9 @@ def usage():
 		run_valexpe_server.py copy
 		
 		run_valexpe_server.py check_db (reset)
+		
+		run_valexpe_server.py SQL "SQL statement"
+		
 	""")
 	exit(0)
 
@@ -414,6 +424,11 @@ elif action == "check_db":
 		action_check_db()
 	elif len(sys.argv) == 3:
 		action_check_db(True)
+	else:
+		usage()
+elif action == "SQL":
+	if len(sys.argv) == 3:
+		action_sql(sys.argv[2])
 	else:
 		usage()
 else:
