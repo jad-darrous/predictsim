@@ -88,6 +88,7 @@ setwd(execution_wd)
 #type stuff here.
 
 name       =c()
+len        =c()
 avgft      =c()
 maxft      =c()
 RMSFT      =c()
@@ -109,6 +110,7 @@ for (i in 1:length(args$swf_filenames)) {
   n=nrow(data)
 
   name=append(name,swf_filename)
+  len=append(len,nrow(data))
   avgft=append(avgft, sum(data$ft)/nrow(data))
   maxft=append(maxft, max(data$ft))
   RMSFT=append(RMSFT, sqrt(sum(data$ft*data$ft)/n))
@@ -122,6 +124,7 @@ for (i in 1:length(args$swf_filenames)) {
 }
 
 df=data.frame(name=name,
+              length=len,
               avgft=avgft,
               maxft=maxft,
               RMSFT=RMSFT,
