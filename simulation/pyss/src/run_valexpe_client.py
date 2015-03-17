@@ -158,8 +158,6 @@ def worker():
 			
 			if hash == "None":
 				print "No more expe for", worker_id
-				with thread_counter.get_lock():
-					thread_counter.value -= 1
 				return
 			
 			#exec it
