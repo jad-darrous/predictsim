@@ -9,14 +9,15 @@ import os
 import time
 
 
-expe_name = "KTH-SP2"
-num_processors = 100
+expe_name = "SDSC-BLUE"
+#expe_name = "KTH-SP2"
+num_processors = 1152
 expe_dir = "../../../experiments/data/"+expe_name
-conn = sqlite3.connect(expe_dir+"/run.db")
+conn = sqlite3.connect(expe_dir+"/run.db", timeout=120)
 ouput_dir = expe_dir+"/simulations/"
 input_file = expe_dir+"/swf/log.swf"
 
-dict_path = '../../../experiments/experiment_dicts.py'
+#dict_path = '../../../experiments/experiment_dicts.py'
 dict_path = '../../../experiments/experiment_dicts_kth.py'
 
 
@@ -125,7 +126,8 @@ def action_get(doer):
 	expe = c.fetchone()
 	print(expe)
 	
-	c.execute('UPDATE expes SET state="DOING", doer=? WHERE hash=?', (doer,expe[0]))
+	if expe != None:
+		c.execute('UPDATE expes SET state="DOING", doer=? WHERE hash=?', (doer,expe[0]))
 	
 	# Save (commit) the changes
 	conn.commit()
@@ -300,6 +302,53 @@ def action_copy():
 
 
 
+def action_check_db(reset=False):
+	c = conn.cursor()
+	expes = c.execute('SELECT * FROM expes').fetchall()
+	for expedb in expes:
+		options = json.loads(expedb[3])
+		output_swf = options["output_swf"]
+		new_state = "UNKNOWN"
+		if not os.path.isfile(output_swf) :
+			if os.path.isfile(output_swf+".out") :
+				print("rm", output_swf+".out")
+				exit(0)
+			new_state = "WAIT"
+		else:
+			if os.path.isfile(output_swf+".out") :
+				for line in open(output_swf+".out"):
+					if "Traceback" in line:
+						new_state = "ERROR"
+						break
+					if "Exception" in line:
+						new_state = "ERROR"
+						break
+					if "Elapsed Time" in line:
+						new_state = "DONE"
+						break
+			else:
+				new_state = "NOOUT"
+				
+		if expedb[1] != new_state:
+			print expedb[1], "!=", new_state, "for", expedb[0]
+			if reset:
+				if expedb[1] == "DOING":
+					c.execute('UPDATE expes SET state="WAIT" WHERE hash=?', (expedb[0],))
+				if expedb[1] == "DONE" and new_state == "WAIT":
+					c.execute('UPDATE expes SET state="WAIT" WHERE hash=?', (expedb[0],))
+			if new_state == "UNKNOWN":
+				print "investigate '"+output_swf+"'"
+	
+	conn.commit()
+
+
+def action_sql(cmd):
+	c = conn.cursor()
+	expes = c.execute(cmd).fetchall()
+	for expedb in expes:
+		print expedb
+	conn.commit()
+
 
 def usage():
 	print("""
@@ -326,6 +375,11 @@ def usage():
 		run_valexpe_server.py stats_db
 		
 		run_valexpe_server.py copy
+		
+		run_valexpe_server.py check_db (reset)
+		
+		run_valexpe_server.py SQL "SQL statement"
+		
 	""")
 	exit(0)
 
@@ -367,6 +421,18 @@ elif action == "stats_db":
 	action_stats_db()
 elif action == "copy":
 	action_copy()
+elif action == "check_db":
+	if len(sys.argv) == 2:
+		action_check_db()
+	elif len(sys.argv) == 3:
+		action_check_db(True)
+	else:
+		usage()
+elif action == "SQL":
+	if len(sys.argv) == 3:
+		action_sql(sys.argv[2])
+	else:
+		usage()
 else:
 	print("not an  action")
 	usage()

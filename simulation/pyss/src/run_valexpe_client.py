@@ -83,7 +83,8 @@ def get_expe():
 	#dont look, it's dirty
 	for r in res:
 		res = res[r]
-		
+	if res == "None":
+		return ("None","None","None","None")
 	(a,hash,a,state,a,doer,a,options,a) = res.split("'")
 	options = json.loads(options)
 	print (hash,state,doer,options)
@@ -121,27 +122,27 @@ def launchExpe(options, worker_id):
 		expe_counter.value += 1
 		myid = expe_counter.value
 	
-	if not ( os.path.isfile(options["output_swf"]) ):
-		print bcolors.WARNING+"Start expe "+str(myid)+" on w"+str(worker_id)+ bcolors.ENDC+" : "+str(options)
-		error = False
-		tempout = sys.stdout
-		sys.stdout = open(options["output_swf"]+".out", 'w')
-		sys.stderr = sys.stdout
-		try:
-			parse_and_run_simulator(options)
-		except Exception,e:
-			print "Exception: "+str(e)
-			error = str(e)
-		sys.stdout = tempout
-		if not error:
-			print bcolors.OKBLUE+"End   epxe "+str(myid)+ bcolors.ENDC
-			return True
-		else:
-			print bcolors.FAIL+"ERROR on "+str(myid)+": "+str(e)+ bcolors.ENDC
-			return False
-	else:
-		print bcolors.OKGREEN+"Already done"+str(myid)+ bcolors.ENDC+" : "+str(options)
+	#if not ( os.path.isfile(options["output_swf"]) ):
+	print bcolors.WARNING+"Start expe "+str(myid)+" on w"+str(worker_id)+ bcolors.ENDC+" : "+str(options)
+	error = False
+	tempout = sys.stdout
+	sys.stdout = open(options["output_swf"]+".out", 'w')
+	sys.stderr = sys.stdout
+	try:
+		parse_and_run_simulator(options)
+	except Exception,e:
+		print "Exception: "+str(e)
+		error = str(e)
+	sys.stdout = tempout
+	if not error:
+		print bcolors.OKBLUE+"End   epxe "+str(myid)+ bcolors.ENDC
 		return True
+	else:
+		print bcolors.FAIL+"ERROR on "+str(myid)+": "+str(e)+ bcolors.ENDC
+		return False
+	#else:
+		#print bcolors.OKGREEN+"Already done"+str(myid)+ bcolors.ENDC+" : "+str(options)
+		#return True
 
 
 def worker():
@@ -154,6 +155,10 @@ def worker():
 		while True:
 			#get a new expe
 			(hash,state,doer,options) = get_expe()
+			
+			if hash == "None":
+				print "No more expe for", worker_id
+				return
 			
 			#exec it
 			#print "doing", hash
