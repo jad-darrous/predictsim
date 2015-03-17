@@ -83,7 +83,8 @@ def get_expe():
 	#dont look, it's dirty
 	for r in res:
 		res = res[r]
-		
+	if res == "None":
+		return ("None","None","None","None")
 	(a,hash,a,state,a,doer,a,options,a) = res.split("'")
 	options = json.loads(options)
 	print (hash,state,doer,options)
@@ -154,6 +155,12 @@ def worker():
 		while True:
 			#get a new expe
 			(hash,state,doer,options) = get_expe()
+			
+			if hash == "None":
+				print "No more expe for", worker_id
+				with thread_counter.get_lock():
+					thread_counter.value -= 1
+				return
 			
 			#exec it
 			#print "doing", hash

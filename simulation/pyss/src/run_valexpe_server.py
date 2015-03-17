@@ -125,7 +125,8 @@ def action_get(doer):
 	expe = c.fetchone()
 	print(expe)
 	
-	c.execute('UPDATE expes SET state="DOING", doer=? WHERE hash=?', (doer,expe[0]))
+	if expe != None:
+		c.execute('UPDATE expes SET state="DOING", doer=? WHERE hash=?', (doer,expe[0]))
 	
 	# Save (commit) the changes
 	conn.commit()
