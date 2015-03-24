@@ -39,10 +39,10 @@ class NAG(object):
 
         #self.model.set_param_vector(W)
         self.N=self.N+sum([a*a/(b*b) for a,b in zip(x,self.s) if not b==0])
-
-        l=[0]*self.model.dim
+        px = self.model.predict(x)
+        l=[0.0]*self.model.dim
         for i in range(0,self.model.dim):
-            tloss = self.loss.d_loss_directional(x,y,i,w)
+            tloss = self.loss.d_loss_directional(x,y,i,w=w,px=px)
             self.G[i]+= (tloss)*tloss
             if not self.G[i]==0.0:
                 l[i]= -self.eta*tloss/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])

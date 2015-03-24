@@ -27,6 +27,8 @@ class  EasyPlusPlusScheduler(Scheduler):
 
         self.cpu_snapshot.archive_old_slices(current_time)
         self.predictor.predict(job, current_time, self.running_jobs)
+        if not hasattr(job,"initial_prediction"):
+            job.initial_prediction=job.predicted_run_time
         self.unscheduled_jobs.append(job)
         return [
             JobStartEvent(current_time, job)
@@ -70,10 +72,6 @@ class  EasyPlusPlusScheduler(Scheduler):
 
     def _schedule_jobs(self, current_time):
         "Schedules jobs that can run right now, and returns them"
-
-        for job in self.unscheduled_jobs:
-            if not hasattr(job,"initial_prediction"):
-                job.initial_prediction=job.predicted_run_time
 
         jobs  = self._schedule_head_of_list(current_time)
         jobs += self._backfill_jobs(current_time)

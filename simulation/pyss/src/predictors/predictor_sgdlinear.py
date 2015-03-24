@@ -236,7 +236,7 @@ class PredictorSgdlinear(Predictor):
         x[10]=float(sum([j.num_required_processors for j in running_mine]))
 
         #sum of runtime of already running jobs of the user
-        lengths_running=[current_time-j.start_time for j in running_mine]
+        lengths_running=[current_time-j.start_to_run_at_time for j in running_mine]
         x[11]=float(sum(lengths_running))
 
         #amount of jobs  of this user already running

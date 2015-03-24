@@ -12,11 +12,11 @@ class RegularizedLoss(object):
         """Return the squared loss of the model on example (x,y)"""
         return self.orig_loss.loss(x,y,w=w)+self.alpha*self.regularizer.norm(self.model.get_param_vector())
 
-    def d_loss_directional(self,x,y,i,w=1):
+    def d_loss_directional(self,x,y,i,w=1.0,px=None):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
-        return self.orig_loss.d_loss_directional(x,y,i,w=w)+self.alpha*self.regularizer.d_norm_directional(self.model.get_param_vector(),i)
+        return self.orig_loss.d_loss_directional(x,y,i,w=w,px=px)+self.alpha*self.regularizer.d_norm_directional(self.model.get_param_vector(),i)
 
-    def grad_loss(self,x,y,w=1):
+    def grad_loss(self,x,y,w=1.0):
         """Gradient of the loss of the model on example (x,y) """
         G=self.orig_loss.grad_loss(x,y,w=w)
         R=self.regularizer.grad_norm(self.model.get_param_vector())

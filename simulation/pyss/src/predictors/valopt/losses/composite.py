@@ -8,17 +8,16 @@ class CompositeLoss(object):
         self.leftside=leftside
         self.threshold=float(threshold)
 
-    def d_loss_directional(self,x,y,i,w=1):
+    def d_loss_directional(self,x,y,i,w=1.0,px=None):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
-        p=self.model.predict(x)
-        if p-y>self.threshold:
-            return w*self.rightside.d_loss_directional(p-y-self.threshold,x,i)
-        elif p-y==self.threshold:
+        if px-y>self.threshold:
+            return w*self.rightside.d_loss_directional(px-y-self.threshold,x,i)
+        elif px-y==self.threshold:
             return 0
         else:
-            return -w*self.leftside.d_loss_directional(self.threshold-p+y,x,i)
+            return -w*self.leftside.d_loss_directional(self.threshold-px+y,x,i)
 
-    def grad_loss(self,x,y,w=1):
+    def grad_loss(self,x,y,w=1.0):
         """
         Gradient of the loss of the model on example (x,y)
         Should be np.array(map(lambda i:d_loss_directional(model, x, i),range(0,len(x))).
