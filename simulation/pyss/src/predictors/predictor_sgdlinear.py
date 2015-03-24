@@ -226,7 +226,7 @@ class PredictorSgdlinear(Predictor):
         #User cores mean
         if not self.user_n_jobs[job.user_id] ==0:
             coremean=float(self.user_sum_cores[job.user_id])/float(self.user_n_jobs[job.user_id])
-            x[9]=job.num_required_processors
+            x[9]=job.num_required_processors/coremean
         else:
             x[9]=0
 

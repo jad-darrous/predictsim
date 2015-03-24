@@ -1,0 +1,34 @@
+Basic features:
+===============
+
+last user run time.
+last user run time2.
+last user run time3.
+-> all the available last user run times.
+required time
+required time of last jobs of the user
+required processors
+required processors of last jobs of the user
+amount of jobs already running of the user on the system.
+time size(length) of jobs of user already running
+machine size of jobs of user already running
+time size(length) of longest job of user already running
+waiting_times of jobs of user already running
+waiting times of last jobs of the user
+average waiting time of user
+user id
+group id
+
+Categorical variables:
+=====================
+User ID
+Status of previous jobs of user
+Think time of user
+
+High-level features:
+===================
+periodic submission time (period:week)
+periodic submission time (period:day)
+moving average(3) of user
+moving average(2) of user
+user runtime mean
