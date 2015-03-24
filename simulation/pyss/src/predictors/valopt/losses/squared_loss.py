@@ -5,11 +5,11 @@ class SquaredLoss(object):
         """Instanciate a squared loss for a specific model"""
         self.model=model
 
-    def d_loss_directional(self,x,y,i,w=1):
+    def d_loss_directional(self,x,y,i,w=1.0,px=None):
         """Return the derivative of the loss with respect to the i-th entry of the parameter vector of the model"""
-        return self.model.d_predict_directional(x, i)*(self.model.predict(x)-y)
+        return self.model.d_predict_directional(x, i)*(px-y)
 
-    def grad_loss(self,x,y,w=1):
+    def grad_loss(self,x,y,w=1.0):
         """
         Gradient of the loss of the model on example (x,y)
         Should be np.array(map(lambda i:d_loss_directional(model, x, i),range(0,len(x))).
