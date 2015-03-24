@@ -5,7 +5,7 @@ class LinearModel(object):
 
     def __init__(self, dim, verbose=False):
         """Linear Model, y=<w,x>"""
-        self.w=[0]*dim
+        self.w=[0.0]*dim
         self.dim=dim
 
     def get_param_vector(self):

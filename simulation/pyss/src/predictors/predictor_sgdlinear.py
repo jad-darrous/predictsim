@@ -135,13 +135,13 @@ class PredictorSgdlinear(Predictor):
             self.user_job_last3[job.user_id] = None
 
         if not self.user_sum_cores.has_key(job.user_id):
-            self.user_sum_cores[job.user_id] = 0
+            self.user_sum_cores[job.user_id] = 0.0
         if not self.user_sum_runtimes.has_key(job.user_id):
-            self.user_sum_runtimes[job.user_id] = 0
+            self.user_sum_runtimes[job.user_id] = 0.0
         if not self.user_n_jobs.has_key(job.user_id):
-            self.user_n_jobs[job.user_id] = 0
+            self.user_n_jobs[job.user_id] = 0.0
         if not self.user_last_ending.has_key(job.user_id):
-            self.user_last_ending[job.user_id] = 0
+            self.user_last_ending[job.user_id] = 0.0
 
         #TODO:make x
         #x[0] is 1
@@ -155,18 +155,18 @@ class PredictorSgdlinear(Predictor):
         #x[8] is time since last time a job of the user ended.
 
         #Turning linear model into affine model
-        x[0]=1
+        x[0]=1.0
 
         #Last runtime
         if self.user_job_last1[job.user_id] != None:
             j1= self.user_job_last1[job.user_id]
             if j1.submit_time+j1.actual_run_time>current_time:
-                last=j1.actual_run_time
+                last=float(j1.actual_run_time)
             else:
-                last=current_time-j1.submit_time
+                last=float(current_time-j1.submit_time)
         else:
-            last=job.user_estimated_run_time
-        x[1] = min(job.user_estimated_run_time, last)
+            last=float(job.user_estimated_run_time)
+        x[1] = float(min(job.user_estimated_run_time, last))
 
         #Last runtime2
         if self.user_job_last2[job.user_id] != None:
@@ -177,7 +177,7 @@ class PredictorSgdlinear(Predictor):
                 last=current_time-j2.submit_time
         else:
             last=job.user_estimated_run_time
-        x[2] = min(job.user_estimated_run_time, last)
+        x[2] = float(min(job.user_estimated_run_time, last))
 
         #Last runtime3
         if self.user_job_last3[job.user_id] != None:
@@ -188,10 +188,10 @@ class PredictorSgdlinear(Predictor):
                 last=current_time-j3.submit_time
         else:
             last=job.user_estimated_run_time
-        x[3] = min(job.user_estimated_run_time, last)
+        x[3] = float(min(job.user_estimated_run_time, last))
 
         #Required_time (aka user estimated run time)
-        x[4]= job.user_estimated_run_time
+        x[4]= float(job.user_estimated_run_time)
 
         #Moving averages
         if self.user_job_last3[job.user_id] != None:
@@ -204,65 +204,65 @@ class PredictorSgdlinear(Predictor):
             x[5]=x[1]
             x[6]=x[5]
         else:
-            x[5]=job.user_estimated_run_time
+            x[5]=float(job.user_estimated_run_time)
             x[6]=x[5]
 
         #User run time mean
         if not self.user_n_jobs[job.user_id] ==0:
-            x[7]=self.user_sum_runtimes[job.user_id]/self.user_n_jobs[job.user_id]
+            x[7]=float(self.user_sum_runtimes[job.user_id])/float(self.user_n_jobs[job.user_id])
             #print "ifed"
             #print x[7]
         else:
-            x[7]=0
+            x[7]=0.0
             #print "elsed"
 
         #T since Last job ending of this user
-        if not self.user_last_ending[job.user_id]==0:
-            x[8]=current_time-self.user_last_ending[job.user_id]
+        if not self.user_last_ending[job.user_id]==0.0:
+            x[8]=float(current_time-self.user_last_ending[job.user_id])
         else:
-            x[8]=0
+            x[8]=0.0
 
         #Ratio of Cores from user mean to this one.
         #User cores mean
-        if not self.user_n_jobs[job.user_id] ==0:
+        if not self.user_n_jobs[job.user_id] ==0.0:
             coremean=float(self.user_sum_cores[job.user_id])/float(self.user_n_jobs[job.user_id])
-            x[9]=job.num_required_processors
+            x[9]=float(job.num_required_processors)/coremean
         else:
-            x[9]=0
+            x[9]=0.0
 
         running_mine=[j for j in list_running_jobs if j.user_id==job.user_id]
 
         #total cores running by this user
-        x[10]=sum([j.num_required_processors for j in running_mine])
+        x[10]=float(sum([j.num_required_processors for j in running_mine]))
 
         #sum of runtime of already running jobs of the user
-        lengths_running=[current_time-j.submit_time for j in running_mine]
-        x[11]=sum(lengths_running)
+        lengths_running=[current_time-j.start_time for j in running_mine]
+        x[11]=float(sum(lengths_running))
 
         #amount of jobs  of this user already running
-        x[12]=len(running_mine)
+        x[12]=float(len(running_mine))
 
         #length of longest job of user already running
         if len(lengths_running)==0:
-            x[13]=0
+            x[13]=0.0
         else:
-            x[13]=max(lengths_running)
+            x[13]=float(max(lengths_running))
 
         #second of day
-        #x[14]=current_time % 3600*60
+        sec_of_day=2.0*math.pi*float(job.submit_time % (3600*24))/(3600.0*24.0)
         #cos second of day
-        x[14]=math.cos(1357168.0263507906*x[14]) #3600*60*2*math.pi
+        x[14]=math.cos(sec_of_day)
         #sin second of day
-        x[15]=math.sin(1357168.0263507906*x[14]) #3600*60*2*math.pi
+        x[15]=math.sin(sec_of_day) #
         #day of week trough seconds:
-        #x[14]=current_time % 3600*60*7
+        day_of_week= 2.0*math.pi*float(job.submit_time % (3600*24*7))/(3600.0*24.0*7.0)
         #cos day of week
-        x[16]=math.cos(9500176.184455534*x[14]) #7*3600*60*2*math.pi
+        x[16]=math.cos(day_of_week) #
         #sin day of week
-        x[17]=math.sin(9500176.184455534*x[14]) #7*3600*60*2*math.pi
+        x[17]=math.sin(day_of_week) #
 
         #Job cores
-        x[18]=job.num_required_processors
+        x[18]=float(job.num_required_processors)
 
 
         if self.quadratic:
@@ -292,7 +292,6 @@ class PredictorSgdlinear(Predictor):
             #for a,b,c in itertools.combinations(x[0:17],3):
                 #x[i]=a*b*c
                 #i+=1
-
         return x
 
     def store_x(self,job,x):
@@ -321,10 +320,11 @@ class PredictorSgdlinear(Predictor):
             x=self.job_x[job]
 
         #make the prediction
-        job.predicted_run_time=max(1,int(abs(self.model.predict(x))))
-        job.predicted_run_time=min(job.predicted_run_time,job.user_estimated_run_time)
+        fff = abs(self.model.predict(x))
+        job.predicted_run_time=int(max(1.0,int(fff)))
+        job.predicted_run_time=int(min(job.predicted_run_time,job.user_estimated_run_time))
         if not self.max_runtime==False:
-            job.predicted_run_time=max(1,min(job.predicted_run_time,self.max_runtime))
+            job.predicted_run_time=int(max(1.0,min(job.predicted_run_time,self.max_runtime)))
 
         #return self.model.loss.loss(x,job.actual_run_time,self.weight(job))
 
