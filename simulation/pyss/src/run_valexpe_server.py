@@ -9,16 +9,15 @@ import os
 import time
 
 
-#expe_name = "SDSC-SP2"
-expe_name = "KTH-SP2"
-num_processors = 100
+expe_name = "SDSC-BLUE"
+num_processors = 1152
 expe_dir = "../../../experiments/data/"+expe_name
 conn = sqlite3.connect(expe_dir+"/run.db", timeout=120)
 ouput_dir = expe_dir+"/simulations/"
 input_file = expe_dir+"/swf/log.swf"
 
-#dict_path = '../../../experiments/experiment_dicts.py'
-dict_path = '../../../experiments/experiment_dicts_kth.py'
+dict_path = '../../../experiments/experiment_dicts.py'
+##dict_path = '../../../experiments/experiment_dicts_kth.py'
 
 
 def nice(s):
