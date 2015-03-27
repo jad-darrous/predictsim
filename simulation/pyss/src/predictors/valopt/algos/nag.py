@@ -18,9 +18,10 @@ class NAG(object):
         self.eta=float(eta)
         self.verbose=verbose
         self.n=1.0
-        self.s=[0.0]*model.dim
-        self.G=[0.0]*model.dim
-        self.N=0.0
+        self.s=[0.000000001]*model.dim
+        self.G=[0.000000001]*model.dim
+        self.N=0.000000001
+
 
     def predict(self, x):
         return self.model.predict(x)
@@ -44,9 +45,8 @@ class NAG(object):
         for i in range(0,self.model.dim):
             tloss = self.loss.d_loss_directional(x,y,i,w=w,px=px)
             self.G[i]+= (tloss)*tloss
-            if not self.G[i]==0.0:
-                l[i]= -self.eta*tloss/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])
+            l[i]= -self.eta*tloss/(math.sqrt(self.N*self.G[i]/self.n)*self.s[i])
         W=[a+b for a,b in zip(l,W)]
         self.model.set_param_vector(W)
 
-        self.n+=1
+        self.n+=2
