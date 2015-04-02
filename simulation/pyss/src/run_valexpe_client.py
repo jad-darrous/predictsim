@@ -22,16 +22,25 @@ ssh.util.log_to_file("paramiko.log", 10)
 
 server_path = "/home/glesser/FSE_simul/internship/simulation/pyss/src/run_valexpe_server.py"
 
-num_threads = 24
 
 env.use_ssh_config = True
 
-#env.gateway = 'dglesser@stremi-6:22'
-#env.hosts = ['glesser@localhost:12345']
-env.hosts = ['houlette']
+
+
+
+if len(sys.argv) != 3:
+	print "pypy -OO client.py serverhost num_thread"
+	exit(1)
+
+
+num_threads = int(sys.argv[2])
+
+
+#env.hosts = ['houlette']
 #env.hosts = ['localhost']
-#env.key_filename = "/home/dglesser/.ssh/id_rsa.notsosecret"
-#env.password = ""
+
+env.hosts = [sys.argv[1]]
+
 
 my_name = str(socket.gethostname())
 

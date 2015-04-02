@@ -7,27 +7,133 @@ import sqlite3
 import hashlib
 import os
 import time
+import glob
 
-
-expe_name = "SDSC-SP2"
-num_processors = 128
+expe_name = "CEA-curie"
+num_processors = 80640
 expe_dir = "../../../experiments/data/"+expe_name
 conn = sqlite3.connect(expe_dir+"/run.db", timeout=120)
 ouput_dir = expe_dir+"/simulations/"
 input_file = expe_dir+"/swf/log.swf"
 
-#dict_path = '../../../experiments/experiment_dicts.py'
-dict_path = '../../../experiments/experiment_dicts_kth.py'
+dict_path = '../../../experiments/experiment_dicts.py'
+#dict_path = '../../../experiments/experiment_dicts_kth.py'
 
 
 def nice(s):
 	# transform an dict into something command-line compatible, the ugliest way!
+	print "DO NOT USE nice()!"
 	return str(s).translate(None, " ':/(){},\"").replace("name", "").replace("predictor_sgdlinear", "gdl").replace("max_coresauto", "").replace("regularizationl2", "").replace("lambda4000000000", "").replace("gdNAG", "")
 
 
+
 def hash(s):
+	print "DO NOT USE hash()!"
 	return hashlib.sha1(nice(s)).hexdigest()
+
+
+
+def sched2filename(s):
+	p = s["predictor"]
+	if p != None:
+		if p["name"] == "predictor_sgdlinear":
+			res = p["name"].replace("_", "")+"I"
+			res += p["rightside"]+"I"
+			res += str(p["rightparam"])+"I"
+			res += p["leftside"]+"I"
+			res += str(p["leftparam"])+"I"
+			res += str(p["threshold"])+"I"
+			res += p["weight"].translate(None, " ':/(){},\"+*")
+		else:
+			res = p["name"].replace("_", "")
+	else:
+		res = "None"
+
+	if s["corrector"] != None:
+		cor = s["corrector"]["name"]
+	else:
+		cor = "None"
+	return "res_"+s["name"]+"_"+res+"_"+cor+".swf.gz"
+
+def opt2filename(opt):
+	return sched2filename(opt["scheduler"])
+
+def opt2hash(opt):
+	return hashlib.sha1(
+		str(opt["input_file"])+
+		str(opt["num_processors"])+
+		opt2filename(opt)).hexdigest()
+
+def filename2opt(s):
+	s = s.split("/")[-1]
+	s = s.rstrip(".out")
+	s = s.rstrip(".gz")
+	s = s.rstrip(".swf")
+
+	ss = s.split("_")
 	
+	#no predictor nor corrector
+	if ss[-1] == 'None' and ss[-2] == 'None':
+		corrector = None
+		predictor = None
+		sched = '_'.join(ss[1:-2])
+	else:
+		tttt = [len(x) for x in ss]
+		opt_index = tttt.index(max(tttt))
+
+		corrector = "_".join(ss[opt_index+1:len(ss)])
+		sched = "_".join(ss[1:opt_index])
+		o = ss[opt_index]
+		oo = o.split("I")
+		if oo[0] != "predictorsgdlinear":
+			raise "only predictorsgdlinear is supported"
+		
+		p = {"name":"predictor_sgdlinear",
+		"max_cores":"auto",
+		"eta":5000,
+		"loss":"composite",
+		"quadratic":True,
+		"cubic": False,
+		"gd": "NAG",
+		"regularization":"l2",
+		"lambda":4000000000}
+		
+		p["rightside"] = oo[1]
+		p["rightparam"] = float(oo[2])
+		if p["rightparam"] >= 1:
+			p["rightparam"] = int(p["rightparam"])
+		p["leftside"] = oo[3]
+		p["leftparam"] = float(oo[4])
+		if p["leftparam"] >= 1:
+			p["leftparam"] = int(p["leftparam"])
+		p["threshold"] = int(oo[5])
+
+		weightnice={"1":"1",
+			"5logrm":"5+log(r/m)",
+			"5logmr":"5+log(m/r)",
+			"11log1rm":"11+log(1/(r*m))",
+			"1logmr":"1+log(m*r)"
+			}
+		p["weight"] = weightnice[oo[6]]
+		
+		predictor = p
+	
+	opt = {'output_swf': 'TBD',
+		'num_processors': num_processors,
+		'input_file': input_file,
+		'stats': False,
+		'scheduler': {
+			'corrector': {'name': corrector},
+			'progressbar': False,
+			'name': sched,
+			'predictor': predictor}}
+	
+	opt["output_swf"] = ouput_dir+opt2filename(opt)
+	
+	return opt
+
+
+
 
 def db_init_new_db():
 	
@@ -36,7 +142,7 @@ def db_init_new_db():
 		{
 		'input_file': input_file,
 		"num_processors":num_processors,
-		'output_swf': ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz",
+		'output_swf': ouput_dir+sched2filename(s),
 		'stats': False,
 		"scheduler":s
 		}
@@ -50,7 +156,7 @@ def db_init_new_db():
 
 	# Insert a row of data
 	for conf in configs:
-		c.execute("INSERT INTO expes VALUES (?, 'WAIT', 'None', ?)", (hash(conf), json.dumps(conf)))
+		c.execute("INSERT INTO expes VALUES (?, 'WAIT', 'None', ?)", (opt2hash(conf), json.dumps(conf)))
 
 	# Save (commit) the changes
 	conn.commit()
@@ -58,13 +164,20 @@ def db_init_new_db():
 
 def db_init_new_db_dir():
 	
+	curs = conn.cursor()
+
+	# Create table
+	curs.execute('''CREATE TABLE expes (hash text, state text, doer text, options text)''')
+	
+	
 	exec(open(dict_path).read())
 	nconf = len(sched_configs)
 	nconf_skipped = 0
 	nconf_finished = 0
-	configs=[]
+	state = "WAIT"
 	for s in sched_configs:
-		output_swf = ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz"
+		output_swf = ouput_dir+sched2filename(s)
+		state = "WAIT"
 		if os.path.isfile(output_swf) :
 			wrong = True
 			for line in open(output_swf+".out"):
@@ -79,26 +192,22 @@ def db_init_new_db_dir():
 				print "rm", output_swf
 				print "rm", output_swf+".out"
 				nconf_skipped += 1
+				state = "ERROR"
 			else:
 				nconf_finished += 1
-				continue
-		configs.append({
+				state = "DONE"
+		conf = {
 			'input_file': input_file,
 			"num_processors":num_processors,
 			'output_swf': output_swf,
 			'stats': False,
 			"scheduler":s
-			})
-	print nconf, "expes =", len(configs), "todo +", nconf_skipped, "in error +", nconf_finished, "finished"
+			}
+		curs.execute("INSERT INTO expes VALUES (?, ?, 'None', ?)", (opt2hash(conf), state, json.dumps(conf)))
+		
+	print nconf, "expes =", len(sched_configs), "todo +", nconf_skipped, "in error +", nconf_finished, "finished"
 
-	c = conn.cursor()
 
-	# Create table
-	c.execute('''CREATE TABLE expes (hash text, state text, doer text, options text)''')
-
-	# Insert a row of data
-	for conf in configs:
-		c.execute("INSERT INTO expes VALUES (?, 'WAIT', 'None', ?)", (hash(conf), json.dumps(conf)))
 
 	# Save (commit) the changes
 	conn.commit()
@@ -191,7 +300,7 @@ def action_stats():
 	data = []
 	configs=[]
 	for s in sched_configs:
-		output_swf = ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz"
+		output_swf = ouput_dir+sched2filename(s)
 		if os.path.isfile(output_swf+".out") :
 			wrong = True
 			for line in open(output_swf+".out"):
@@ -268,7 +377,7 @@ def action_copy():
 	nunkn = 0
 	
 	for s in sched_configs:
-		output_swf = ouput_dir+"res_"+s["name"]+"_"+nice(s["predictor"])+"_"+nice(s["corrector"])+".swf.gz"
+		output_swf = ouput_dir+sched2filename(s)
 		if os.path.isfile(output_swf) :
 			state = "UNKNOWN"
 			for line in open(output_swf+".out"):
@@ -349,6 +458,141 @@ def action_sql(cmd):
 	conn.commit()
 
 
+def unnice(s):
+	
+	s = s.split("/")[-1]
+	s = s.rstrip(".out")
+	s = s.rstrip(".gz")
+	s = s.rstrip(".swf")
+
+	ss = s.split("_")
+	tttt = [len(x) for x in ss]
+	opt_index = tttt.index(max(tttt))
+
+	sched = '_'.join(ss[1:opt_index])
+	corrector = "_".join(ss[opt_index+1:len(ss)])
+	o = ss[opt_index]
+
+	ks = ['loss', 'weight', 'cubic', 'eta', 'threshold', 'rightside', 'rightparam', 'quadratic', 'leftside', 'leftparam']
+
+	a = [(o.find(x), x) for x in ks]
+	a.sort()
+	t = o.lstrip(a[0][1])
+	opt = {"name":"predictor_sgdlinear",
+		"max_cores":"auto",
+		"eta":5000,
+		"loss":"composite",
+		"quadratic":True,
+		"cubic": False,
+		"gd": "NAG",
+		"regularization":"l2",
+		"lambda":4000000000}
+
+	for i in range(1, len(a)):
+		tt = t.split(a[i][1])
+		opt[a[i-1][1]] = tt[0].strip('gdl')
+		t = a[i][1].join(tt[1:len(tt)])
+
+	opt[a[len(a)-1][1]] = t.strip('gdl')
+
+	weightnice={"1":"1",
+		"5+logrm":"5+log(r/m)",
+		"5+logmr":"5+log(m/r)",
+		"11+log1r*m":"11+log(1/(r*m))",
+		"1+logm*r":"1+log(m*r)"
+		}
+	if opt["weight"] != "":
+		opt["weight"] = weightnice[opt["weight"]]
+	
+		opt["threshold"] = int(opt["threshold"])
+		opt["leftparam"] = float(opt["leftparam"])
+		if opt["leftparam"] >= 1:
+			opt["leftparam"] = int(opt["leftparam"])
+		opt["rightparam"] = float(opt["rightparam"])
+		if opt["rightparam"] >= 1:
+			opt["rightparam"] = int(opt["rightparam"])
+		opt["eta"] = int(opt["eta"])
+
+	finalopt = {'output_swf': 'res.swf',
+		'num_processors': 80640,
+		'input_file': '../../../experiments/data/CEA-curie_sample/swf/log.swf',
+		'stats': False,
+		'scheduler': {'corrector': {'name': corrector},
+			'progressbar': False,
+			'name': sched,
+			'predictor': opt}}
+
+	return finalopt
+
+
+def ascii_encode(x):
+	if isinstance(x, unicode):
+		return x.encode('ascii')
+	return x
+
+def ascii_encode_dict(data):
+    return dict(map(ascii_encode, pair) for pair in data.items())
+
+def action_nice(opts):
+	#print type(opts)
+	opt = json.loads(opts, object_hook=ascii_encode_dict)
+	s = opt["scheduler"]
+	print ouput_dir+"res_"+s["name"]+"_"+nice(str(s["predictor"]).encode('ascii'))+"_"+nice(str(s["corrector"]).encode('ascii'))+".swf.gz"
+
+
+def init_db_curie():
+	#limit = 10
+	res = {}
+	ouput_dirSAVE = "../../../experiments/data/CEA-curie/simulations_SAVE/"
+	for file in glob.glob(ouput_dirSAVE+"*.gz"):
+		#print "#############################"
+		#print(file)
+		#print "---------------------------"
+		try:
+			opt = filename2opt(file)
+		except:
+			opt = unnice(file)
+		#print opt
+		#print "---------------------------"
+		#print ouput_dir+opt2filename(opt)
+		#print opt2hash(opt)
+		fro=file
+		too=ouput_dir+opt2filename(opt)
+		#print fro
+		#print too
+		
+		os.system("cp \""+fro+"\" \""+too+"\"")
+		'''res[hash] = {
+			"outfile":file,
+			"swffile": xx,
+			"oldformat": True,
+			"hash":hash,
+			"comptime": 12,
+			"state":xx
+			}'''
+		
+		
+		
+		#limit -= 1
+		#if limit == 0:
+			#break
+	
+	
+	
+	return
+
+	
+	
+	
+
+
+
+
+
+
+
+
+
 def usage():
 	print("""
 		run_valexpe_server.py get "houle"
@@ -379,6 +623,7 @@ def usage():
 		
 		run_valexpe_server.py SQL "SQL statement"
 		
+		run_valexpe_server.py init_db_curie
 	""")
 	exit(0)
 
@@ -432,6 +677,8 @@ elif action == "SQL":
 		action_sql(sys.argv[2])
 	else:
 		usage()
+elif action == "init_db_curie":
+	init_db_curie()
 else:
 	print("not an  action")
 	usage()
