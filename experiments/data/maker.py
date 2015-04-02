@@ -36,7 +36,7 @@ class Maker:
 
 
 	def doTask(self, source, dest, command):
-		
+		print "[Maker]: Start of ", command
 		list_of_task = []
 		
 		if type(source) == list:
@@ -59,6 +59,8 @@ class Maker:
 			
 		
 		#print list_of_task
+		t_already_done=0
+		t_done=0
 	
 		for task in list_of_task:
 			src = task[0]
@@ -88,14 +90,16 @@ class Maker:
 				out = f.read()
 				if out != "":
 					print(f.read())
-			
+				t_done += 1
 			else:
 				if self.verbose: print("[Maker]: Nothing to do for "+str(src)+" => "+str(dst)+")")
+				t_already_done += 1
+		print "[Maker]: \tAlready done:", t_already_done, "\tDone:", t_done
 
 
 
 
-b = Maker(True)
+b = Maker(False)
 
 
 b.doTask(
