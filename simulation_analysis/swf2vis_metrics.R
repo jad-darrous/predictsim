@@ -101,9 +101,13 @@ RMSBSLD    =c()
 
 for (i in 1:length(args$swf_filenames)) {
   swf_filename=args$swf_filenames[i]
-  data=swf_read(swf_filename)
+  data= tryCatch({
+    swf_read(swf_filename)
+  }, error= function(e) {
+    data.frame(job_id=c(NA), submit_time=c(NA), wait_time=c(NA), run_time=c(NA), proc_alloc=c(NA), cpu_time_used=c(NA), mem_used=c(NA), proc_req=c(NA), time_req=c(NA), mem_req=c(NA), status=c(NA), user_id=c(NA), group_id=c(NA), exec_id=c(NA), queue_id=c(NA), partition_id=c(NA), previous_job_id=c(NA), think_time=c(NA))
+  })
 
-  data=data[as.integer(floor(nrow(data)*0.01)):nrow(data),]
+#   data=data[as.integer(floor(nrow(data)*0.01)):nrow(data),]
   data$ft=data$wait_time+data$run_time
   data$stretch=data$ft/data$run_time
   data$bsld=pmax(1,data$ft/pmax(rep(10, nrow(data)),data$run_time))

@@ -103,7 +103,7 @@ b.doTask(
 	command="""../../../simulation_analysis/swf2vis_metrics.R $SOURCE_FILE -o $DEST_FILE""")
 b.doTask(
 	source=["sim_analysis/individual/", ".csv"], dest="sim_analysis/metrics",
-	command="../../../simulation_analysis/merge_to_metrics.sh $SOURCE > $DEST_FILE")
+	command="../../data_manipulation/merge_to_metrics.sh $SOURCE > $DEST_FILE")
 
 b.doTask(
 	source="sim_analysis/metrics", dest="sim_analysis/metrics_complete",
