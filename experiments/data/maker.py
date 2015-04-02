@@ -2,6 +2,7 @@
 import glob
 import os.path, time
 import os
+import subprocess
 
 class Maker:
 	
@@ -72,7 +73,7 @@ class Maker:
 				
 			
 				os.environ["SOURCE"] = self.listToGlob(source)
-				os.environ["SOURCE_GLOB"] = " ".join(glob.glob(self.listToGlob(source)))
+				#os.environ["SOURCE_GLOB"] = " ".join(glob.glob(self.listToGlob(source)))
 				os.environ["DEST"] = self.listToGlob(dest)
 				
 				os.environ["SOURCE_FILE"] = self.listToGlob(src)
@@ -86,10 +87,7 @@ class Maker:
 					os.environ["DEST_FILE_BASE"] = os.path.basename(str(dst))
 				
 				if self.verbose: print("[Maker]: Launching: "+str(cmd))
-				f = os.popen(cmd)
-				out = f.read()
-				if out != "":
-					print(f.read())
+				print subprocess.check_output(cmd, shell=True)
 				t_done += 1
 			else:
 				if self.verbose: print("[Maker]: Nothing to do for "+str(src)+" => "+str(dst)+")")
