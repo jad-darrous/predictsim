@@ -117,7 +117,7 @@ for (i in 1:length(args$swf_filenames)) {
   len=append(len,nrow(data))
   avgft=append(avgft, sum(data$ft)/nrow(data))
   maxft=append(maxft, max(data$ft))
-  RMSFT=append(RMSFT, sqrt(sum(data$ft*data$ft)/n))
+  RMSFT=append(RMSFT, sqrt(sum(as.numeric(data$ft)*as.numeric(data$ft))/n))
   avgstretch=append(avgstretch, sum(data$stretch)/nrow(data))
   maxstretch=append(maxstretch, max(data$stretch))
   RMSS=append(RMSS, sqrt(sum(data$stretch*data$stretch)/n))
