@@ -58,18 +58,20 @@ for i in range(len(df['name'])):
 	if expes != None:
 		df["hash"][i] = expes[0]
 		params = json.loads(expes[3])
-
+		
 		df["scheduler"][i] = params['scheduler']['name']
-		df["corrector"][i] = params['scheduler']['corrector']['name']
-		df["predictor"][i] = params['scheduler']['predictor']['name']
-		if "predictor_sgdlinear" ==  params['scheduler']['predictor']['name']:
-			predictor = params['scheduler']['predictor']
-			df["prightside"][i] = predictor['rightside']
-			df["prightparam"][i] = predictor['rightparam']
-			df["pleftside"][i] = predictor['leftside']
-			df["pleftparam"][i] = predictor['leftparam']
-			df["pthreshold"][i] = predictor['threshold']
-			df["pweight"][i] = predictor['weight']
+		if params['scheduler']['corrector'] != None:
+			df["corrector"][i] = params['scheduler']['corrector']['name']
+		if params['scheduler']['corrector'] != None:
+			df["predictor"][i] = params['scheduler']['predictor']['name']
+			if "predictor_sgdlinear" ==  params['scheduler']['predictor']['name']:
+				predictor = params['scheduler']['predictor']
+				df["prightside"][i] = predictor['rightside']
+				df["prightparam"][i] = predictor['rightparam']
+				df["pleftside"][i] = predictor['leftside']
+				df["pleftparam"][i] = predictor['leftparam']
+				df["pthreshold"][i] = predictor['threshold']
+				df["pweight"][i] = predictor['weight']
 	else:
 		#print "NOT FOUND:", input_swf
 		pass
