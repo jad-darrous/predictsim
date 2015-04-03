@@ -9,8 +9,8 @@ import os
 import time
 import glob
 
-expe_name = "SDSC-SP2"
-num_processors = 128
+expe_name = "SDSC-BLUE"
+num_processors = 1152
 expe_dir = "../../../experiments/data/"+expe_name
 conn = sqlite3.connect(expe_dir+"/run.db", timeout=120)
 ouput_dir = expe_dir+"/simulations/"
