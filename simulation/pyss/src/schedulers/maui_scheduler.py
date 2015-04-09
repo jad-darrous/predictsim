@@ -25,7 +25,9 @@ class MauiScheduler(EasyBackfillScheduler):
 
         # weights for calculation of priorities for the jobs in MAUI style
         if weights_list is not None:
-            self.weights_list = weights_list
+            # self.weights_list = weights_list
+            # Weights class is private/local we can't pass it as parameter
+            self.weights_list = Weights(*weights_list)
         else:
             self.weights_list = Weights(1, 0, 0, 0, 0, 0) # sort the jobs by order of submission
 
