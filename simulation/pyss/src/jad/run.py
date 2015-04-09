@@ -85,18 +85,12 @@ def add_l2r_score_jobs(infile, outfile, score):
 	write_lines_to_file(outfile, jobs)
 
 
-def average_stretch_time(fname):
+def average_stretch(fname):
 
-	# time.sleep(1)
-	# with open(fname) as f, open("dd.txt", "w") as o:
-	# 	o.write(f.read())
-	# print fname
-	# return 0;
 	s_time = []
 	with open(fname, "rb") as f:
 		for line in f.xreadlines():
 			if not line.lstrip().startswith(';'):
-				# print line.lstrip()
 				try:
 					wt, rt = [float(v) for v in [u for u in line.strip().split()][2:4]]
 					s_time.append((wt+rt)/rt);
@@ -109,30 +103,6 @@ def average_stretch_time(fname):
 if __name__ == "__main__":
 
 	arguments = docopt(__doc__, version='1.0.0rc2')
-
-	# test_file = 'output/log_test.swf'
-
-	# # add the l2r to the test log as the think time.
-	# l = [float(u) for u in open("%s/%s" % (out_dir, cl_out_fn))]
-	# h = "%s/%s" % (out_dir, new_l2r_fn)
-	# add_l2r_score_jobs(test_file, h, l)
-	
-	# config = {
-	# 	"scheduler": {"name":'maui_scheduler'},
-	# 	"num_processors": 80640,
-	# 	"stats": False,
-	# 	"verbose": False
-	# }
-
-	# # Simulate the file after l2r
-	# config["scheduler"]["name"] = 'l2r_maui_scheduler'
-	# config["weights"] = (0, 0, 0, 0, 0, 0, 1)
-	# config["input_file"] = test_file
-	# config["output_swf"] = "%s_sim_l2r.swf" % h.split('.')[0]
-	# l2r_exc_time = parse_and_run_simulator(config)
-	# print "l2r_exc_time:", l2r_exc_time
-
-	# print average_stretch_time(rel("log_part1.swf"))
 	
 	# import progressbar
 	# widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
@@ -155,6 +125,8 @@ if __name__ == "__main__":
 
 	out_files, test_file = split_swf(fname, training_percentage, training_parts, dir=out_dir)
 
+	print "[Simulating the training set..]"
+
 	best_all = []
 	for p in out_files:
 		index, best, outf = None, float("inf"), None
@@ -169,12 +141,12 @@ if __name__ == "__main__":
 		gc.collect()
 
 		for idx, swf in enumerate(out_swf):
-			# exc_time_ms = exc_time.total_seconds()
-			exc_time_ms = average_stretch_time(swf)
-			if exc_time_ms < best:
-				best = exc_time_ms
+			avg_stch = average_stretch(swf)
+			if avg_stch < best:
+				best = avg_stch
 				index = idx
 				outf = swf
+
 		best_all.append(outf)
 		print index, best
 
@@ -199,45 +171,19 @@ if __name__ == "__main__":
 
 	print "[Simulating the test file..]"
 	# Simulate the test file
-	index, best, run_time = None, float("inf"), None
 	out_swf = []
 	for idx, w in enumerate(weights_options):
 		config["weights"] = w
 		config["input_file"] = test_file
 		config["output_swf"] = "%s_sim%d.swf" % (test_file.split('.')[0], idx)
-		exc_time = parse_and_run_simulator(config)
-		# exc_time_ms = exc_time.total_seconds()
+		parse_and_run_simulator(config)
 		out_swf.append(config["output_swf"])
 
-		# gc.collect()
-
-		# exc_time_ms = average_stretch_time(config["output_swf"])
-		# print exc_time_ms
-		# if exc_time_ms < best:
-		# 	best = exc_time_ms
-		# 	index = idx
-
 	gc.collect()
-	# print "test_exc_time:", best
-	# print map(lambda u: average_stretch_time(u), out_swf)
-	best = min(map(lambda u: average_stretch_time(u), out_swf))
-	print "test_exc_time:", best
+	# print map(lambda u: average_stretch(u), out_swf)
+	best_avg_stch = min(map(lambda u: average_stretch(u), out_swf))
+	print "Test Average Stretch:", best_avg_stch
 
-
-	# # reorder the jobs according to their score
-	# l = [float(u) for u in open("%s/%s" % (out_dir, cl_out_fn))]
-	# x = zip(l, range(len(l)))
-	# z = sorted(x, key=lambda v: v[0])
-	# o = map(lambda u: u[1], z)
-	# h = "%s/%s" % (out_dir, new_l2r_fn)
-	# reorder_jobs(test_file, h, o)
-
-	# # Simulate the file after l2r
-	# config["weights"] = weights_options[0]
-	# config["input_file"] = h
-	# config["output_swf"] = "%s_sim.swf" % h.split('.')[0]
-	# l2r_exc_time = parse_and_run_simulator(config)
-	# print "l2r_exc_time:", l2r_exc_time
 
 	print "[Simulating the test file using L2R..]"
 	# add the l2r to the test log as the think time.
@@ -250,6 +196,6 @@ if __name__ == "__main__":
 	config["weights"] = (0, 0, 0, 0, 0, 0, 1)
 	config["input_file"] = test_l2r_fn
 	config["output_swf"] = "%s_sim_l2r.swf" % test_l2r_fn.split('.')[0]
-	l2r_exc_time = parse_and_run_simulator(config)
-	l2r_exc_time = average_stretch_time(config["output_swf"])
-	print "l2r_exc_time:", l2r_exc_time
+	parse_and_run_simulator(config)
+	l2r_avg_stch = average_stretch(config["output_swf"])
+	print "L2R Average Stretch:", l2r_avg_stch
