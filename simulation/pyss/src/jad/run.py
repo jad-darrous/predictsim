@@ -25,15 +25,6 @@ import os
 import gc
 
 
-weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0), (0, 0, 0, 0, 0, +1)]
-#weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0), (0, 0, 0, 0, 0, +1), (0, 0, 0, 0, 0, -1)]
-# weights_options = [(1, 0, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0, 0), (0, 0, 0, 0, 0, +1, 0), (0, 0, 0, 0, 0, -1, 0)]
-
-training_percentage = 0.6;
-training_parts = 4;
-
-indices = (2,3,4,5,11)
-
 train_fn = 'train.txt'
 test_fn = 'test.txt'
 model_fn = 'model.txt'
@@ -56,20 +47,6 @@ def write_str_to_file(fname, _str):
 def write_lines_to_file(fname, lines):
 	write_str_to_file(fname, '\n'.join(lines))
 
-def reorder_jobs(infile, outfile, criteria):
-
-	jobs = []
-	with open(infile) as f:
-		for line in f:
-			if not line.lstrip().startswith(';'):
-				jobs.append(line.strip());
-
-	new_jobs = []
-	for i in criteria:
-		new_jobs.append(jobs[i])
-
-	write_lines_to_file(outfile, new_jobs)
-
 
 def add_l2r_score_jobs(infile, outfile, score):
 
@@ -85,7 +62,14 @@ def add_l2r_score_jobs(infile, outfile, score):
 	write_lines_to_file(outfile, jobs)
 
 
-def average_stretch(fname):
+def stretch(wt, rt):
+	return (wt+rt)/rt
+
+def bounded_slowdown(wt, rt):
+	tau = 10.0
+	return max((wt+rt)/max(rt, tau), 1)
+
+def average_func(fname, func):
 
 	s_time = []
 	with open(fname, "rb") as f:
@@ -93,35 +77,23 @@ def average_stretch(fname):
 			if not line.lstrip().startswith(';'):
 				try:
 					wt, rt = [float(v) for v in [u for u in line.strip().split()][2:4]]
-					s_time.append((wt+rt)/rt);
-				except :
+					s_time.append(func(wt, rt));
+				except:
 					print 'except'
 					pass
 	return sum(s_time) / len(s_time)
 
+def average_stretch(fname):
+	return average_func(fname, stretch)
 
-if __name__ == "__main__":
+def average_bounded_slowdown(fname):
+	return average_func(fname, bounded_slowdown)
 
-	arguments = docopt(__doc__, version='1.0.0rc2')
-	
-	# import progressbar
-	# widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
-	# pbar = progressbar.ProgressBar(widgets=widgets,maxval=10000000, poll=0.1).start()
-	# for i in range(1000000):
-	# 	pbar.update(i)
-	# exit(0)
 
-	os.system("date")
-	os.system("rm %s/*" % out_dir)
 
-	config = {
-		"scheduler": {"name":'maui_scheduler', "progressbar": False},
-		"num_processors": 80640,
-		"stats": False,
-		"verbose": False
-	}
+def split_and_simulate(fname):
 
-	fname = arguments["<swf_file>"]
+	os.system("rm -f %s/*" % out_dir)
 
 	out_files, test_file = split_swf(fname, training_percentage, training_parts, dir=out_dir)
 
@@ -135,13 +107,13 @@ if __name__ == "__main__":
 			config["weights"] = w
 			config["input_file"] = p
 			config["output_swf"] = "%s_%d.swf" % (p.split('.')[0], idx)
-			exc_time = parse_and_run_simulator(config)
+			parse_and_run_simulator(config)
 			out_swf.append(config["output_swf"])
 
 		gc.collect()
 
 		for idx, swf in enumerate(out_swf):
-			avg_stch = average_stretch(swf)
+			avg_stch = obj_func(swf)
 			if avg_stch < best:
 				best = avg_stch
 				index = idx
@@ -157,17 +129,47 @@ if __name__ == "__main__":
 		features.append(conv_features(f, idx, indices))
 	write_lines_to_file(rel(train_fn), features)
 
-	features = conv_features(test_file, 0, indices)
-	write_str_to_file(rel(test_fn), features)
+	return test_file
+
+
+def svm_light():
 
 	print "[Training..]"
-	os.system("./svm_rank_learn -c 3 {0}/{1} {0}/{2} > {0}/{3}". \
+	# -t 2 -g 0.8
+	# -t 1 -d 2 -s 100 -r 77 
+	os.system("libs/svm_rank_learn -c 3 {0}/{1} {0}/{2} > {0}/{3}". \
 		format(out_dir, train_fn, model_fn, train_log_fn))
 
 	print "[Classifying/Testing..]"
-	os.system("./svm_rank_classify -v 3 {0}/{1} {0}/{2} {0}/{3} > {0}/{4}". \
+	os.system("libs/svm_rank_classify -v 3 {0}/{1} {0}/{2} {0}/{3} > {0}/{4}". \
 		format(out_dir, test_fn, model_fn, cl_out_fn, classify_log_fn))
 
+def rank_lib():
+
+	print "[Training..]"
+	os.system("java -jar libs/RankLib.jar -ranker 0 -train {0}/{1} -save {0}/{2} > {0}/{3}". \
+		format(out_dir, train_fn, model_fn, train_log_fn))
+
+	print "[Classifying/Testing..]"
+	os.system("java -jar libs/RankLib.jar -rank {0}/{1} -load {0}/{2} -score {0}/{3} > {0}/{4}". \
+		format(out_dir, test_fn, model_fn, cl_out_fn, classify_log_fn))
+
+	lst = []
+	with open(rel(cl_out_fn)) as in_f:
+		lst = map(lambda u: u.split()[-1] if len(u) > 0 else "", in_f.read().split('\n'))
+	# print lst
+	with open(rel(cl_out_fn), 'w') as out_f:
+		out_f.write('\n'.join(lst))
+
+	# open(rel(cl_out_fn), 'w').write(map(lambda u: u.split()[-1], open(rel(cl_out_fn)).read().split('\n')))
+
+
+def classify_and_simulat_h(test_file):
+
+	features = conv_features(test_file, 0, indices)
+	write_str_to_file(rel(test_fn), features)
+
+	learning_lib()
 
 	print "[Simulating the test file..]"
 	# Simulate the test file
@@ -180,8 +182,8 @@ if __name__ == "__main__":
 		out_swf.append(config["output_swf"])
 
 	gc.collect()
-	# print map(lambda u: average_stretch(u), out_swf)
-	best_avg_stch = min(map(lambda u: average_stretch(u), out_swf))
+	# print map(lambda u: obj_func(u), out_swf)
+	best_avg_stch = min(map(lambda u: obj_func(u), out_swf))
 	print "Test Average Stretch:", best_avg_stch
 
 
@@ -197,5 +199,49 @@ if __name__ == "__main__":
 	config["input_file"] = test_l2r_fn
 	config["output_swf"] = "%s_sim_l2r.swf" % test_l2r_fn.split('.')[0]
 	parse_and_run_simulator(config)
-	l2r_avg_stch = average_stretch(config["output_swf"])
+	l2r_avg_stch = obj_func(config["output_swf"])
 	print "L2R Average Stretch:", l2r_avg_stch
+
+
+
+obj_func = average_stretch
+obj_func = average_bounded_slowdown
+
+learning_lib = svm_light
+learning_lib = rank_lib
+
+
+
+if __name__ == "__main__":
+
+	arguments = docopt(__doc__, version='1.0.0rc2')
+
+	os.system("date")
+
+	config = {
+		"scheduler": {"name":'maui_scheduler', "progressbar": False},
+		"num_processors": 80640,
+		"stats": False,
+		"verbose": False
+	}
+
+	execfile("conf.py")
+
+	log_path = arguments["<swf_file>"]
+	fname = os.path.basename(log_path)
+	
+	try:
+		import shutil
+		shutil.copy(log_path, ".")
+
+		if 0:
+			test_file = split_and_simulate(fname)
+		elif 0:
+			test_file = fname
+		else:
+			test_file = "output/%s_test.swf" % fname.split('.')[0]
+
+		classify_and_simulat_h(test_file)
+
+	finally:
+		os.remove(fname)
