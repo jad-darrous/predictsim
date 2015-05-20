@@ -28,12 +28,12 @@ def conv_features(fname, qid, indices=None):
 
 	rng = range(1, size+1)
 
-	score = -1;
+	score = 1000000-1;
 	lines = []
 	with open(fname) as f:
 		for line in f:
 			if not line.lstrip().startswith(';'):
-				job = [int(u) for u in line.strip().split()];
+				job = [int(float(u)) for u in line.strip().split()];
 				l = itertools.compress(job, mask)
 				t = ' '.join(map(lambda v: "%d:%d" % v, zip(rng, l)))
 				lines.append("{0} qid:{1} {2}".format(score, qid, t))
