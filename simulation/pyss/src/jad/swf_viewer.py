@@ -13,6 +13,9 @@ Options:
 	-r --identical		Remove identical columns.
 '''
 
+import sys
+sys.path.append("..")
+
 from base.docopt import docopt
 import sys
 import itertools
