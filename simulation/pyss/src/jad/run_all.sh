@@ -4,13 +4,19 @@
 #   echo ${file##*/}
 # done
 
-for file in logs/*.swf; do
+rm -f results/results.txt
+touch results/results.txt
+
+for file in `find logs -type f -name "*.swf"`; do
+#for file in logs/small/*.swf; do
   	# echo ${file##*/}
-	echo $(basename $file), $file
-  	i=${file##*/}
-  	cp logs/$i $i
-  	pypy -OO run.py $i > $i.out
- 	tar -cf $i.tar $i.out output2
- 	rm $i.out $i
- 	mv $i.tar results/$i.tar
+	echo $file
+  	#fname=${file##*/}
+  	fname=$(basename $file)
+  	# cp logs/$fname $fname
+  	pypy -OO run.py $file > results/$fname.out
+ 	# tar -cf $fname.tar $fname.out #output
+ 	# rm $fname.out $fname
+ 	# mv $fname.tar results/$fname.tar
+ 	# mv $fname.out results/$fname.out
 done
