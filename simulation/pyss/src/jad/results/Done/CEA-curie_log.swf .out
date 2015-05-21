@@ -1,0 +1,96 @@
+jad@cocopah:~/Desktop/predictsim/simulation/pyss/src/jad$ pypy -OO run.py logs/big/CEA-curie_log.swf 
+Wed May 20 16:31:20 CEST 2015
+[Simulating the training set..]
+# Jobs Terminated: 14102 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14692 Elapsed Time: 0:00:01                                    
+# Jobs Terminated: 14627 Elapsed Time: 0:00:01                                    
+2 14.9475491569
+# Jobs Terminated: 14640 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14220 Elapsed Time: 0:00:04                                    
+# Jobs Terminated: 14168 Elapsed Time: 0:00:04                                    
+2 57.7743327751
+# Jobs Terminated: 14628 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14525 Elapsed Time: 0:00:02                                    
+# Jobs Terminated: 14381 Elapsed Time: 0:00:02                                    
+1 39.5307258399
+# Jobs Terminated: 14362 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14338 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14191 Elapsed Time: 0:00:05                                    
+0 35.5816537882
+# Jobs Terminated: 14386 Elapsed Time: 0:00:10                                    
+# Jobs Terminated: 14277 Elapsed Time: 0:00:17                                    
+# Jobs Terminated: 13999 Elapsed Time: 0:00:09                                    
+2 92.8618650631
+# Jobs Terminated: 14474 Elapsed Time: 0:00:08                                    
+# Jobs Terminated: 14602 Elapsed Time: 0:00:06                                    
+# Jobs Terminated: 14313 Elapsed Time: 0:00:05                                    
+2 123.77318849
+# Jobs Terminated: 14437 Elapsed Time: 0:00:05                                    
+# Jobs Terminated: 14385 Elapsed Time: 0:00:51                                    
+# Jobs Terminated: 14513 Elapsed Time: 0:00:03                                    
+2 43.9518406615
+# Jobs Terminated: 14544 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 14410 Elapsed Time: 0:00:03                                    
+# Jobs Terminated: 13671 Elapsed Time: 0:00:04                                    
+1 14.808082294
+# Jobs Terminated: 14541 Elapsed Time: 0:00:02                                    
+# Jobs Terminated: 14017 Elapsed Time: 0:00:02                                    
+# Jobs Terminated: 14216 Elapsed Time: 0:00:02                                    
+1 3.30503515698
+# Jobs Terminated: 14493 Elapsed Time: 0:01:02                                    
+# Jobs Terminated: 14266 Elapsed Time: 0:00:16                                    
+# Jobs Terminated: 14285 Elapsed Time: 0:00:14                                    
+2 198.914131041
+# Jobs Terminated: 14389 Elapsed Time: 0:00:04                                    
+# Jobs Terminated: 14619 Elapsed Time: 0:00:04                                    
+# Jobs Terminated: 14378 Elapsed Time: 0:00:06                                    
+1 13.1206733263
+# Jobs Terminated: 14405 Elapsed Time: 0:00:07                                    
+# Jobs Terminated: 14689 Elapsed Time: 0:00:06                                    
+# Jobs Terminated: 13534 Elapsed Time: 0:00:09                                    
+1 65.0692606111
+# Jobs Terminated: 13364 Elapsed Time: 0:00:02                                    
+# Jobs Terminated: 14010 Elapsed Time: 0:00:02                                    
+# Jobs Terminated: 14099 Elapsed Time: 0:00:03                                    
+1 6.36699640053
+# Jobs Terminated: 14430 Elapsed Time: 0:00:04                                    
+# Jobs Terminated: 14407 Elapsed Time: 0:00:04                                    
+# Jobs Terminated: 14749 Elapsed Time: 0:00:05                                    
+1 11.1026730048
+# Jobs Terminated: 14516 Elapsed Time: 0:00:01                                    
+# Jobs Terminated: 14262 Elapsed Time: 0:00:01                                    
+# Jobs Terminated: 14396 Elapsed Time: 0:00:01                                    
+1 2.10399637665
+# Jobs Terminated: 14496 Elapsed Time: 0:00:07                                    
+# Jobs Terminated: 14478 Elapsed Time: 0:00:07                                    
+# Jobs Terminated: 14603 Elapsed Time: 0:00:14                                    
+0 37.6897413104
+[Converting swf file format to ML file format..]
+[Training..]
+[Classifying/Testing..]
+[Simulating the test file..]
+# Jobs Terminated: 58823 Elapsed Time: 0:00:30                                    
+# Jobs Terminated: 58720 Elapsed Time: 0:00:23                                    
+# Jobs Terminated: 58775 Elapsed Time: 0:00:36                                    
+Test Average Stretch: 28.7388753166
+[Simulating the test file using L2R..]
+# Jobs Terminated: 58709 Elapsed Time: 0:00:16                                    
+L2R Average Stretch: 7.04879801501
+
+-----------------------------------------------
+
+obj_func = average_bounded_slowdown
+
+learning_lib = svm_light
+
+
+weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 0, 0, 0, +1)]
+
+training_percentage = 0.8
+training_parts = 16
+
+indices = (2,3,4,5,9)
+
+obj_func = average_bounded_slowdown
+
+learning_lib = svm_light
