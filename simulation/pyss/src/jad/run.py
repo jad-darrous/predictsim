@@ -20,6 +20,8 @@ from run_simulator import parse_and_run_simulator
 from swf_splitter import split_swf
 from swf_converter import conv_features
 
+from batch_learning_to_rank import SVM_Rank, RankLib
+
 from datetime import timedelta
 import os
 import gc
@@ -31,12 +33,11 @@ model_fn = 'model.txt'
 cl_out_fn = 'cl_out.txt' # classification's output file
 new_l2r_fn = 'new_l2r.txt' # this file contains the jobs after reordering/adding think time
 
-train_log_fn = 'svm_rank_learn.log'
-classify_log_fn = 'svm_rank_classify.log'
 
 out_dir = "output"
 
 rel = lambda fn: "%s/%s" % (out_dir, fn);
+
 
 
 def write_str_to_file(fname, _str):
@@ -90,7 +91,22 @@ def average_bounded_slowdown(fname):
 	return average_func(fname, bounded_slowdown)
 
 
+def simulate(fname):
+	out_swf = []
+	for idx, w in enumerate(weights_options):
+		config["weights"] = w
+		config["input_file"] = fname
+		config["output_swf"] = "%s_%d.swf" % (fname.split('.')[0], idx)
+		parse_and_run_simulator(config)
+		out_swf.append(config["output_swf"])
+	return out_swf
 
+"""
+This function takes the original log file, split it and simulate
+the training parts then select the best part for each scheduler's
+configuration and then prepare the training file of features to
+be fed to the learning algorithm and returns the test file name
+"""
 def split_and_simulate(fname):
 
 	os.system("rm -f %s/*" % out_dir)
@@ -102,13 +118,7 @@ def split_and_simulate(fname):
 	best_all = []
 	for p in out_files:
 		index, best, outf = None, float("inf"), None
-		out_swf = []
-		for idx, w in enumerate(weights_options):
-			config["weights"] = w
-			config["input_file"] = p
-			config["output_swf"] = "%s_%d.swf" % (p.split('.')[0], idx)
-			parse_and_run_simulator(config)
-			out_swf.append(config["output_swf"])
+		out_swf = simulate(p)
 
 		gc.collect()
 
@@ -123,7 +133,7 @@ def split_and_simulate(fname):
 		print index, best
 
 
-	print "[Converting swf file format to ML file format..]"
+	print "[Creating the ML training file..]"
 	features = []
 	for idx, f in enumerate(best_all):
 		features.append(conv_features(f, idx, indices))
@@ -132,60 +142,27 @@ def split_and_simulate(fname):
 	return test_file
 
 
-def svm_light():
-
+def training():
 	print "[Training..]"
-	# -t 2 -g 0.8
-	# -t 1 -d 2 -s 100 -r 77 
-	os.system("libs/svm_rank_learn -c 3 {0}/{1} {0}/{2} > {0}/{3}". \
-		format(out_dir, train_fn, model_fn, train_log_fn))
-
-	print "[Classifying/Testing..]"
-	os.system("libs/svm_rank_classify -v 3 {0}/{1} {0}/{2} {0}/{3} > {0}/{4}". \
-		format(out_dir, test_fn, model_fn, cl_out_fn, classify_log_fn))
-
-def rank_lib():
-
-	print "[Training..]"
-	os.system("java -jar libs/RankLib.jar -ranker 0 -train {0}/{1} -save {0}/{2} > {0}/{3}". \
-		format(out_dir, train_fn, model_fn, train_log_fn))
-
-	print "[Classifying/Testing..]"
-	os.system("java -jar libs/RankLib.jar -rank {0}/{1} -load {0}/{2} -score {0}/{3} > {0}/{4}". \
-		format(out_dir, test_fn, model_fn, cl_out_fn, classify_log_fn))
-
-	lst = []
-	with open(rel(cl_out_fn)) as in_f:
-		lst = map(lambda u: u.split()[-1] if len(u) > 0 else "", in_f.read().split('\n'))
-	# print lst
-	with open(rel(cl_out_fn), 'w') as out_f:
-		out_f.write('\n'.join(lst))
-
-	# open(rel(cl_out_fn), 'w').write(map(lambda u: u.split()[-1], open(rel(cl_out_fn)).read().split('\n')))
+	batchL2Rlib.train(train_fn, model_fn)
 
 
-def classify_and_simulat_h(test_file):
+def classify_and_eval_h(test_file):
 
+	print "[Creating the ML testing file..]"
 	features = conv_features(test_file, 0, indices)
 	write_str_to_file(rel(test_fn), features)
 
-	learning_lib()
-
 	print "[Simulating the test file..]"
 	# Simulate the test file
-	out_swf = []
-	for idx, w in enumerate(weights_options):
-		config["weights"] = w
-		config["input_file"] = test_file
-		config["output_swf"] = "%s_sim%d.swf" % (test_file.split('.')[0], idx)
-		parse_and_run_simulator(config)
-		out_swf.append(config["output_swf"])
-
+	out_swf = simulate(test_file)
 	gc.collect()
-	# print map(lambda u: obj_func(u), out_swf)
-	best_avg_stch = min(map(lambda u: obj_func(u), out_swf))
-	print "Test Average Stretch:", best_avg_stch
+	best_std_obj_func_val = min(map(lambda u: obj_func(u), out_swf))
+	print "+ Bounded-Slowdown [Std]:", best_std_obj_func_val
 
+
+	print "[Classifying/Testing..]"
+	batchL2Rlib.classify(test_fn, model_fn, cl_out_fn)
 
 	print "[Simulating the test file using L2R..]"
 	# add the l2r to the test log as the think time.
@@ -199,17 +176,31 @@ def classify_and_simulat_h(test_file):
 	config["input_file"] = test_l2r_fn
 	config["output_swf"] = "%s_sim_l2r.swf" % test_l2r_fn.split('.')[0]
 	parse_and_run_simulator(config)
-	l2r_avg_stch = obj_func(config["output_swf"])
-	print "L2R Average Stretch:", l2r_avg_stch
+	l2r_obj_func_val = obj_func(config["output_swf"])
+	print "+ Bounded-Slowdown [L2R]:", l2r_obj_func_val
 
+	res_data.append(str(best_std_obj_func_val))
+	res_data.append(str(l2r_obj_func_val))
 
 
 obj_func = average_stretch
 obj_func = average_bounded_slowdown
 
-learning_lib = svm_light
-learning_lib = rank_lib
+batchL2Rlib = SVM_Rank(out_dir)
 
+
+def getMaxProcs(fname):
+	with open(fname) as f:
+		for line in f.readlines():
+			if "; MaxProcs:" in line:
+				return int(line.strip().split()[-1])
+	raise NameError('No MaxProcs in the log')
+
+
+res_data = []
+def append_results():
+	with open("results/results.txt", "a") as myfile:
+	    myfile.write(' '.join(res_data) + '\n')
 
 
 if __name__ == "__main__":
@@ -220,28 +211,39 @@ if __name__ == "__main__":
 
 	config = {
 		"scheduler": {"name":'maui_scheduler', "progressbar": False},
-		"num_processors": 80640,
+		"num_processors": 80640, # depend on the swf log
 		"stats": False,
 		"verbose": False
 	}
 
-	execfile("conf.py")
-
 	log_path = arguments["<swf_file>"]
 	fname = os.path.basename(log_path)
+
+	res_data.append(fname)
+
+	execfile("conf.py")
 	
+	config["num_processors"] = getMaxProcs(log_path)
+
 	try:
 		import shutil
 		shutil.copy(log_path, ".")
 
-		if 0:
+		if 1:
 			test_file = split_and_simulate(fname)
-		elif 0:
-			test_file = fname
 		else:
-			test_file = "output/%s_test.swf" % fname.split('.')[0]
+			test_file = "%s/%s_test.swf" % (out_dir, fname.split('.')[0])
+			if 0: os.system("cp " + fname + " " + test_file)
 
-		classify_and_simulat_h(test_file)
+		if 1: training()
+
+		print "--- Test on the test set"
+		classify_and_eval_h(test_file)
+		print "--- Test on the complete log"
+		os.system("cp " + fname + " " + test_file)
+		classify_and_eval_h(test_file)
+
+		append_results()
 
 	finally:
 		os.remove(fname)
