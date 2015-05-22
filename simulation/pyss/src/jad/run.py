@@ -31,8 +31,7 @@ import gc
 train_fn = 'train.txt'
 test_fn = 'test.txt'
 model_fn = 'model.txt'
-cl_out_fn = 'cl_out.txt' # classification's output file
-new_l2r_fn = 'new_l2r.txt' # this file contains the jobs after reordering/adding think time
+score_fn = 'score.txt'
 
 
 out_dir = "output"
@@ -50,19 +49,17 @@ def write_lines_to_file(fname, lines):
 	write_str_to_file(fname, '\n'.join(lines))
 
 
-def add_l2r_score_jobs(infile, outfile, score):
 
-	jobs = []
-	with open(infile) as input_file:
-		c = 0
-		for line in input_file:
-			if not line.lstrip().startswith(';'):
-				job = [u for u in line.strip().split()]
-				jobs.append(' '.join(job[:-1] + [str(int(score[c] * 1000))]));
-				c += 1
+def add_l2r_score(infile, scorefile, outfile):
+	from itertools import izip, dropwhile
+	from contextlib import nested
 
-	write_lines_to_file(outfile, jobs)
-
+	with nested(open(infile), open(scorefile), open(outfile, "w")) as (fin, fscore, fout):
+		for job_str, score_str in izip(dropwhile(lambda u: u.lstrip().startswith(';'), fin), fscore):
+			new_score_str = str(int(float(score_str) * 1000))
+			job = [u for u in job_str.strip().split()]
+			new_job_str = ' '.join(job[:-1] + [new_score_str])
+			fout.write(new_job_str + '\n')
 
 def simulate(fname):
 	out_swf = []
@@ -144,19 +141,18 @@ def classify_and_eval_h(test_file):
 
 
 	print "[Classifying/Testing..]"
-	batchL2Rlib.classify(test_fn, model_fn, cl_out_fn)
+	batchL2Rlib.classify(test_fn, model_fn, score_fn)
 
 	print "[Simulating the test file using L2R..]"
 	# add the l2r to the test log as the think time.
-	score = [float(u) for u in open(rel(cl_out_fn))]
-	test_l2r_fn = rel(new_l2r_fn)
-	add_l2r_score_jobs(test_file, test_l2r_fn, score)
+	test_l2r_fn = "%s_with_score.swf" % test_file.split('.')[0]
+	add_l2r_score(test_file, rel(score_fn), test_l2r_fn)
 
 	# Simulate the file after l2r
 	config["scheduler"]["name"] = 'l2r_maui_scheduler'
 	config["weights"] = (0, 0, 0, 0, 0, 0, 1)
 	config["input_file"] = test_l2r_fn
-	config["output_swf"] = "%s_sim_l2r.swf" % test_l2r_fn.split('.')[0]
+	config["output_swf"] = "%s_sim.swf" % test_l2r_fn.split('.')[0]
 	parse_and_run_simulator(config)
 
 	l2r_bsld = PerfMeasure(config["output_swf"])
@@ -166,12 +162,13 @@ def classify_and_eval_h(test_file):
 	print "+ [L2R] Max Bounded-Slowdown:", l2r_bsld_max
 
 	res_data.extend([str(u) for u in (std_bsld_avg, std_bsld_med, std_bsld_max)])
-	res_data.append('\t')
 	res_data.extend([str(u) for u in (l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max)])
+	res_data.append(' ')
 
 
 PerfMeasure = BoundedSlowdown
 batchL2Rlib = SVM_Rank(out_dir)
+batchL2Rlib = RankLib(out_dir)
 
 
 def getMaxProcs(fname):
