@@ -21,6 +21,7 @@ from swf_splitter import split_swf
 from swf_converter import conv_features
 
 from batch_learning_to_rank import SVM_Rank, RankLib
+from scheduling_performance_measurement import *
 
 from datetime import timedelta
 import os
@@ -63,34 +64,6 @@ def add_l2r_score_jobs(infile, outfile, score):
 	write_lines_to_file(outfile, jobs)
 
 
-def stretch(wt, rt):
-	return (wt+rt)/rt
-
-def bounded_slowdown(wt, rt):
-	tau = 10.0
-	return max((wt+rt)/max(rt, tau), 1)
-
-def average_func(fname, func):
-
-	s_time = []
-	with open(fname, "rb") as f:
-		for line in f.xreadlines():
-			if not line.lstrip().startswith(';'):
-				try:
-					wt, rt = [float(v) for v in [u for u in line.strip().split()][2:4]]
-					s_time.append(func(wt, rt));
-				except:
-					print 'except'
-					pass
-	return sum(s_time) / len(s_time)
-
-def average_stretch(fname):
-	return average_func(fname, stretch)
-
-def average_bounded_slowdown(fname):
-	return average_func(fname, bounded_slowdown)
-
-
 def simulate(fname):
 	out_swf = []
 	for idx, w in enumerate(weights_options):
@@ -100,6 +73,7 @@ def simulate(fname):
 		parse_and_run_simulator(config)
 		out_swf.append(config["output_swf"])
 	return out_swf
+
 
 """
 This function takes the original log file, split it and simulate
@@ -123,9 +97,9 @@ def split_and_simulate(fname):
 		gc.collect()
 
 		for idx, swf in enumerate(out_swf):
-			avg_stch = obj_func(swf)
-			if avg_stch < best:
-				best = avg_stch
+			obj_fun_val = PerfMeasure(swf).average()
+			if obj_fun_val < best:
+				best = obj_fun_val
 				index = idx
 				outf = swf
 
@@ -157,8 +131,16 @@ def classify_and_eval_h(test_file):
 	# Simulate the test file
 	out_swf = simulate(test_file)
 	gc.collect()
-	best_std_obj_func_val = min(map(lambda u: obj_func(u), out_swf))
-	print "+ Bounded-Slowdown [Std]:", best_std_obj_func_val
+
+	obj_func_vals = map(lambda u: PerfMeasure(u).average(), out_swf)
+	best_std_obj_func_val = min(obj_func_vals)
+	best_index = obj_func_vals.index(best_std_obj_func_val)
+
+	std_bsld = PerfMeasure(out_swf[best_index])
+	std_bsld_avg, std_bsld_med, std_bsld_max = std_bsld.all()
+	print "+ [STD] Average Bounded-Slowdown:", std_bsld_avg
+	print "+ [STD] Median Bounded-Slowdown:", std_bsld_med
+	print "+ [STD] Max Bounded-Slowdown:", std_bsld_max
 
 
 	print "[Classifying/Testing..]"
@@ -176,16 +158,19 @@ def classify_and_eval_h(test_file):
 	config["input_file"] = test_l2r_fn
 	config["output_swf"] = "%s_sim_l2r.swf" % test_l2r_fn.split('.')[0]
 	parse_and_run_simulator(config)
-	l2r_obj_func_val = obj_func(config["output_swf"])
-	print "+ Bounded-Slowdown [L2R]:", l2r_obj_func_val
 
-	res_data.append(str(best_std_obj_func_val))
-	res_data.append(str(l2r_obj_func_val))
+	l2r_bsld = PerfMeasure(config["output_swf"])
+	l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max = l2r_bsld.all()
+	print "+ [L2R] Average Bounded-Slowdown:", l2r_bsld_avg
+	print "+ [L2R] Median Bounded-Slowdown:", l2r_bsld_med
+	print "+ [L2R] Max Bounded-Slowdown:", l2r_bsld_max
+
+	res_data.extend([str(u) for u in (std_bsld_avg, std_bsld_med, std_bsld_max)])
+	res_data.append('\t')
+	res_data.extend([str(u) for u in (l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max)])
 
 
-obj_func = average_stretch
-obj_func = average_bounded_slowdown
-
+PerfMeasure = BoundedSlowdown
 batchL2Rlib = SVM_Rank(out_dir)
 
 
@@ -194,13 +179,13 @@ def getMaxProcs(fname):
 		for line in f.readlines():
 			if "; MaxProcs:" in line:
 				return int(line.strip().split()[-1])
-	raise NameError('No MaxProcs in the log')
+	raise NameError('No MaxProcs in the log\'s header')
 
 
 res_data = []
 def append_results():
 	with open("results/results.txt", "a") as myfile:
-	    myfile.write(' '.join(res_data) + '\n')
+	    myfile.write('\t'.join(res_data) + '\n')
 
 
 if __name__ == "__main__":
@@ -219,7 +204,7 @@ if __name__ == "__main__":
 	log_path = arguments["<swf_file>"]
 	fname = os.path.basename(log_path)
 
-	res_data.append(fname)
+	res_data.append(fname + '\t')
 
 	execfile("conf.py")
 	
