@@ -4,19 +4,26 @@
 #   echo ${file##*/}
 # done
 
+echo "Sarte time:" $(date)
+
 rm -f results/results.txt
 touch results/results.txt
 
-for file in `find logs -type f -name "*.swf"`; do
-#for file in logs/small/*.swf; do
-  	# echo ${file##*/}
-	echo $file
-  	#fname=${file##*/}
-  	fname=$(basename $file)
-  	# cp logs/$fname $fname
-  	pypy -OO run.py $file > results/$fname.out
- 	# tar -cf $fname.tar $fname.out #output
- 	# rm $fname.out $fname
- 	# mv $fname.tar results/$fname.tar
- 	# mv $fname.out results/$fname.out
+for file in `find logs -type f -name "*.swf"`;
+#for file in logs/small/*.swf; 
+do
+	echo $file # ${file##*/}
+	fname=$(basename $file)
+	pypy -OO run.py $file > results/$fname.out
 done
+
+NOW=$(date +"%F#%H_%M")
+
+cp conf.py results/conf.py
+cd results
+tar -cf $NOW.tar *_log.swf.out conf.py results.txt
+cd ..
+
+echo "Results are saved in $NOW.tar file"
+
+echo "Finish time:" $(date)
