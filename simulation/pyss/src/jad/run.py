@@ -17,8 +17,7 @@ sys.path.append("..")
 from base.docopt import docopt
 
 from run_simulator import parse_and_run_simulator
-from swf_splitter import split_swf
-from swf_converter import conv_features
+from swf_utils import split_swf, conv_features, swf_skip_hdr
 
 from batch_learning_to_rank import SVM_Rank, RankLib
 from scheduling_performance_measurement import *
@@ -39,7 +38,6 @@ out_dir = "output"
 rel = lambda fn: "%s/%s" % (out_dir, fn);
 
 
-
 def write_str_to_file(fname, _str):
 	with open(fname, "w") as f:
 		f.write(_str)
@@ -52,10 +50,9 @@ def write_lines_to_file(fname, lines):
 
 def add_l2r_score(infile, scorefile, outfile):
 	from itertools import izip, dropwhile
-	from contextlib import nested
 
-	with nested(open(infile), open(scorefile), open(outfile, "w")) as (fin, fscore, fout):
-		for job_str, score_str in izip(dropwhile(lambda u: u.lstrip().startswith(';'), fin), fscore):
+	with open(infile) as fin, open(scorefile) as fscore, open(outfile, "w") as fout:
+		for job_str, score_str in izip(dropwhile(swf_skip_hdr, fin), fscore):
 			new_score_str = str(int(float(score_str) * 1000))
 			job = [u for u in job_str.strip().split()]
 			new_job_str = ' '.join(job[:-1] + [new_score_str])
@@ -166,6 +163,8 @@ def classify_and_eval_h(test_file):
 	res_data.append(' ')
 
 
+
+PerfMeasure = Slowdown
 PerfMeasure = BoundedSlowdown
 batchL2Rlib = SVM_Rank(out_dir)
 batchL2Rlib = RankLib(out_dir)
