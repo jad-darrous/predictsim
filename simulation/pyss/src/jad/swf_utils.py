@@ -62,3 +62,27 @@ def conv_features(fname, qid, indices=None):
 			score-=1
 
 	return '\n'.join(lines)
+
+
+
+def getMaxProcs(fname):
+	with open(fname) as f:
+		for line in f.readlines():
+			if "; MaxProcs:" in line:
+				return int(line.strip().split()[-1])
+	raise NameError('No MaxProcs in the log\'s header')
+
+
+def compute_utilisation(fname):
+	first, last, procs, sum_area = float("inf"), 0, getMaxProcs(fname), 0
+	with open(fname) as f:
+		for line in dropwhile(swf_skip_hdr, f):
+			st, wt, rt, pr = [float(v) for v in [u for u in line.strip().split()][1:5]]
+			first = min(first, st + wt)
+			last = max(last, wt + rt + st)
+			sum_area += rt * pr
+
+	print "procs =", procs, "last = ", last, "first = ", first, "sum_area", sum_area
+	vals = sum_area / (1.0 * procs * (last-first))
+	print vals*100, "%"
+	return vals
