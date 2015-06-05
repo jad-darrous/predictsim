@@ -11,10 +11,10 @@ touch results/results.txt
 
 fname=$1
 for i in `seq 32 32 192`;
-#for i in `seq 16 32 64 96 128 160 192`;
+#for i in 16 32 64 96 128 160 192;
 do
-	echo "::::::::::::: " $i " :::::::::::::"
-	pypy -OO run.py $fname $i >> results/results.txt
+	echo ":::::::::::::"  $i  ":::::::::::::"
+	pypy -OO run.py $fname $i
 done
 
 echo "Finish time:" $(date)
