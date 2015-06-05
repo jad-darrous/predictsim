@@ -3,7 +3,7 @@
 '''
 
 
-from itertools import compress, dropwhile
+from itertools import compress, dropwhile, izip
 
 swf_skip_hdr = lambda u: u.lstrip().startswith(';');
 swf_skip_hdr_itr = lambda _file: dropwhile(swf_skip_hdr, _file)
@@ -20,6 +20,9 @@ def split_swf(in_file_name, tpercent, parts, dir="./"):
 	with open(in_file_name) as f:
 		for line in dropwhile(swf_skip_hdr, f):
 			jobs.append(line.strip());
+
+	# from random import shuffle
+	# shuffle(jobs)
 
 	training_size = int(len(jobs) * tpercent)
 	part_size = training_size / parts
@@ -40,7 +43,53 @@ def split_swf(in_file_name, tpercent, parts, dir="./"):
 	return training_files, test_file
 
 
-def conv_features(fname, qid, indices=None):
+def extract_columns(fname, indices=None):
+
+	if indices is not None:
+		mask = [i in indices for i in range(1, 19)]
+		size = mask.count(True)
+	else:
+		size = 18
+		mask = [True] * 18
+
+	cols = [[] for i in range(size)]
+	with open(fname) as f:
+		for line in dropwhile(swf_skip_hdr, f):
+			job = [float(u) for u in line.strip().split()];
+			row = compress(job, mask)
+			for col, val in izip(cols, row):
+				col.append(val)
+
+	return cols
+
+def normalize(lst, min_max=None):
+	if min_max is None:
+		mn, mx = min(lst), max(lst)
+	else:
+		mn, mx = min_max[0], min_max[1]
+	rng = mx - mn;
+	if rng == 0: return [0] * len(lst)
+	return map(lambda u: (u-mn)/rng, lst)
+
+def normalize_mat(mat, min_max):
+	#print "normalize_mat", len(mat), len(min_max), min_max, mat
+	return map(lambda u: normalize(u[0], u[1]), izip(mat, min_max))
+
+def convert_to_ml_format(lst, qid):
+
+	rng = range(1, len(lst)+1)
+	score = 1000000-1;
+	lines = []
+	for i in xrange(len(lst[0])):
+		l = [p[i] for p in lst]
+		t = ' '.join(map(lambda v: "%d:%f" % v, zip(rng, l)))
+		lines.append("{0} qid:{1} {2}".format(score, qid, t))
+		score-=1
+
+	return lines
+
+
+def convert_to_ml_format_from_file(fname, qid, indices=None):
 
 	if indices is not None:
 		mask = [i in indices for i in range(1, 19)]
@@ -61,7 +110,7 @@ def conv_features(fname, qid, indices=None):
 			lines.append("{0} qid:{1} {2}".format(score, qid, t))
 			score-=1
 
-	return '\n'.join(lines)
+	return lines
 
 
 
@@ -82,7 +131,7 @@ def compute_utilisation(fname):
 			last = max(last, wt + rt + st)
 			sum_area += rt * pr
 
-	print "procs =", procs, "last = ", last, "first = ", first, "sum_area", sum_area
-	vals = sum_area / (1.0 * procs * (last-first))
-	print vals*100, "%"
-	return vals
+	#print "procs =", procs, "last = ", last, "first = ", first, "sum_area", sum_area
+	ratio = sum_area / (1.0 * procs * (last-first))
+	#print ratio*100, "%"
+	return ratio
