@@ -4,7 +4,7 @@
 Main script that combine everyting.
 
 Usage:
-	run.py <swf_file>
+	run.py <swf_file> [<tp>]
 
 Options:
 	-h --help			Show this help message and exit.
@@ -17,9 +17,9 @@ sys.path.append("..")
 from base.docopt import docopt
 
 from run_simulator import parse_and_run_simulator
-from swf_utils import split_swf, conv_features, swf_skip_hdr
+from swf_utils import *
 
-from batch_learning_to_rank import SVM_Rank, RankLib
+from batch_learning_to_rank import *
 from scheduling_performance_measurement import *
 
 from datetime import timedelta
@@ -39,13 +39,15 @@ rel = lambda fn: "%s/%s" % (out_dir, fn);
 
 
 def write_str_to_file(fname, _str):
-	with open(fname, "w") as f:
+	with open(fname, 'w') as f:
 		f.write(_str)
 		# assert f.write(_str) == len(_str)
 
 def write_lines_to_file(fname, lines):
-	write_str_to_file(fname, '\n'.join(lines))
-
+	# write_str_to_file(fname, '\n'.join(lines))
+	# return
+	with open(fname, 'w') as f:
+		f.writelines("%s\n" % line for line in lines)
 
 
 def add_l2r_score(infile, scorefile, outfile):
@@ -71,8 +73,8 @@ def simulate(fname):
 
 """
 This function takes the original log file, split it and simulate
-the training parts then select the best part for each scheduler's
-configuration and then prepare the training file of features to
+the training lists then select the best list for each backfilling
+priority, and then prepare the training file of "queries" to
 be fed to the learning algorithm and returns the test file name
 """
 def split_and_simulate(fname):
@@ -85,11 +87,11 @@ def split_and_simulate(fname):
 
 	best_all = []
 	for p in out_files:
-		index, best, outf = None, float("inf"), None
 		out_swf = simulate(p)
 
-		gc.collect()
+		gc.collect() # to ensure that the output files are closed
 
+		best = float("inf")
 		for idx, swf in enumerate(out_swf):
 			obj_fun_val = PerfMeasure(swf).average()
 			if obj_fun_val < best:
@@ -100,26 +102,49 @@ def split_and_simulate(fname):
 		best_all.append(outf)
 		print index, best
 
-
 	print "[Creating the ML training file..]"
+	cols_matrix = [[] for i in range(len(indices))]
+	for idx, fname in enumerate(best_all):
+		cols = extract_columns(fname, indices)
+		for i in range(len(indices)):
+			cols_matrix[i].extend(cols[i])
+
+	global min_max
+	min_max = map(lambda u: (min(u), max(u)), cols_matrix)
+	# print min_max
+
 	features = []
-	for idx, f in enumerate(best_all):
-		features.append(conv_features(f, idx, indices))
+	for idx, fname in enumerate(best_all):
+		mat = extract_columns(fname, indices)
+		mat = normalize_mat(mat, min_max)
+		queries = convert_to_ml_format(mat, idx+1)
+		features.extend(queries)
+
 	write_lines_to_file(rel(train_fn), features)
 
 	return test_file
 
-
+"""
+Run the training phase
+"""
 def training():
 	print "[Training..]"
 	batchL2Rlib.train(train_fn, model_fn)
 
-
+"""
+Give score to the jobs of the test file and compare wit the
+standard algorithm
+"""
 def classify_and_eval_h(test_file):
 
+	global min_max
+
 	print "[Creating the ML testing file..]"
-	features = conv_features(test_file, 0, indices)
-	write_str_to_file(rel(test_fn), features)
+	mat = extract_columns(test_file, indices)
+	mat = normalize_mat(mat, min_max)
+	features = convert_to_ml_format(mat, 0)
+
+	write_lines_to_file(rel(test_fn), features)
 
 	print "[Simulating the test file..]"
 	# Simulate the test file
@@ -135,6 +160,7 @@ def classify_and_eval_h(test_file):
 	print "+ [STD] Average Bounded-Slowdown:", std_bsld_avg
 	print "+ [STD] Median Bounded-Slowdown:", std_bsld_med
 	print "+ [STD] Max Bounded-Slowdown:", std_bsld_max
+	print "+ [STD] System Utilization:", compute_utilisation(out_swf[best_index])
 
 
 	print "[Classifying/Testing..]"
@@ -157,6 +183,7 @@ def classify_and_eval_h(test_file):
 	print "+ [L2R] Average Bounded-Slowdown:", l2r_bsld_avg
 	print "+ [L2R] Median Bounded-Slowdown:", l2r_bsld_med
 	print "+ [L2R] Max Bounded-Slowdown:", l2r_bsld_max
+	print "+ [L2R] System Utilization:", compute_utilisation(config["output_swf"])
 
 	res_data.extend([str(u) for u in (std_bsld_avg, std_bsld_med, std_bsld_max)])
 	res_data.extend([str(u) for u in (l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max)])
@@ -166,22 +193,16 @@ def classify_and_eval_h(test_file):
 
 PerfMeasure = Slowdown
 PerfMeasure = BoundedSlowdown
-batchL2Rlib = SVM_Rank(out_dir)
 batchL2Rlib = RankLib(out_dir)
+batchL2Rlib = SophiaML(out_dir)
+batchL2Rlib = SVM_Rank(out_dir)
 
-
-def getMaxProcs(fname):
-	with open(fname) as f:
-		for line in f.readlines():
-			if "; MaxProcs:" in line:
-				return int(line.strip().split()[-1])
-	raise NameError('No MaxProcs in the log\'s header')
 
 
 res_data = []
 def append_results():
 	with open("results/results.txt", "a") as myfile:
-	    myfile.write('\t'.join(res_data) + '\n')
+		myfile.write('\t'.join(res_data) + '\n')
 
 
 if __name__ == "__main__":
@@ -206,6 +227,13 @@ if __name__ == "__main__":
 	
 	config["num_processors"] = getMaxProcs(log_path)
 
+	if "CEA" in arguments["<swf_file>"]: config["num_processors"] = 80640
+
+	if "<tp>" in arguments:
+		training_parts = int(arguments["<tp>"])
+
+	res_data.extend([str(training_parts), ' '])
+
 	try:
 		import shutil
 		shutil.copy(log_path, ".")
@@ -220,6 +248,11 @@ if __name__ == "__main__":
 
 		print "--- Test on the test set"
 		classify_and_eval_h(test_file)
+
+		# print "--- Test on the training set"
+		# os.system("cp " + fname + " " + test_file)
+		# classify_and_eval_h(test_file)
+
 		print "--- Test on the complete log"
 		os.system("cp " + fname + " " + test_file)
 		classify_and_eval_h(test_file)
