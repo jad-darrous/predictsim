@@ -19,6 +19,7 @@ from base.docopt import docopt
 from run_simulator import parse_and_run_simulator
 from swf_utils import *
 
+from io_utils import *
 from batch_learning_to_rank import *
 from scheduling_performance_measurement import *
 
@@ -37,17 +38,6 @@ out_dir = "output"
 
 rel = lambda fn: "%s/%s" % (out_dir, fn);
 
-
-def write_str_to_file(fname, _str):
-	with open(fname, 'w') as f:
-		f.write(_str)
-		# assert f.write(_str) == len(_str)
-
-def write_lines_to_file(fname, lines):
-	# write_str_to_file(fname, '\n'.join(lines))
-	# return
-	with open(fname, 'w') as f:
-		f.writelines("%s\n" % line for line in lines)
 
 
 def add_l2r_score(infile, scorefile, outfile):
@@ -77,11 +67,11 @@ the training lists then select the best list for each backfilling
 priority, and then prepare the training file of "queries" to
 be fed to the learning algorithm and returns the test file name
 """
-def split_and_simulate(fname):
+def split_and_simulate(log_path):
 
 	os.system("rm -f %s/*" % out_dir)
 
-	out_files, test_file = split_swf(fname, training_percentage, training_parts, dir=out_dir)
+	out_files, test_file = split_swf(log_path, training_percentage, training_parts, dir=out_dir)
 
 	print "[Simulating the training set..]"
 
@@ -219,7 +209,7 @@ if __name__ == "__main__":
 	}
 
 	log_path = arguments["<swf_file>"]
-	fname = os.path.basename(log_path)
+	fname = simple_name(log_path)
 
 	res_data.append(fname + '\t')
 
@@ -234,30 +224,24 @@ if __name__ == "__main__":
 
 	res_data.extend([str(training_parts), ' '])
 
-	try:
-		import shutil
-		shutil.copy(log_path, ".")
 
-		if 1:
-			test_file = split_and_simulate(fname)
-		else:
-			test_file = "%s/%s_test.swf" % (out_dir, fname.split('.')[0])
-			if 0: os.system("cp " + fname + " " + test_file)
+	if 1:
+		test_file = split_and_simulate(log_path)
+	else:
+		test_file = "%s/%s_test.swf" % (out_dir, fname)
+		if 0: os.system("cp " + log_path + " " + test_file)
 
-		if 1: training()
+	if 1: training()
 
-		print "--- Test on the test set"
-		classify_and_eval_h(test_file)
+	print "--- Test on the test set"
+	classify_and_eval_h(test_file)
 
-		# print "--- Test on the training set"
-		# os.system("cp " + fname + " " + test_file)
-		# classify_and_eval_h(test_file)
+	# print "--- Test on the training set"
+	# os.system("cp " + fname + " " + test_file)
+	# classify_and_eval_h(test_file)
 
-		print "--- Test on the complete log"
-		os.system("cp " + fname + " " + test_file)
-		classify_and_eval_h(test_file)
+	print "--- Test on the complete log"
+	os.system("cp " + log_path + " " + test_file)
+	classify_and_eval_h(test_file)
 
-		append_results()
-
-	finally:
-		os.remove(fname)
+	append_results()
