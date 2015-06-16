@@ -37,7 +37,7 @@ class SVM_Rank(BatchLearningToRank):
 	def train(self, train_fn, model_fn):
 		# -t 2 -g 0.8
 		# -t 1 -d 2 -s 100 -r 77 
-		system("{0}/svm_rank_learn -c 3 {1}/{2} {1}/{3} > {1}/{4}". \
+		system("time {0}/svm_rank_learn -c 3 {1}/{2} {1}/{3} > {1}/{4}". \
 			format(libs_dir, self.out_dir, train_fn, model_fn, train_log_fn))
 
 	def classify(self, test_fn, model_fn, cl_out_fn):
@@ -51,7 +51,7 @@ class RankLib(BatchLearningToRank):
 		self.out_dir = out_dir
 
 	def train(self, train_fn, model_fn):
-		system("java -jar {0}/RankLib.jar -ranker 4 -train {1}/{2} -save {1}/{3} > {1}/{4}". \
+		system("java -jar {0}/RankLib.jar -ranker 0 -train {1}/{2} -save {1}/{3} > {1}/{4}". \
 			format(libs_dir, self.out_dir, train_fn, model_fn, train_log_fn))
 
 	def classify(self, test_fn, model_fn, cl_out_fn):
@@ -75,7 +75,7 @@ class SophiaML(BatchLearningToRank):
 		system("{0}/sofia-ml --test_file {1}/{2} --model_in {1}/{3} --results_file {1}/{4} > {1}/{5}". \
 			format(libs_dir, self.out_dir, test_fn, model_fn, cl_out_fn, classify_log_fn))
 
-		system("perl eval.pl %s/%s" % (self.out_dir, cl_out_fn))
+		# system("perl eval.pl %s/%s" % (self.out_dir, cl_out_fn))
 
 		rel = lambda fn: "%s/%s" % (self.out_dir, fn);
 		self.keep_column(rel(cl_out_fn), 0)
