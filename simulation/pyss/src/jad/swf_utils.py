@@ -5,16 +5,13 @@
 
 from itertools import compress, dropwhile, izip
 
+from io_utils import *
+
 swf_skip_hdr = lambda u: u.lstrip().startswith(';');
 swf_skip_hdr_itr = lambda _file: dropwhile(swf_skip_hdr, _file)
 
 
 def split_swf(in_file_name, tpercent, parts, dir="./"):
-
-	def write_to_file(fname, jobs):
-		out = open(fname, "w")
-		out.write('\n'.join(jobs));
-		out.close()
 
 	jobs = []
 	with open(in_file_name) as f:
@@ -23,22 +20,23 @@ def split_swf(in_file_name, tpercent, parts, dir="./"):
 
 	# from random import shuffle
 	# shuffle(jobs)
+	file_name = simple_name(in_file_name)
 
 	training_size = int(len(jobs) * tpercent)
 	part_size = training_size / parts
 	training_size = part_size * parts
 
-	str_name_format = "%s/%s_part%%d.swf" % (dir, in_file_name.split('.')[0])
+	str_name_format = "%s/%s_part%%d.swf" % (dir, file_name)
 
 	training_files = []
 
 	for i in range(parts):
 		fname = str_name_format % (i+1)
 		training_files.append(fname)
-		write_to_file(fname, jobs[i*part_size:(i+1)*part_size])
+		write_lines_to_file(fname, jobs[i*part_size:(i+1)*part_size])
 
-	test_file = "%s/%s_test.swf" % (dir, in_file_name.split('.')[0])
-	write_to_file(test_file, jobs[training_size:])
+	test_file = "%s/%s_test.swf" % (dir, file_name)
+	write_lines_to_file(test_file, jobs[training_size:])
 
 	return training_files, test_file
 
@@ -55,8 +53,9 @@ def extract_columns(fname, indices=None):
 	cols = [[] for i in range(size)]
 	with open(fname) as f:
 		for line in dropwhile(swf_skip_hdr, f):
-			job = [float(u) for u in line.strip().split()];
+			job = [u for u in line.strip().split()];
 			row = compress(job, mask)
+			row = [float(u) for u in row];
 			for col, val in izip(cols, row):
 				col.append(val)
 
@@ -74,6 +73,21 @@ def normalize(lst, min_max=None):
 def normalize_mat(mat, min_max):
 	#print "normalize_mat", len(mat), len(min_max), min_max, mat
 	return map(lambda u: normalize(u[0], u[1]), izip(mat, min_max))
+
+def convert_to_ml_format_(lst, qid):
+
+	cat_num = 10
+	ct_size = len(lst[0]) / cat_num + 1
+	rng = range(1, len(lst)+1)
+	score = cat_num+1;
+	lines = []
+	for i in xrange(len(lst[0])):
+		l = [p[i] for p in lst]
+		t = ' '.join(map(lambda v: "%d:%f" % v, zip(rng, l)))
+		lines.append("{0} qid:{1} {2}".format(score, qid, t))
+		if (i+1)%ct_size==0: score-=1
+
+	return lines
 
 def convert_to_ml_format(lst, qid):
 
@@ -131,7 +145,5 @@ def compute_utilisation(fname):
 			last = max(last, wt + rt + st)
 			sum_area += rt * pr
 
-	#print "procs =", procs, "last = ", last, "first = ", first, "sum_area", sum_area
 	ratio = sum_area / (1.0 * procs * (last-first))
-	#print ratio*100, "%"
 	return ratio
