@@ -42,6 +42,7 @@ rel = lambda fn: "%s/%s" % (out_dir, fn);
 
 def add_l2r_score(infile, scorefile, outfile):
 	from itertools import izip, dropwhile
+	from random import randint
 
 	with open(infile) as fin, open(scorefile) as fscore, open(outfile, "w") as fout:
 		for job_str, score_str in izip(dropwhile(swf_skip_hdr, fin), fscore):
@@ -50,15 +51,25 @@ def add_l2r_score(infile, scorefile, outfile):
 			new_job_str = ' '.join(job[:-1] + [new_score_str])
 			fout.write(new_job_str + '\n')
 
-def simulate(fname):
+def simulate(path):
 	out_swf = []
 	for idx, w in enumerate(weights_options):
 		config["weights"] = w
-		config["input_file"] = fname
-		config["output_swf"] = "%s_%d.swf" % (fname.split('.')[0], idx)
+		config["input_file"] = path
+		config["output_swf"] = "%s_%d.swf" % (path.split('.')[0], idx)
 		parse_and_run_simulator(config)
 		out_swf.append(config["output_swf"])
+
 	return out_swf
+
+
+def simulate_scheduler(path, sch_name):
+
+	config["scheduler"]["name"] = sch_name # 'easy_sjbf_scheduler'
+	config["input_file"] = path
+	config["output_swf"] = "%s_%s.swf" % (path.split('.')[0], sch_name)
+	parse_and_run_simulator(config)
+	out_swf.append(config["output_swf"])
 
 
 """
@@ -74,6 +85,10 @@ def split_and_simulate(log_path):
 	out_files, test_file = split_swf(log_path, training_percentage, training_parts, dir=out_dir)
 
 	print "[Simulating the training set..]"
+
+	if redirect_sim_output:
+		# Redirect the stdout temporary to get rid of simulator output.
+		sys.stdout = open('/dev/null', 'w')
 
 	best_all = []
 	for p in out_files:
@@ -91,6 +106,10 @@ def split_and_simulate(log_path):
 
 		best_all.append(outf)
 		print index, best
+
+	if redirect_sim_output:
+		# Redirect the stdout again to its default state.
+		sys.stdout = sys.__stdout__
 
 	print "[Creating the ML training file..]"
 	cols_matrix = [[] for i in range(len(indices))]
@@ -150,7 +169,7 @@ def classify_and_eval_h(test_file):
 	print "+ [STD] Average Bounded-Slowdown:", std_bsld_avg
 	print "+ [STD] Median Bounded-Slowdown:", std_bsld_med
 	print "+ [STD] Max Bounded-Slowdown:", std_bsld_max
-	print "+ [STD] System Utilization:", compute_utilisation(out_swf[best_index])
+	#print "+ [STD] System Utilization:", compute_utilisation(out_swf[best_index])
 
 
 	print "[Classifying/Testing..]"
@@ -173,11 +192,44 @@ def classify_and_eval_h(test_file):
 	print "+ [L2R] Average Bounded-Slowdown:", l2r_bsld_avg
 	print "+ [L2R] Median Bounded-Slowdown:", l2r_bsld_med
 	print "+ [L2R] Max Bounded-Slowdown:", l2r_bsld_max
-	print "+ [L2R] System Utilization:", compute_utilisation(config["output_swf"])
+	#print "+ [L2R] System Utilization:", compute_utilisation(config["output_swf"])
 
 	res_data.extend([str(u) for u in (std_bsld_avg, std_bsld_med, std_bsld_max)])
 	res_data.extend([str(u) for u in (l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max)])
 	res_data.append(' ')
+
+
+
+def classify_and_eval_h_rand(test_file):
+
+	def add_l2r_score_rand(infile, outfile):
+		from itertools import izip, dropwhile
+		from random import randint
+
+		with open(infile) as fin, open(outfile, "w") as fout:
+			for job_str in dropwhile(swf_skip_hdr, fin):
+				new_score_str = str(randint(0, 1000000))
+				job = [u for u in job_str.strip().split()]
+				new_job_str = ' '.join(job[:-1] + [new_score_str])
+				fout.write(new_job_str + '\n')
+
+
+	print "[Simulating the test file using L2R..]"
+	test_l2r_fn = "%s_with_score.swf" % test_file.split('.')[0]
+	add_l2r_score_rand(test_file, test_l2r_fn)
+
+	# Simulate the file after l2r
+	config["scheduler"]["name"] = 'l2r_maui_scheduler'
+	config["weights"] = (0, 0, 0, 0, 0, 0, 1)
+	config["input_file"] = test_l2r_fn
+	config["output_swf"] = "%s_sim.swf" % test_l2r_fn.split('.')[0]
+	parse_and_run_simulator(config)
+
+	l2r_bsld = PerfMeasure(config["output_swf"])
+	l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max = l2r_bsld.all()
+	print "+ [RND] Average Bounded-Slowdown:", l2r_bsld_avg
+	print "+ [RND] Median Bounded-Slowdown:", l2r_bsld_med
+	print "+ [RND] Max Bounded-Slowdown:", l2r_bsld_max
 
 
 
@@ -187,7 +239,7 @@ batchL2Rlib = RankLib(out_dir)
 batchL2Rlib = SophiaML(out_dir)
 batchL2Rlib = SVM_Rank(out_dir)
 
-
+redirect_sim_output = True
 
 res_data = []
 def append_results():
@@ -219,7 +271,7 @@ if __name__ == "__main__":
 
 	if "CEA" in arguments["<swf_file>"]: config["num_processors"] = 80640
 
-	if "<tp>" in arguments:
+	if arguments["<tp>"] is not None:
 		training_parts = int(arguments["<tp>"])
 
 	res_data.extend([str(training_parts), ' '])
@@ -235,13 +287,14 @@ if __name__ == "__main__":
 
 	print "--- Test on the test set"
 	classify_and_eval_h(test_file)
+	# classify_and_eval_h_rand(test_file)
 
 	# print "--- Test on the training set"
 	# os.system("cp " + fname + " " + test_file)
 	# classify_and_eval_h(test_file)
 
-	print "--- Test on the complete log"
-	os.system("cp " + log_path + " " + test_file)
-	classify_and_eval_h(test_file)
+	# print "--- Test on the complete log"
+	# os.system("cp " + log_path + " " + test_file)
+	# classify_and_eval_h(test_file)
 
 	append_results()
