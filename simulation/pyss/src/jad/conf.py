@@ -1,9 +1,18 @@
 
+#
+# geenral parameters
+#
+
 weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0), (0, 0, 0, 0, 0, +1)]
 #weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0), (0, 0, 0, 0, 0, +1), (0, 0, 0, 0, 0, -1)]
-# weights_options = [(1, 0, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0, 0), (0, 0, 0, 0, 0, +1, 0), (0, 0, 0, 0, 0, -1, 0)]
+
+
+weights_options = [(1, 0, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0, 0), (0, 0, 0, 0, 0, +1, 0), (0, 0, 0, 0, 0, -1, 0)]
+weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0),
+(0, 0, 0, 0, 0, +1), (0, 0, 0, 0, 0, -1), (0, -1, 0, 0, 0, 0)]
 
 weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0), (0, 0, 0, 0, 0, +1)]
+
 weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0)]
 
 
@@ -11,8 +20,11 @@ indices = (2,3,4,5,11)
 indices = (2,3,4,5,9)
 
 
-#indices = (2,3,4,5,11, 8,9,15)
+# indices = (2,3,4,5,11, 8,9,15)
 
+#
+# Offline learning parameters
+#
 
 mp = {
 	"CEA-curie_sample_log":  4,
@@ -25,7 +37,14 @@ mp = {
 	"CEA-curie_log": 1024,
 	"Metacentrum2013": 1024,
 }
-training_parts = mp[fname.split('.')[0]]
+# training_parts = mp[fname.split('.')[0]]
 del mp
 
+
+training_percentage = 0.01
+
 training_percentage = 0.7
+
+# training_parts = int(training_parts * training_percentage / 0.7)
+# training_parts = 1
+

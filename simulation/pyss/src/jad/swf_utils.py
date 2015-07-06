@@ -38,6 +38,7 @@ def split_swf(in_file_name, tpercent, parts, dir="./"):
 	test_file = "%s/%s_test.swf" % (dir, file_name)
 	write_lines_to_file(test_file, jobs[training_size:])
 
+	print "#parts={0} part_size={1} test_set_size={2}".format(parts, part_size, len(jobs)-training_size)
 	return training_files, test_file
 
 
@@ -58,6 +59,25 @@ def extract_columns(fname, indices=None):
 			row = [float(u) for u in row];
 			for col, val in izip(cols, row):
 				col.append(val)
+
+	return cols
+
+def extract_columns_from_itr(itr, indices=None):
+
+	if indices is not None:
+		mask = [i in indices for i in range(1, 19)]
+		size = mask.count(True)
+	else:
+		size = 18
+		mask = [True] * 18
+
+	cols = [[] for i in range(size)]
+	for line in itr:
+		job = [u for u in line.strip().split()];
+		row = compress(job, mask)
+		row = [float(u) for u in row];
+		for col, val in izip(cols, row):
+			col.append(val)
 
 	return cols
 
@@ -90,6 +110,16 @@ def convert_to_ml_format_(lst, qid):
 	return lines
 
 def convert_to_ml_format(lst, qid):
+
+	fmt = ' '.join(map(lambda v: "%d:%%f" % (v+1), range(len(lst))))
+	score = 1000000-1;
+	lines = []
+	for i in xrange(len(lst[0])):
+		t = fmt % tuple([p[i] for p in lst])
+		lines.append("{0} qid:{1} {2}".format(score, qid, t))
+		score-=1
+
+	return lines
 
 	rng = range(1, len(lst)+1)
 	score = 1000000-1;
@@ -147,3 +177,20 @@ def compute_utilisation(fname):
 
 	ratio = sum_area / (1.0 * procs * (last-first))
 	return ratio
+
+# def split_by_time(in_file_name, dir="./"):
+
+def statistics(fname):
+	RT, PR = [], []
+	with open(fname) as f:
+		for line in dropwhile(swf_skip_hdr, f):
+			st, wt, rt, pr = [float(v) for v in [u for u in line.strip().split()][1:5]]
+			RT.append(rt)
+			PR.append(pr)
+	print "min run-time", min(RT)
+	print "min processors", min(PR)
+	print "min run-time", sorted(RT)[10000:10200]
+	print "min processors", sorted(PR)[10000:10200]
+
+# statistics("logs/CEA-curie_log.swf")
+# statistics("logs/KTH-SP2_log.swf")

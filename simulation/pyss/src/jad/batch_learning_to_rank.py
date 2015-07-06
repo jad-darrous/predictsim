@@ -36,7 +36,7 @@ class SVM_Rank(BatchLearningToRank):
 
 	def train(self, train_fn, model_fn):
 		# -t 2 -g 0.8
-		# -t 1 -d 2 -s 100 -r 77 
+		# -t 1 -d 2 -s 100 -r 77
 		system("time {0}/svm_rank_learn -c 3 {1}/{2} {1}/{3} > {1}/{4}". \
 			format(libs_dir, self.out_dir, train_fn, model_fn, train_log_fn))
 
@@ -60,7 +60,7 @@ class RankLib(BatchLearningToRank):
 
 		rel = lambda fn: "%s/%s" % (self.out_dir, fn);
 		self.keep_column(rel(cl_out_fn), -1)
- 
+
 
 class SophiaML(BatchLearningToRank):
 
@@ -79,4 +79,4 @@ class SophiaML(BatchLearningToRank):
 
 		rel = lambda fn: "%s/%s" % (self.out_dir, fn);
 		self.keep_column(rel(cl_out_fn), 0)
- 
+
