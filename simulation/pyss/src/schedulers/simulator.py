@@ -21,51 +21,57 @@ class Simulator(object):
     """
 
     def __init__(self, jobs, num_processors, scheduler, output_swf, input_file, options):
+
         self.num_processors = num_processors
         self.jobs = jobs
-        self.terminated_jobs=[]
+        self.terminated_jobs = []
         self.scheduler = scheduler
         self.time_of_last_job_submission = 0
         self.event_queue = EventQueue()
-        self.output_swf = None
+        self.output_swf = output_swf
         self.options = options
         self.pbar_activated = options["scheduler"]["progressbar"]
 
         self.machine = ValidatingMachine(num_processors=num_processors, event_queue=self.event_queue)
 
         if hasattr(self.scheduler, "I_NEED_A_PREDICTOR") and self.scheduler.I_NEED_A_PREDICTOR:
-                self.scheduler.running_jobs =  self.machine.jobs
+                self.scheduler.running_jobs = self.machine.jobs
 
         self.event_queue.add_handler(JobSubmissionEvent, self.handle_submission_event)
         self.event_queue.add_handler(JobTerminationEvent, self.handle_termination_event)
-        if(output_swf != None):
-		if( output_swf[-3:] == ".gz"):
-			import gzip
-			self.output_swf = gzip.open(output_swf, 'w+')
-		else:
-			self.output_swf = open(output_swf, 'w+')
-		version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
-		self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
-		self.output_swf.write("; Preemption: No\n")
-		self.output_swf.write("; MaxNodes: -1\n")
-		self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
-		self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
-		self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
-		self.output_swf.write("; Note: options:"+str(options)+"\n")
-                self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
-                self.output_swf.write("; Note: if a predictor is used, the Preceding Job Number column represents the number of under-predictions. (-1 <=> 0) \n")
-                self.output_swf.write("; Note: the Partition Number column can represents it have been backfilled (-1<=>False, 1<=>True) \n")
-		self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
+
+        if output_swf != None:
+            if output_swf[-3:] == ".gz":
+                import gzip
+                self.output_swf = gzip.open(output_swf, 'w+')
+            else:
+                self.output_swf = open(output_swf, 'w+')
+
+            version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
+            self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
+            self.output_swf.write("; Preemption: No\n")
+            self.output_swf.write("; MaxNodes: -1\n")
+            self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
+            self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
+            self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
+            self.output_swf.write("; Note: options:"+str(options)+"\n")
+            self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
+            self.output_swf.write("; Note: if a predictor is used, the Preceding Job Number column represents the number of under-predictions. (-1 <=> 0) \n")
+            self.output_swf.write("; Note: the Partition Number column can represents it have been backfilled (-1<=>False, 1<=>True) \n")
+
+            self.event_queue.add_handler(JobTerminationEvent, self.store_terminated_job)
 
         if hasattr(scheduler, "I_NEED_A_PREDICTOR") and scheduler.I_NEED_A_PREDICTOR:
             self.event_queue.add_handler(JobPredictionIsOverEvent, self.handle_prediction_event)
 
         for job in self.jobs:
-            self.event_queue.add_event( JobSubmissionEvent(job.submit_time, job) )
-	if self.pbar_activated:
-		widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
-		self.pbar = progressbar.ProgressBar(widgets=widgets,maxval=10000000, poll=0.1).start()
-		self.pbari=1
+            self.event_queue.add_event(JobSubmissionEvent(job.submit_time, job))
+
+        if self.pbar_activated:
+            widgets = ['# Jobs Terminated: ', progressbar.Counter(),' ',progressbar.Timer()]
+            self.pbar = progressbar.ProgressBar(widgets=widgets,maxval=10000000, poll=0.1).start()
+            self.pbari=1
+
 
     def handle_submission_event(self, event):
         assert isinstance(event, JobSubmissionEvent)
@@ -81,34 +87,36 @@ class Simulator(object):
         for event in newEvents:
             self.event_queue.add_event(event)
 
-    def store_terminated_job(self, event):
-        assert isinstance(event, JobTerminationEvent)
-        outl = []
+    def get_terminated_jobs(self):
+        return self.terminated_jobs
 
+    @staticmethod
+    def _convert_job_to_str(job):
+        outl = []
         #1. Job Number
-        outl.append(str(event.job.id))
+        outl.append(str(job.id))
         #2. Submit Time
-        outl.append(str(event.job.submit_time))
+        outl.append(str(job.submit_time))
         #3. Wait Time
-        outl.append(str(event.job.start_to_run_at_time - event.job.submit_time))
+        outl.append(str(job.start_to_run_at_time - job.submit_time))
         #4. Run Time
-        outl.append(str(event.job.actual_run_time))
+        outl.append(str(job.actual_run_time))
         #5. Number of Allocated Processors
-        outl.append(str(event.job.num_required_processors))
+        outl.append(str(job.num_required_processors))
         #6. Average CPU Time Used
         outl.append("-1")
         #7. Used Memory
         outl.append("-1")
         #8. Requested Number of Processors.
-        outl.append(str(event.job.num_required_processors))
+        outl.append(str(job.num_required_processors))
         #9. Requested Time
-        outl.append(str(event.job.user_estimated_run_time))
+        outl.append(str(job.user_estimated_run_time))
         #10. Requested Memory
         outl.append("-1")
         #11. Status. This field is meaningless for models, so would be -1.
         outl.append("-1")
         #12. User ID
-        outl.append(str(event.job.user_id))
+        outl.append(str(job.user_id))
         #13. Group ID
         outl.append("-1")
         #14. Executable (Application) Number
@@ -116,22 +124,28 @@ class Simulator(object):
         #15. Queue Number
         outl.append("-1")
         #16. Partition Number
-        if hasattr(event.job,"is_backfilled"):
-            outl.append(str(event.job.is_backfilled))
+        if hasattr(job,"is_backfilled"):
+            outl.append(str(job.is_backfilled))
         else:
             outl.append("-1")
         #17. Preceding Job Number
-        if hasattr(event.job,"num_underpredict"):
-            outl.append(str(event.job.num_underpredict))
+        if hasattr(job,"num_underpredict"):
+            outl.append(str(job.num_underpredict))
         else:
             outl.append("-1")
         #18. Think Time
-        if hasattr(event.job,"initial_prediction"):
-            outl.append(str(event.job.initial_prediction))
+        if hasattr(job,"initial_prediction"):
+            outl.append(str(job.initial_prediction))
         else:
             outl.append("-1")
 
-        self.output_swf.write(' '.join(outl)+"\n")
+        return ' '.join(outl)
+
+
+    def store_terminated_job(self, event):
+        assert isinstance(event, JobTerminationEvent)
+        job_str = Simulator._convert_job_to_str(event.job)
+        self.output_swf.write(job_str+"\n")
         if self.pbar_activated:
             self.pbari+=1
             self.pbar.update(self.pbari)
@@ -146,16 +160,24 @@ class Simulator(object):
              self.event_queue.add_event(JobPredictionIsOverEvent(job=event.job, timestamp=event.job.predicted_finish_time))
 
 
+    def close_output_file(self):
+        if self.output_swf != None:
+            self.output_swf.flush()
+            os.fsync(self.output_swf.fileno())
+            self.output_swf.close()
+
     def run(self):
         while not self.event_queue.is_empty:
             self.event_queue.advance()
 
 
 def run_simulator(num_processors, jobs, scheduler, output_swf, input_file, no_stats, options):
+
     simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file, options)
     simulator.run()
-    if(not no_stats):
-	print_simulator_stats(simulator)
+    simulator.close_output_file()
+    if (not no_stats):
+        print_simulator_stats(simulator)
     return simulator
 
 def print_simulator_stats(simulator):

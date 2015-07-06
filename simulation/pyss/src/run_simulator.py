@@ -51,12 +51,13 @@ def parse_and_run_simulator(options):
 					continue
 			else:
 				break
+
 	if options["num_processors"] is None:
 		parser.error("missing num processors")
 
 	if options["stats"] is None:
 		options["stats"] = False
-	
+
 	if sys.stdout.isatty():# You're running in a real terminal
 		options["scheduler"]["progressbar"] = True
 	else:# You're being piped or redirected
@@ -84,28 +85,38 @@ def parse_and_run_simulator(options):
 	#load the class
 	scheduler_non_instancied = package.__dict__[my_module].__dict__[my_class]
 
-	scheduler = scheduler_non_instancied(options, weights_list=options["weights"])
+	if my_module in ('maui_scheduler', 'l2r_maui_scheduler', 'online_l2r_maui_scheduler'):
+		scheduler = scheduler_non_instancied(options\
+			, weights_list=options["weights"], weights_backfill=options["weights"])
+	else:
+		scheduler = scheduler_non_instancied(options)
+
+	# scheduler = scheduler_non_instancied(options\
+	# 	, weights_list=options["weights"], weights_backfill=options["weights"])
+
 
 	#if hasattr(scheduler_non_instancied, 'I_NEED_A_PREDICTOR'):
 
 	try:
-		#print "...."
+		# print "...."
 
 		starttime = datetime.today()
-		run_simulator(
+		sim = run_simulator(
 			num_processors = options["num_processors"],
 			jobs = _job_inputs_to_jobs(parse_lines(input_file), options["num_processors"]),
 			scheduler = scheduler,
-			output_swf = options["output_swf"],
+			output_swf = options["output_swf"] if "output_swf" in options else None,
 			input_file = options["input_file"],
 			no_stats = not(options["stats"]),
 			options = options
 			)
 		end_time = datetime.today() - starttime
 
+		options["terminated_jobs"] = sim.get_terminated_jobs()
+
 		print "\b" * 50
-		
-		if not options["verbose"] is None and options["verbose"]:
+
+		if options.get("verbose", False):
 			print "\n"
 			print "Num of Processors: ", options["num_processors"]
 			print "Input file: ", options["input_file"]
@@ -128,5 +139,5 @@ if __name__ == "__main__":
 	config["input_file"]=arguments["<swf_file>"]
 	config["output_swf"]=arguments["<output_file>"]
 	# python 3: exec(open("example.conf").read(), config)
-	
+
 	parse_and_run_simulator(config)
