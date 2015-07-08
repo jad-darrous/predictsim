@@ -16,23 +16,61 @@ from scheduling_performance_measurement import *
 import os
 import gc
 
-import thread
+import time
+import multiprocessing
 
-def extract_features(job):
-    #second of day
-    sec_of_day=2.0*math.pi*float(job.submit_time % (3600*24))/(3600.0*24.0)
-    #cos second of day
-    x[14]=math.cos(sec_of_day)
-    #sin second of day
-    x[15]=math.sin(sec_of_day) #
-    #day of week trough seconds:
-    day_of_week= 2.0*math.pi*float(job.submit_time % (3600*24*7))/(3600.0*24.0*7.0)
-    #cos day of week
-    x[16]=math.cos(day_of_week) #
-    #sin day of week
-    x[17]=math.sin(day_of_week) #
+from base.prototype import JobStartEvent
 
-    return (job.submit_time, job.user_estimated_run_time, job.num_required_processors)
+from base.workload_parser import parse_lines
+from base.prototype import _job_inputs_to_jobs, _job_inputs_to_jobs_with_wait
+
+
+import math
+import itertools
+
+def extract_features(job, rt=None):
+    x = []
+    T = x.append
+
+    T(job.submit_time)
+    T(job.start_to_run_at_time - job.submit_time)
+    T(job.actual_run_time)
+    T(job.num_required_processors)
+    T(job.user_estimated_run_time)
+
+    return tuple(str(i) for i in x)
+
+    T(1)
+    # Submit time (F. 2)
+    # T(job.submit_time)
+    # Predicted run-time, instead of actuacl_run_time (F. 4)
+    if rt is None:
+        T(job.actual_run_time)
+    else:
+        T(rt)
+    # Requested time (F. 9)
+    T(job.user_estimated_run_time)
+    # Required/Allocated procs (F. 5 & 8)
+    T(job.num_required_processors)
+
+    # second of day
+    sec_of_day = 2.0*math.pi*float(job.submit_time % (3600*24))/(3600.0*24.0)
+    T(math.cos(sec_of_day))
+    T(math.sin(sec_of_day))
+    # day of week trough seconds
+    day_of_week = 2.0*math.pi*float(job.submit_time % (3600*24*7))/(3600.0*24.0*7.0)
+    T(math.cos(day_of_week))
+    T(math.sin(day_of_week))
+
+    # for a,b,c in itertools.combinations(x[1:],3):
+    #     T(a*b*c)
+
+    return tuple(str(i) for i in x)
+
+
+def train(lib, train_fn, model_fn):
+    lib.train(train_fn, model_fn)
+
 
 class Weights(object):
     # this class defines the configuration of weights for the MAUI
@@ -55,10 +93,12 @@ from easy_backfill_scheduler import EasyBackfillScheduler
 
 class OnlineL2RMauiScheduler(EasyBackfillScheduler):
 
+    # I_NEED_A_PREDICTOR = True
+
     max_parts_num = 1000
     job_per_part = 500
 
-    out_dir = "out"
+    out_dir = "out_"
 
     rel = lambda self, fn: "%s/%s" % (OnlineL2RMauiScheduler.out_dir, fn);
 
@@ -91,6 +131,8 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         else:
             self.weights_backfill = Weights() # sort the jobs by order of submission
 
+        self.init_predictor(options)
+        self.init_corrector(options)
 
         self.curr_part_num = 0
         self.curr_jobs_num = 0
@@ -98,6 +140,10 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         self.best_all = deque()
         self.queries = deque()
         self.terminated_jobs = []
+
+        OnlineL2RMauiScheduler.out_dir = "out/out_" + str(int(time.time()))
+        os.system("mkdir " + OnlineL2RMauiScheduler.out_dir)
+        print "pwd:", OnlineL2RMauiScheduler.out_dir
 
         self.batchL2Rlib = SVM_Rank(OnlineL2RMauiScheduler.out_dir)
 
@@ -110,6 +156,7 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
 
         OnlineL2RMauiScheduler.config["num_processors"] = self.num_processors
 
+        self.oldF = False
 
 
     def new_events_on_job_submission(self, just_submitted_job, current_time):
@@ -117,18 +164,26 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         just_submitted_job.maui_counter = self.maui_counter
         self.maui_counter += 1
 
-        just_submitted_job.actual_run_time = just_submitted_job.user_estimated_run_time
+        # just_submitted_job.actual_run_time = just_submitted_job.user_estimated_run_time
+        # self.predictor.predict(just_submitted_job, current_time, self.running_jobs)
+        # just_submitted_job.actual_run_time = just_submitted_job.predicted_run_time
 
         if self.curr_model_fn is None:
             just_submitted_job.think_time = just_submitted_job.submit_time
         else:
             test_fn = "test.txt"
 
-            lst_str_job = [OnlineL2RMauiScheduler._convert_job_to_str(just_submitted_job)]
-            mat = extract_columns_from_itr(lst_str_job, OnlineL2RMauiScheduler.indices)
-            # mat = normalize_mat(mat, min_max)
-            features = convert_to_ml_format(mat, 0)
-            write_lines_to_file(self.rel(test_fn), features)
+            if self.oldF:
+                lst_str_job = [OnlineL2RMauiScheduler._convert_job_to_str(just_submitted_job)]
+                mat = extract_columns_from_itr(lst_str_job, OnlineL2RMauiScheduler.indices)
+                # mat = normalize_mat(mat, min_max)
+                features = convert_to_ml_format(mat, 0)[0]
+            else:
+                f = extract_features(just_submitted_job, rt=just_submitted_job.predicted_run_time)
+                features = convert_job_to_ml_format(f, score=99999)
+
+            # print features
+            write_str_to_file(self.rel(test_fn), features+'\n')
 
             # gc.collect()
 
@@ -140,6 +195,8 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
 
     def new_events_on_job_termination(self, job, current_time):
 
+        # self.predictor.fit(job, current_time)
+
         self.terminated_jobs.append(OnlineL2RMauiScheduler._convert_job_to_str(job))
         self.curr_jobs_num += 1
 
@@ -147,7 +204,7 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
             self.curr_jobs_num = 0
             self.curr_part_num += 1
 
-            training_file = "out/train.swf"
+            training_file = self.rel("train.swf")
             write_lines_to_file(training_file, self.terminated_jobs)
 
             # gc.collect()
@@ -155,11 +212,19 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
             self.terminated_jobs[:] = []
 
             outf = self._prepare_training_set_file(training_file)
+            # print "outf", outf
             if self.curr_part_num >= OnlineL2RMauiScheduler.max_parts_num:
                 self.best_all.popleft()
                 self.queries.popleft()
             self.best_all.append(outf)
-            query = OnlineL2RMauiScheduler._convert_to_ml_query(outf, self.curr_part_num)
+
+            if self.oldF:
+                query = OnlineL2RMauiScheduler._convert_to_ml_query(outf, self.curr_part_num)
+            else:
+                x = parse_lines(open(outf))
+                jobs = _job_inputs_to_jobs_with_wait(x, self.num_processors)
+                jobs_str = map(lambda u: extract_features(u), jobs)
+                query = convert_jobs_to_ml_format(jobs_str, self.curr_part_num)
             self.queries.append(query)
 
             self.every += 1
@@ -170,19 +235,56 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 #     self.best_all)
                 write_lines_to_file(self.rel(train_fn), self.queries)
                 model_fn = "model_{0}.txt".format(self.curr_part_num)
-                self.batchL2Rlib.train(train_fn, model_fn)
-                self.curr_model_fn = model_fn
-                print "curr_model_fn:", self.curr_model_fn
-                self.lib.update_model(self.rel(self.curr_model_fn))
+
+                # ## single process trainin
+                # self.batchL2Rlib.train(train_fn, model_fn)
+                # self.curr_model_fn = model_fn
+                # print "curr_model_fn:", self.curr_model_fn
+                # self.lib.update_model(self.rel(self.curr_model_fn))
+
+                ## training in another thread
+                p = multiprocessing.Process(target=train, \
+                    args=(self.batchL2Rlib, train_fn, model_fn))
+                p.start()
+                p.join(50 * 60)
+
+                # If thread is still active
+                if p.is_alive():
+                    print "running... let's kill it..."
+                    p.terminate()
+                    p.join()
+                else:
+                    self.curr_model_fn = model_fn
+                    print "curr_model_fn:", self.curr_model_fn
+                    self.lib.update_model(self.rel(self.curr_model_fn))
 
         return super(OnlineL2RMauiScheduler, self).new_events_on_job_termination(job, current_time)
+
+
+    def new_events_on_job_under_prediction(self, job, current_time):
+        assert job.predicted_run_time <= job.user_estimated_run_time
+
+        if not hasattr(job,"num_underpredict"):
+            job.num_underpredict = 0
+        else:
+            job.num_underpredict += 1
+
+        if self.corrector.__name__=="ninetynine":
+            new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
+        else:
+            new_predicted_run_time = self.corrector(job, current_time)
+
+        #set the new predicted runtime
+        self.cpu_snapshot.assignTailofJobToTheCpuSlices(job, new_predicted_run_time)
+        job.predicted_run_time = new_predicted_run_time
+
+        return [JobStartEvent(current_time, job)]
 
 
     # @staticmethod
     def _prepare_training_set_file(self, training_file):
 
         weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0)]
-
 
         def simulate(path):
             config = OnlineL2RMauiScheduler.config
@@ -196,7 +298,6 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 # out_swf.append(config["terminated_jobs"])
             # gc.collect() # to ensure that the output files are closed
             return out_swf
-
 
         redirect_sim_output = True
 
