@@ -252,6 +252,15 @@ def _job_inputs_to_jobs(job_inputs, total_num_processors):
     for job_input in job_inputs:
         yield _job_input_to_job(job_input, total_num_processors)
 
+def _job_inputs_to_jobs_with_wait(job_inputs, total_num_processors):
+
+    def append_wait(job, job_input):
+        job.start_to_run_at_time = job_input.submit_time + job_input.wait_time
+        return job
+
+    for job_input in job_inputs:
+        yield append_wait(_job_input_to_job(job_input, total_num_processors), job_input)
+
 from event_queue import EventQueue
 class Simulator(object):
     def __init__(self, jobs, num_processors, scheduler):

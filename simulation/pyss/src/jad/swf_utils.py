@@ -132,6 +132,21 @@ def convert_to_ml_format(lst, qid):
 
 	return lines
 
+def convert_job_to_ml_format(job, score=0, qid=0):
+	fmt = ' '.join(map(lambda v: "%d:%%s" % (v+1), range(len(job))))
+	return "{0} qid:{1} {2}".format(score, qid, fmt % job)
+
+def convert_jobs_to_ml_format(jobs, qid):
+
+	fmt = ' '.join(map(lambda v: "%d:%%s" % (v+1), range(len(jobs[0]))))
+	score = 1000000-1;
+	lines = []
+	for job in jobs:
+		lines.append("{0} qid:{1} {2}".format(score, qid, fmt % job))
+		score-=1
+
+	# return lines
+	return '\n'.join(lines)
 
 def convert_to_ml_format_from_file(fname, qid, indices=None):
 

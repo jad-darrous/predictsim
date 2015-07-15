@@ -86,8 +86,9 @@ def parse_and_run_simulator(options):
 	scheduler_non_instancied = package.__dict__[my_module].__dict__[my_class]
 
 	if my_module in ('maui_scheduler', 'l2r_maui_scheduler', 'online_l2r_maui_scheduler'):
-		scheduler = scheduler_non_instancied(options\
-			, weights_list=options["weights"], weights_backfill=options["weights"])
+		scheduler = scheduler_non_instancied(options, \
+			# weights_list=options["weights"], \
+			weights_backfill=options["weights"])
 	else:
 		scheduler = scheduler_non_instancied(options)
 

@@ -28,14 +28,12 @@ class L2RMauiScheduler(EasyBackfillScheduler):
 
         # weights for calculation of priorities for the jobs in MAUI style
         if weights_list is not None:
-            #self.weights_list = weights_list
-            # Weights class is private/local we can't pass it as parameter
             self.weights_list = Weights(*weights_list)
         else:
             self.weights_list = Weights() # sort the jobs by order of submission
 
         if weights_backfill is not None:
-            self.weights_backfill = weights_backfill
+            self.weights_backfill = Weights(*weights_backfill)
         else:
             self.weights_backfill = Weights() # sort the jobs by order of submission
 
@@ -80,6 +78,7 @@ class L2RMauiScheduler(EasyBackfillScheduler):
         wait = current_time - job.submit_time # wait time since submission of job
         sld = (wait + job.user_estimated_run_time) /  job.user_estimated_run_time
 
+        # print job.think_time, 
         return (
             weights.wtime  * wait +
             weights.sld    * sld +

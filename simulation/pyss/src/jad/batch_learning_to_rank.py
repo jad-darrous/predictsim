@@ -37,7 +37,8 @@ class SVM_Rank(BatchLearningToRank):
 	def train(self, train_fn, model_fn):
 		# -t 2 -g 0.8
 		# -t 1 -d 2 -s 100 -r 77
-		system("time {0}/svm_rank_learn -c 3 {1}/{2} {1}/{3} > {1}/{4}". \
+		# -e 0.1
+		system("time {0}/svm_rank_learn -c 3  {1}/{2} {1}/{3} > {1}/{4}". \
 			format(libs_dir, self.out_dir, train_fn, model_fn, train_log_fn))
 
 	def classify(self, test_fn, model_fn, cl_out_fn):

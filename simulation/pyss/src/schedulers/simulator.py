@@ -47,14 +47,14 @@ class Simulator(object):
             else:
                 self.output_swf = open(output_swf, 'w+')
 
-            version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
-            self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
+            # version = os.popen("git show -s --format=\"%h %ci\" HEAD").read().strip()
+            # self.output_swf.write("; Computer: Pyss Simulator ("+version+")\n")
             self.output_swf.write("; Preemption: No\n")
             self.output_swf.write("; MaxNodes: -1\n")
             self.output_swf.write("; MaxProcs: "+str(num_processors)+"\n")
             self.output_swf.write("; Note: input_file:"+str(input_file)+"\n")
             self.output_swf.write("; Note: scheduler:"+str(scheduler.__class__.__name__)+"\n")
-            self.output_swf.write("; Note: options:"+str(options)+"\n")
+            # self.output_swf.write("; Note: options:"+str(options)+"\n")
             self.output_swf.write("; Note: if a predictor is used, the thinktime column represents the initial prediction. \n")
             self.output_swf.write("; Note: if a predictor is used, the Preceding Job Number column represents the number of under-predictions. (-1 <=> 0) \n")
             self.output_swf.write("; Note: the Partition Number column can represents it have been backfilled (-1<=>False, 1<=>True) \n")

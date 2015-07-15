@@ -4,7 +4,7 @@
 Main script that combine everyting.
 
 Usage:
-	run.py <swf_file> [<tp>] [-o] [-s]
+	run.py <swf_file> [<tp>] [-r] [-o] [-s] [-w] [-f] [-a]
 
 Options:
 	-h --help			Show this help message and exit.
@@ -28,6 +28,7 @@ from datetime import timedelta
 import os
 import gc
 
+from multiprocessing import Pool
 
 train_fn = 'train.txt'
 test_fn = 'test.txt'
@@ -72,12 +73,13 @@ def add_l2r_score(infile, scorefile, outfile):
 			new_job_str = ' '.join(job[:-1] + [new_score_str])
 			fout.write(new_job_str + '\n')
 
+
 def simulate(path):
 	out_swf = []
 	for idx, w in enumerate(weights_options):
 		config["weights"] = w
 		config["input_file"] = path
-		config["output_swf"] = "%s_%d.swf" % (path.split('.')[0], idx)
+		config["output_swf"] = rel("%s_%d.swf" % (simple_name(path), idx))
 		parse_and_run_simulator(config)
 		out_swf.append(config["output_swf"])
 
@@ -131,7 +133,7 @@ def prepare_training_set_file(training_files):
 				outf = swf
 
 		best_all.append(outf)
-		print index, best
+		print >> sys.__stdout__, index, best
 
 	if redirect_sim_output:
 		# Redirect the stdout again to its default state.
@@ -195,30 +197,15 @@ def classify_and_eval_h(test_file):
 
 	global min_max
 
-	if 0:
-		print "[Creating the ML testing file..]"
-		mat = extract_columns(test_file, indices)
-		mat = normalize_mat(mat, min_max)
-		features = convert_to_ml_format(mat, 0)
+	print "[Creating the ML testing file..]"
+	mat = extract_columns(test_file, indices)
+	mat = normalize_mat(mat, min_max)
+	features = convert_to_ml_format(mat, 0)
 
-		write_lines_to_file(rel(test_fn), features)
+	write_lines_to_file(rel(test_fn), features)
 
-		print "[Classifying/Testing..]"
-		batchL2Rlib.classify(test_fn, model_fn, score_fn)
-	else:
-		# classify each job alone
-		str_score_all = []
-		with open(test_file) as f:
-			for line in dropwhile(swf_skip_hdr, itr):
-				mat = extract_columns_from_itr([line], indices)
-				mat = normalize_mat(mat, min_max)
-				features = convert_to_ml_format(mat, 0)
-
-				write_lines_to_file(rel(test_fn), features)
-				batchL2Rlib.classify(test_fn, model_fn, score_fn)
-				str_score_all.append(open(rel(score_fn)).read())
-		gc.collect()
-		open(rel(score_fn), 'w').write('\n'.join(str_score_all))
+	print "[Classifying/Testing..]"
+	batchL2Rlib.classify(test_fn, model_fn, score_fn)
 
 
 	print "[Simulating the test file using L2R..]"
@@ -282,7 +269,7 @@ def classify_and_eval_h_rand(test_file):
 
 def sim_statistics(test_file, sch_name):
 
-	print "\n[Simulation using", sch_name, "]"
+	print "[Simulation using", sch_name, "]"
 	sim_out = simulate_scheduler(test_file, sch_name)
 	l2r_bsld = PerfMeasure(sim_out)
 	l2r_bsld_avg, l2r_bsld_med, l2r_bsld_max = l2r_bsld.all()
@@ -313,6 +300,10 @@ def sim_all_schedulers(swf_path, dt=None):
 			dt[scheduler_name] = sim_statistics(swf_path, scheduler_name)
 		except:
 			dt[scheduler_name] = (float("Inf"),float("Inf"),float("Inf"))
+		print
+
+	# p = Pool(5)
+	# vals = p.map(f, schedulers_names)
 
 	ls = map(lambda u: (u, dt[u][0]), dt)
 	ls.sort(key=lambda u: u[1])
@@ -330,6 +321,9 @@ batchL2Rlib = SVM_Rank(out_dir)
 
 redirect_sim_output = True
 
+random_weights = True
+
+
 res_data = []
 def append_results():
 	with open("results/results.txt", "a") as myfile:
@@ -346,8 +340,16 @@ if __name__ == "__main__":
 		"scheduler": {
 			"name":'maui_scheduler',
 			"progressbar": False,
-			"predictor":{"name":'predictor_tsafrir'},
-			"corrector":{"name":'tsafrir'}},
+			# "predictor":{"name":'predictor_clairvoyant'},
+			# "predictor":{"name":'predictor_tsafrir'},
+			# "predictor":{"name":'predictor_reqtime'},
+			# "predictor":{"name":'predictor_double_reqtime'},
+			# "predictor":{"name":'predictor_my'},
+			# "predictor":{"name":'predictor_sgdlinear', 'gd': 'NAG', 'loss': 'composite', 'rightside': 'square', 'weight': '1+log(m*r)', 'cubic': False, 'regularization': 'l2', 'max_cores': 'auto', 'eta': 5000, 'leftparam': 1, 'leftside': 'abs', 'threshold': 0, 'quadratic': True, 'rightparam': 1, 'lambda': 4000000000},
+			# "predictor":{"name":'predictor_sgdlinear', "quadratic":True, "cubic": False, "loss":"squaredloss", "gd":"NAG", "eta": 0.1, "weight": False},
+			# "corrector":{"name":'recursive_doubling'}
+			# "corrector":{"name":'tsafrir'}
+			},
 		"num_processors": 80640, # depend on the swf log
 		"stats": False,
 		"verbose": False
@@ -364,40 +366,71 @@ if __name__ == "__main__":
 
 	if "CEA" in arguments["<swf_file>"]: config["num_processors"] = 80640
 
+	redirect_sim_output = arguments["-r"]
 
+	print config
+
+	# simulate with all the schedulers
 	if arguments["-s"]:
 		sim_all_schedulers(log_path)
-		exit(0)
 
 	# do online learning
 	if arguments["-o"]:
 		config["weights"] = (0, 0, 0, 0, 0, 0, +1)
 		sim_statistics(log_path, 'online_l2r_maui_scheduler')
-		exit(0)
 
+	# simulate with all the schedulers
+	if arguments["-a"]:
+		sim_statistics(log_path, 'adaptive_maui_scheduler')
 
-	if arguments["<tp>"] is not None:
-		training_parts = int(arguments["<tp>"])
+	# simulate with diff weights
+	if arguments["-w"]:
+		if redirect_sim_output:	sys.stdout = open('/dev/null', 'w')
 
-	res_data.extend([str(training_parts), ' '])
+		vals = []
+		try:
+			for w in weights_options:
+				config["weights"] = w
+				config["input_file"] = log_path
+				parse_and_run_simulator(config)
+				sim_jobs = config["terminated_jobs"]
+				del config["terminated_jobs"]
+				obj_fun_val = PerfMeasure(jobs=sim_jobs).average()
+				vals.append((w, obj_fun_val))
+				print >> sys.__stdout__, vals[-1]
+		except:
+			pass
+		vals.sort(key= lambda u: u[1])
+		print >> sys.__stdout__
+		for i in range(min(10, len(vals))):
+			print >> sys.__stdout__, vals[i]
 
-	os.system("rm -f %s/*" % out_dir)
+		if redirect_sim_output: sys.stdout = sys.__stdout__
 
-	training_files, test_file = split_swf(\
-		log_path, training_percentage, training_parts, dir=out_dir)
+	# train offline
+	if arguments["-f"]:
+		if arguments["<tp>"] is not None:
+			training_parts = int(arguments["<tp>"])
 
-	if 1:
-		prepare_training_set_file(training_files)
-		training()
+		res_data.extend([str(training_parts), ' '])
 
-	dt = {}
+		os.system("rm -f %s/*" % out_dir)
 
-	print "--{ Evaluate on the test set }--"
-	dt["maui"] = sim_maui_weights(test_file)
-	dt["L2R"] = classify_and_eval_h(test_file)
-	dt["l2r_rand"] = classify_and_eval_h_rand(test_file)
+		training_files, test_file = split_swf(\
+			log_path, training_percentage, training_parts, dir=out_dir)
 
-	sim_all_schedulers(test_file, dt)
+		if 1:
+			prepare_training_set_file(training_files)
+			training()
 
-	append_results()
+		dt = {}
+
+		print "--{ Evaluate on the test set }--"
+		dt["maui"] = sim_maui_weights(test_file)
+		dt["L2R"] = classify_and_eval_h(test_file)
+		dt["l2r_rand"] = classify_and_eval_h_rand(test_file)
+
+		# sim_all_schedulers(test_file, dt)
+
+		append_results()
 

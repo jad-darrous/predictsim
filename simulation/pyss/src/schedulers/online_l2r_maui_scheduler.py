@@ -28,12 +28,76 @@ from base.prototype import _job_inputs_to_jobs, _job_inputs_to_jobs_with_wait
 import math
 import itertools
 
+from predictors.predictor_clairvoyant import PredictorClairvoyant
+from predictors.predictor_reqtime import PredictorReqtime
+from predictors.predictor_double_reqtime import PredictorDoubleReqtime
+from predictors.predictor_tsafrir import PredictorTsafrir
+from predictors.predictor_sgdlinear import PredictorSgdlinear
+from predictors.predictor_my import PredictorMy
+
+
+
+def extract_features_for_training(job, p=None):
+    x = []
+    T = x.append
+
+    # completly useless here
+    # T(1)
+
+    T(job.submit_time)
+    T(job.start_to_run_at_time - job.submit_time)
+    T(job.actual_run_time)
+    T(job.num_required_processors)
+    T(job.user_estimated_run_time)
+
+    if not p is None:
+        x.extend(p)
+
+    # no convergence
+    # for a,b in itertools.combinations(x[1:],2): T(a*b)
+
+    # These features are not important - small improvement/degradation
+    # # second of day
+    # sec_of_day = 2.0*math.pi*float(job.submit_time % (3600*24))/(3600.0*24.0)
+    # T(math.cos(sec_of_day))
+    # T(math.sin(sec_of_day))
+    # # day of week trough seconds
+    # day_of_week = 2.0*math.pi*float(job.submit_time % (3600*24*7))/(3600.0*24.0*7.0)
+    # T(math.cos(day_of_week))
+    # T(math.sin(day_of_week))
+
+    # not big influence
+    # T(job.user_id)
+    return tuple(str(i) for i in x)
+
+
+def extract_features_for_classifying(job, p=None):
+    x = []
+    T = x.append
+
+    T(job.submit_time)
+    T(-1)
+    if OnlineL2RMauiScheduler.I_NEED_A_PREDICTOR:
+        T(job.predicted_run_time)
+    else:
+        T(job.actual_run_time)
+    T(job.num_required_processors)
+    T(job.user_estimated_run_time)
+
+    # T(job.user_id)
+
+    if not p is None:
+        x.extend(p)
+
+    return tuple(str(i) for i in x)
+
+
 def extract_features(job, rt=None):
     x = []
     T = x.append
 
     T(job.submit_time)
-    T(job.start_to_run_at_time - job.submit_time)
+    # T(job.start_to_run_at_time - job.submit_time)
     T(job.actual_run_time)
     T(job.num_required_processors)
     T(job.user_estimated_run_time)
@@ -71,6 +135,20 @@ def extract_features(job, rt=None):
 def train(lib, train_fn, model_fn):
     lib.train(train_fn, model_fn)
 
+def gen_weights():
+    import random
+    R = random.randint
+    weights_options = set()
+    weights_options.add((1, 0, 0, 0, 0, 0))
+    weights_options.add((0, 1, 0, 0, 0, 0))
+    weights_options.add((0, 1, 0, 0, 0, 1))
+    for _ in range(100):
+        w = (R(-3,3), R(-3,3), 0,0,0, R(-3,3))
+        weights_options.add(tuple(w))
+    # weights_options = sorted(weights_options)
+    # print "#weights_options", len(weights_options), weights_options
+    return weights_options
+
 
 class Weights(object):
     # this class defines the configuration of weights for the MAUI
@@ -93,18 +171,13 @@ from easy_backfill_scheduler import EasyBackfillScheduler
 
 class OnlineL2RMauiScheduler(EasyBackfillScheduler):
 
-    # I_NEED_A_PREDICTOR = True
+    I_NEED_A_PREDICTOR = True
 
     max_parts_num = 1000
     job_per_part = 500
 
-    out_dir = "out_"
-
-    rel = lambda self, fn: "%s/%s" % (OnlineL2RMauiScheduler.out_dir, fn);
-
     indices = (2,3,4,5,9)
     # indices = (2,3,4) # best
-    # indices = (3,4,10,11,12,13)
 
     config = {
         "scheduler": {
@@ -114,6 +187,8 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         "stats": False,
         "verbose": False
     }
+
+    weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0)]
 
     def __init__(self, options, weights_list=None, weights_backfill=None):
         super(OnlineL2RMauiScheduler, self).__init__(options)
@@ -131,8 +206,9 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         else:
             self.weights_backfill = Weights() # sort the jobs by order of submission
 
-        self.init_predictor(options)
-        self.init_corrector(options)
+        # if OnlineL2RMauiScheduler.I_NEED_A_PREDICTOR:
+        #     self.init_predictor(options)
+        #     self.init_corrector(options)
 
         self.curr_part_num = 0
         self.curr_jobs_num = 0
@@ -141,61 +217,81 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         self.queries = deque()
         self.terminated_jobs = []
 
-        OnlineL2RMauiScheduler.out_dir = "out/out_" + str(int(time.time()))
-        os.system("mkdir " + OnlineL2RMauiScheduler.out_dir)
-        print "pwd:", OnlineL2RMauiScheduler.out_dir
+        self.out_dir = "out/out_" + str(int(time.time()))
+        os.system("mkdir " + self.out_dir)
+        print "pwd:", self.out_dir
 
-        self.batchL2Rlib = SVM_Rank(OnlineL2RMauiScheduler.out_dir)
+        self.rel = lambda fn: "%s/%s" % (self.out_dir, fn);
+
+        self.batchL2Rlib = SVM_Rank(self.out_dir)
 
         self.every = 0
 
         from ctypes import cdll, c_char_p
-        self.lib = cdll.LoadLibrary('libs/lib_svm_rank_classify_single.so')
+        self.lib = cdll.LoadLibrary('libs/lib_svm_rank_classify_single_mem.so')
         self.lib.rank.restype = c_char_p
         # self.lib.print_help()
 
         OnlineL2RMauiScheduler.config["num_processors"] = self.num_processors
+        # OnlineL2RMauiScheduler.weights_options = gen_weights()
 
-        self.oldF = False
+
+        self.pred_clairvoyant = PredictorClairvoyant(None)
+        self.pred_reqtime = PredictorReqtime(None)
+        self.pred_dbl_reqtime = PredictorDoubleReqtime(None)
+        self.pred_tsafrir = PredictorTsafrir(None)
+        self.pred_sgd_linear = PredictorSgdlinear({
+        "scheduler": {
+            "name":'maui_scheduler',
+            "progressbar": False,
+            "predictor":{"name":'predictor_sgdlinear', 'gd': 'NAG', 'loss': 'composite', 'rightside': 'square', 'weight': '1+log(m*r)', 'cubic': False, 'regularization': 'l2', 'max_cores': 'auto', 'eta': 5000, 'leftparam': 1, 'leftside': 'abs', 'threshold': 0, 'quadratic': True, 'rightparam': 1, 'lambda': 4000000000},
+            # "predictor":{"name":'predictor_sgdlinear', "quadratic":True, "cubic": False, "loss":"squaredloss", "gd":"NAG", "eta": 0.1, "weight": False},
+            "corrector":{"name":'recursive_doubling'}
+            # "corrector":{"name":'tsafrir'}
+            }})
+        self.pred_my = PredictorMy(None)
+
+        self.predictor = self.pred_sgd_linear
 
 
-    def new_events_on_job_submission(self, just_submitted_job, current_time):
+    def predict_all(self, job, current_time):
+        ps = [self.pred_reqtime, self.pred_tsafrir]
+        ps = [self.pred_clairvoyant, self.pred_reqtime, self.pred_tsafrir]
+        pr = []
+        for p in ps:
+            p.predict(job, current_time, self.running_jobs)
+            pr.append(job.predicted_run_time)
+        job.predicted_run_time = job.user_estimated_run_time
+        # job.lopv = pr
+        return pr
+
+    def new_events_on_job_submission(self, job, current_time):
         "Overriding parent method"
-        just_submitted_job.maui_counter = self.maui_counter
+        job.maui_counter = self.maui_counter
         self.maui_counter += 1
 
-        # just_submitted_job.actual_run_time = just_submitted_job.user_estimated_run_time
-        # self.predictor.predict(just_submitted_job, current_time, self.running_jobs)
-        # just_submitted_job.actual_run_time = just_submitted_job.predicted_run_time
+        # if OnlineL2RMauiScheduler.I_NEED_A_PREDICTOR:
+        #     self.predictor.predict(job, current_time, self.running_jobs)
 
         if self.curr_model_fn is None:
-            just_submitted_job.think_time = just_submitted_job.submit_time
+            job.think_time = job.submit_time
         else:
-            test_fn = "test.txt"
+            p = self.predict_all(job, current_time)
+            self.predictor.predict(job, current_time, self.running_jobs)
+            job_x = extract_features_for_classifying(job, p)
+            # remove the effect of the predicted value - original value
+            job.predicted_run_time = job.user_estimated_run_time
+            ml_features = convert_job_to_ml_format(job_x, score=99999)
+            score_str = self.lib.rank(ml_features)
+            job.think_time = int(float(score_str) * 1000)
 
-            if self.oldF:
-                lst_str_job = [OnlineL2RMauiScheduler._convert_job_to_str(just_submitted_job)]
-                mat = extract_columns_from_itr(lst_str_job, OnlineL2RMauiScheduler.indices)
-                # mat = normalize_mat(mat, min_max)
-                features = convert_to_ml_format(mat, 0)[0]
-            else:
-                f = extract_features(just_submitted_job, rt=just_submitted_job.predicted_run_time)
-                features = convert_job_to_ml_format(f, score=99999)
-
-            # print features
-            write_str_to_file(self.rel(test_fn), features+'\n')
-
-            # gc.collect()
-
-            score_str = self.lib.rank(self.rel(test_fn))
-            just_submitted_job.think_time = int(float(score_str) * 1000)
-
-        return super(OnlineL2RMauiScheduler, self).new_events_on_job_submission(just_submitted_job, current_time)
+        return super(OnlineL2RMauiScheduler, self).new_events_on_job_submission(job, current_time)
 
 
     def new_events_on_job_termination(self, job, current_time):
 
-        # self.predictor.fit(job, current_time)
+        # if OnlineL2RMauiScheduler.I_NEED_A_PREDICTOR:
+        #     self.predictor.fit(job, current_time)
 
         self.terminated_jobs.append(OnlineL2RMauiScheduler._convert_job_to_str(job))
         self.curr_jobs_num += 1
@@ -218,13 +314,15 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 self.queries.popleft()
             self.best_all.append(outf)
 
-            if self.oldF:
-                query = OnlineL2RMauiScheduler._convert_to_ml_query(outf, self.curr_part_num)
-            else:
-                x = parse_lines(open(outf))
-                jobs = _job_inputs_to_jobs_with_wait(x, self.num_processors)
-                jobs_str = map(lambda u: extract_features(u), jobs)
-                query = convert_jobs_to_ml_format(jobs_str, self.curr_part_num)
+
+            x = parse_lines(open(outf))
+            jobs = _job_inputs_to_jobs_with_wait(x, self.num_processors)
+            # jobs_str = map(lambda u: extract_features_for_training(u), jobs)
+            jobs_str = []
+            for j in jobs:
+                p = self.predict_all(j, current_time)
+                jobs_str.append(extract_features_for_training(j, p))
+            query = convert_jobs_to_ml_format(jobs_str, self.curr_part_num)
             self.queries.append(query)
 
             self.every += 1
@@ -236,7 +334,7 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 write_lines_to_file(self.rel(train_fn), self.queries)
                 model_fn = "model_{0}.txt".format(self.curr_part_num)
 
-                # ## single process trainin
+                # ## single process training
                 # self.batchL2Rlib.train(train_fn, model_fn)
                 # self.curr_model_fn = model_fn
                 # print "curr_model_fn:", self.curr_model_fn
@@ -246,7 +344,7 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 p = multiprocessing.Process(target=train, \
                     args=(self.batchL2Rlib, train_fn, model_fn))
                 p.start()
-                p.join(50 * 60)
+                p.join(10 * 60)
 
                 # If thread is still active
                 if p.is_alive():
@@ -263,20 +361,21 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
 
     def new_events_on_job_under_prediction(self, job, current_time):
         assert job.predicted_run_time <= job.user_estimated_run_time
+        # assert False
 
-        if not hasattr(job,"num_underpredict"):
-            job.num_underpredict = 0
-        else:
-            job.num_underpredict += 1
+        # if not hasattr(job,"num_underpredict"):
+        #     job.num_underpredict = 0
+        # else:
+        #     job.num_underpredict += 1
 
-        if self.corrector.__name__=="ninetynine":
-            new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
-        else:
-            new_predicted_run_time = self.corrector(job, current_time)
+        # if self.corrector.__name__=="ninetynine":
+        #     new_predicted_run_time = self.corrector(self.pestimator,job,current_time)
+        # else:
+        #     new_predicted_run_time = self.corrector(job, current_time)
 
-        #set the new predicted runtime
-        self.cpu_snapshot.assignTailofJobToTheCpuSlices(job, new_predicted_run_time)
-        job.predicted_run_time = new_predicted_run_time
+        # #set the new predicted runtime
+        # self.cpu_snapshot.assignTailofJobToTheCpuSlices(job, new_predicted_run_time)
+        # job.predicted_run_time = new_predicted_run_time
 
         return [JobStartEvent(current_time, job)]
 
@@ -284,12 +383,10 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
     # @staticmethod
     def _prepare_training_set_file(self, training_file):
 
-        weights_options = [(1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0)]
-
         def simulate(path):
             config = OnlineL2RMauiScheduler.config
             out_swf = []
-            for idx, w in enumerate(weights_options):
+            for idx, w in enumerate(OnlineL2RMauiScheduler.weights_options):
                 config["weights"] = w
                 config["input_file"] = path
                 config["output_swf"] = "%s_%d_%d.swf" % (path.split('.')[0], self.curr_part_num, idx)
@@ -309,7 +406,6 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
         # Redirect the stdout again to its default state.
         if redirect_sim_output: sys.stdout = sys.__stdout__
 
-
         best = float("inf")
         for idx, swf in enumerate(out_swf):
             obj_fun_val = BoundedSlowdown(swf).average()
@@ -317,42 +413,34 @@ class OnlineL2RMauiScheduler(EasyBackfillScheduler):
                 best = obj_fun_val
                 index = idx
                 outf = swf
-        # print index, best
-
         return outf
 
-    @staticmethod
-    def _merge_and_create_ml_training_file(best_all):
+    # @staticmethod
+    # def _merge_and_create_ml_training_file(best_all):
+    #     indices = OnlineL2RMauiScheduler.indices
+    #     # print "[Creating the ML training file..]"
+    #     cols_matrix = [[] for i in range(len(indices))]
+    #     for idx, fname in enumerate(best_all):
+    #         cols = extract_columns(fname, indices)
+    #         for i in range(len(indices)):
+    #             cols_matrix[i].extend(cols[i])
+    #     global min_max
+    #     min_max = map(lambda u: (min(u), max(u)), cols_matrix)
+    #     # print min_max
+    #     features = []
+    #     for idx, fname in enumerate(best_all):
+    #         mat = extract_columns(fname, indices)
+    #         # mat = normalize_mat(mat, min_max)
+    #         queries = convert_to_ml_format(mat, idx+1)
+    #         features.extend(queries)
+    #     return features
 
-        indices = OnlineL2RMauiScheduler.indices
-
-        # print "[Creating the ML training file..]"
-        cols_matrix = [[] for i in range(len(indices))]
-        for idx, fname in enumerate(best_all):
-            cols = extract_columns(fname, indices)
-            for i in range(len(indices)):
-                cols_matrix[i].extend(cols[i])
-
-        global min_max
-        min_max = map(lambda u: (min(u), max(u)), cols_matrix)
-        # print min_max
-
-        features = []
-        for idx, fname in enumerate(best_all):
-            mat = extract_columns(fname, indices)
-            # mat = normalize_mat(mat, min_max)
-            queries = convert_to_ml_format(mat, idx+1)
-            features.extend(queries)
-
-        return features
-
-    @staticmethod
-    def _convert_to_ml_query(swf, qid):
-
-        indices = OnlineL2RMauiScheduler.indices
-        mat = extract_columns(swf, indices)
-        lines = convert_to_ml_format(mat, qid)
-        return '\n'.join(lines)
+    # @staticmethod
+    # def _convert_to_ml_query(swf, qid):
+    #     indices = OnlineL2RMauiScheduler.indices
+    #     mat = extract_columns(swf, indices)
+    #     lines = convert_to_ml_format(mat, qid)
+    #     return '\n'.join(lines)
 
     @staticmethod
     def _convert_job_to_str(job):

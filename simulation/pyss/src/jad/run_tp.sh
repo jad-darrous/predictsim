@@ -10,8 +10,9 @@ rm -f results/results.txt
 touch results/results.txt
 
 fname=$1
-for i in `seq 32 32 192`;
-#for i in 16 32 64 96 128 160 192;
+# for i in 1024;
+for i in `seq 512 256 1024`;
+# for i in `seq 32 32 256`;
 do
 	echo ":::::::::::::"  $i  ":::::::::::::"
 	pypy -OO run.py $fname $i

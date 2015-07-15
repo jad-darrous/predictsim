@@ -30,9 +30,10 @@ class MauiScheduler(EasyBackfillScheduler):
             self.weights_list = Weights(*weights_list)
         else:
             self.weights_list = Weights(1, 0, 0, 0, 0, 0) # sort the jobs by order of submission
+        #self.weights_list = Weights(1, 0, 0, 0, 0, 0) # sort the jobs by order of submission
 
         if weights_backfill is not None:
-            self.weights_backfill = weights_backfill
+            self.weights_backfill = Weights(*weights_backfill)
         else:
             self.weights_backfill = Weights(1, 0, 0, 0, 0, 0) # sort the jobs by order of submission
 

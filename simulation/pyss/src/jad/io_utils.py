@@ -4,6 +4,8 @@ import os
 def write_str_to_file(path, _str):
 	with open(path, 'w') as f:
 		f.write(_str)
+		f.flush()
+		os.fsync(f.fileno())
 		# assert f.write(_str) == len(_str)
 
 def write_lines_to_file(path, lines):

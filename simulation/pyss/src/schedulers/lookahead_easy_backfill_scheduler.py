@@ -1,4 +1,4 @@
-from common import CpuSnapshot, list_copy 
+from common import CpuSnapshot, list_copy
 from easy_backfill_scheduler import EasyBackfillScheduler
 
 def default_score_function(job):
@@ -14,19 +14,19 @@ class Entry(object):
         return '%d' % (self.utilization)
 
 
-        
-class LookAheadEasyBackFillScheduler(EasyBackfillScheduler):
+
+class LookaheadEasyBackfillScheduler(EasyBackfillScheduler):
     """
-    
+
     This scheduler implements the LOS Scheduling Algorithm [Edi Shmueli and Dror Feitelson, 2005]
     It uses a dynamic programing method to decide which subset of jobs to backfill.
     The implemelmentation of this scheduler is based mainly on the EasyBackfillScheduler class.
     The single difference is that we only overide the _backfill_jobs function.
     This function calls the function _mark_jobs_in_look_ahead_best_order before the preforming backfilling itself.
     """
-    
+
     def __init__(self, options, score_function = None):
-        super(LookAheadEasyBackFillScheduler, self).__init__(options)
+        super(LookaheadEasyBackfillScheduler, self).__init__(options)
 
         if score_function is None:
             self.score_function = default_score_function
@@ -60,17 +60,17 @@ class LookAheadEasyBackFillScheduler(EasyBackfillScheduler):
         first_job = self.unscheduled_jobs[0]
         cpu_snapshot_with_first_job = self.cpu_snapshot.quick_copy()
         cpu_snapshot_with_first_job.assignJobEarliest(first_job, current_time)
-         
+
 
         # M[j, k] represents the subset of jobs in {0...j} with the highest utilization if k processors are available
-        M = {}  
-        
-        for k in range(free_processors + 1): 
+        M = {}
+
+        for k in range(free_processors + 1):
             M[-1, k] = Entry(cpu_snapshot_with_first_job.copy())
 
         for j in range(len(self.unscheduled_jobs)):
             job = self.unscheduled_jobs[j]
-            assert job.backfill_flag == 0 
+            assert job.backfill_flag == 0
             for k in range(free_processors + 1):
                 M[j, k] = Entry()
                 M[j, k].utilization  =  M[j-1, k].utilization
@@ -78,26 +78,26 @@ class LookAheadEasyBackFillScheduler(EasyBackfillScheduler):
 
                 if (k < job.num_required_processors):
                     continue
-                
+
                 tmp_cpu_snapshot = M[j-1, k-job.num_required_processors].cpu_snapshot.copy()
                 if tmp_cpu_snapshot.canJobStartNow(job, current_time):
                     tmp_cpu_snapshot.assignJob(job, current_time)
                 else:
                     continue
-                
-                U1 = M[j, k].utilization 
-                U2 = M[j-1, k-job.num_required_processors].utilization + self.score_function(job) 
+
+                U1 = M[j, k].utilization
+                U2 = M[j-1, k-job.num_required_processors].utilization + self.score_function(job)
 
                 if U1 <= U2:
                     M[j, k].utilization = U2
                     M[j, k].cpu_snapshot = tmp_cpu_snapshot
-                    
+
 
         best_entry = M[len(self.unscheduled_jobs) - 1, free_processors]
         for job in self.unscheduled_jobs:
-            if job.id in best_entry.cpu_snapshot.slices[0].job_ids:        
-                job.backfill_flag = 1  
+            if job.id in best_entry.cpu_snapshot.slices[0].job_ids:
+                job.backfill_flag = 1
 
-        
+
 
 

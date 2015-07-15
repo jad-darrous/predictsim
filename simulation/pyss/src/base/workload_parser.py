@@ -50,7 +50,7 @@ class JobInput(object):
         return int(self.fields[9])
     @property
     def status(self):
-        return int(self.fields[10]) 
+        return int(self.fields[10])
     @property
     def user_id(self):
         return int(self.fields[11])
@@ -74,20 +74,22 @@ class JobInput(object):
         return int(self.fields[17])
 
     def __str__(self):
+        print self.fields
         return "JobInput<number=%s>" % self.number
 
 def parse_lines(lines_iterator):
     "returns an iterator of JobInput objects"
 
     def _should_skip(line): # TODO: skip if runtime, num allocated processors, submit time is problematic
-        return (line.lstrip().startswith(';') or (len(line.strip()) == 0)) # comment or empty line 
-         
+        return (line.lstrip().startswith(';') or (len(line.strip()) == 0)) # comment or empty line
+
 
     for line in lines_iterator:
         if _should_skip(line):
             continue # skipping
 
         yield JobInput(line)
+
 
 def _measure_performance():
     import sys
