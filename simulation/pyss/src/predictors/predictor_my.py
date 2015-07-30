@@ -6,7 +6,7 @@ class PredictorMy(Predictor):
 		pass
 
 	def predict(self, job, current_time, list_running_jobs):
-		job.predicted_run_time = job.user_estimated_run_time/10.0
+		job.predicted_run_time = 1
 
 	def fit(self, job, current_time):
 		pass

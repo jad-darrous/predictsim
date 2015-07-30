@@ -176,6 +176,16 @@ def run_simulator(num_processors, jobs, scheduler, output_swf, input_file, no_st
     simulator = Simulator(jobs, num_processors, scheduler, output_swf, input_file, options)
     simulator.run()
     simulator.close_output_file()
+    # if hasattr(simulator.scheduler, "ff"):
+    #     simulator.scheduler.ff.close()
+    print
+    # print
+    # for job in simulator.terminated_jobs:
+    #     if hasattr(job, "num_underpredict"):
+    #         print job.num_underpredict,
+    # print
+    print "num_underpredict:", sum(map(lambda job: job.num_underpredict if hasattr(job, "num_underpredict") else 0, simulator.terminated_jobs))
+    print "num_underpredict jobs:", sum(map(lambda job: 1 if hasattr(job, "num_underpredict") else 0, simulator.terminated_jobs))
     if (not no_stats):
         print_simulator_stats(simulator)
     return simulator

@@ -209,3 +209,31 @@ def statistics(fname):
 
 # statistics("logs/CEA-curie_log.swf")
 # statistics("logs/KTH-SP2_log.swf")
+
+
+def classify_jobs(fname):
+	runtime_limit = 60*60 # second
+	processors_limit = 8
+	SN, LN, LW, SW = 0, 0, 0, 0
+	total_jobs = 0.0
+	with open(fname) as f:
+		for line in dropwhile(swf_skip_hdr, f):
+			total_jobs += 1
+			rt, pr = [float(v) for v in [u for u in line.strip().split()][3:5]]
+			if rt <= runtime_limit:
+				if pr <= processors_limit:
+					SN+=1
+				else:
+					SW+=1
+			else:
+				if pr <= processors_limit:
+					LN+=1
+				else:
+					LW+=1
+
+	print fname
+	print "     |   N   |   W"
+	print "  S  | %.2f  | %.2f" % (100*SN/total_jobs, 100*SW/total_jobs)
+	print "  L  | %.2f  | %.2f" % (100*LN/total_jobs, 100*LW/total_jobs)
+	print
+	return total_jobs

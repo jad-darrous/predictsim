@@ -22,11 +22,17 @@ class  EasyPlusPlusScheduler(Scheduler):
         self.cpu_snapshot = CpuSnapshot(self.num_processors, options["stats"])
         self.unscheduled_jobs = []
 
+        self.ff = open("times-epp-sgd.txt", 'w')
+
 
     def new_events_on_job_submission(self, job, current_time):
 
         self.cpu_snapshot.archive_old_slices(current_time)
         self.predictor.predict(job, current_time, self.running_jobs)
+
+        self.ff.write("%d\t%d\n" % (job.actual_run_time, job.predicted_run_time))
+        self.ff.flush()
+
         if not hasattr(job,"initial_prediction"):
             job.initial_prediction=job.predicted_run_time
         self.unscheduled_jobs.append(job)

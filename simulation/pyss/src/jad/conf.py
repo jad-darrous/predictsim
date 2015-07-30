@@ -48,7 +48,7 @@ if random_weights:
 	weights_options.append((0, 0, 0, 0, 0, -1))
 
 	# weights_options = sorted(weights_options)
-	print "#weights_options", len(weights_options), weights_options
+	# print "#weights_options", len(weights_options), weights_options
 
 
 indices = (2,3,4,5,11)

@@ -342,12 +342,12 @@ if __name__ == "__main__":
 			"progressbar": False,
 			# "predictor":{"name":'predictor_clairvoyant'},
 			# "predictor":{"name":'predictor_tsafrir'},
-			# "predictor":{"name":'predictor_reqtime'},
+			"predictor":{"name":'predictor_reqtime'},
 			# "predictor":{"name":'predictor_double_reqtime'},
 			# "predictor":{"name":'predictor_my'},
 			# "predictor":{"name":'predictor_sgdlinear', 'gd': 'NAG', 'loss': 'composite', 'rightside': 'square', 'weight': '1+log(m*r)', 'cubic': False, 'regularization': 'l2', 'max_cores': 'auto', 'eta': 5000, 'leftparam': 1, 'leftside': 'abs', 'threshold': 0, 'quadratic': True, 'rightparam': 1, 'lambda': 4000000000},
 			# "predictor":{"name":'predictor_sgdlinear', "quadratic":True, "cubic": False, "loss":"squaredloss", "gd":"NAG", "eta": 0.1, "weight": False},
-			# "corrector":{"name":'recursive_doubling'}
+			"corrector":{"name":'recursive_doubling'}
 			# "corrector":{"name":'tsafrir'}
 			},
 		"num_processors": 80640, # depend on the swf log
@@ -372,7 +372,8 @@ if __name__ == "__main__":
 
 	# simulate with all the schedulers
 	if arguments["-s"]:
-		sim_all_schedulers(log_path)
+		# sim_all_schedulers(log_path)
+		sim_statistics(log_path, 'easy_plus_plus_scheduler')
 
 	# do online learning
 	if arguments["-o"]:
